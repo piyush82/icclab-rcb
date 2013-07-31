@@ -3,78 +3,19 @@
 #@version: 0.1
 #@summary: Module implementing RCB Rest Interface
 #
-#
+#@requires: bottle
 ############################################################
+
 from bottle import get, post, request, route, run, response
 import ConfigParser
 import sqlite3 as db
 import sys, getopt
+import myRCBwebui
+import myRCBactuator
+import config
 
 #list of database tables, this list is used to do DB sanity check whenever needed
 dbtables = ['user', 'project', 'session']
-
-@get('/rcb/web/')
-def index():
-    response.set_header('Content-Language', 'en')
-    response.set_header('Content-Type', 'text/html')
-    content = '''
-        <div style='padding:5px;width:700px;margin-left:auto;margin-right:auto;font-family:Helvetica;font-size:10pt;background:#4A4F65;color:white;'>
-        <h3>Welcome to <a style='color:#8BACD7;' href='http://www.cloudcomp.ch/' target='_blank'>ICCLab</a>'s OpenCharge&trade; Platform!</h3>
-        
-        <i>OpenCharge&trade;</i> is a one of its kind - fully generic rating, charging, and billing platform designed to fully support
-        any generic business process your company supports. You have full control over how you manage customer usage data collection, 
-        mediation strategies, rating, charging, pricing and billing configuration. The platform supports special promotions, discounts
-        and refunds in your overall billing functions.<br><br>
-        
-        <form action="/rcb/login" method="post" style='background:#6D8AB1;padding:5px;'>
-            Username: <input name="username" type="text" />
-            Password: <input name="password" type="password" />
-            <input value="Login" type="submit" />
-        </form>
-        
-        <b>Salient Features:</b>
-        <ul>
-            <li>Support for OpenStack Grizzly Release</li>
-            <li>REST API for seamless integration with your service
-            <li>Customizable Analytics Module
-            <li>OpenSource Licensing
-        </ul>
-        
-        <br>
-    '''
-    return header() + content + footer() + '</div>'
-
-def footer():
-    content = '''
-    <table style='margin:0px;background:#C3CAD3;font-color:#80858B;font-family:Verdana;font-size:8pt;width:700px;text-align:left;'>
-        <tr>
-            <td style='width:300px;background:white;'><img src='http://www.cloudcomp.ch/wp-content/uploads/2012/05/icclogo-left-300x86.png'></td>
-            <td style='border-style:dashed;border-right-width:1px;border-left-width:0px;border-top-width:0px;border-bottom-width:0px;border-color:black;' valign='top'>
-                <a style='color:black;text-decoration:none;' href='http://www.cloudcomp.ch/research/foundation/themes/initiatives/rating-charging-billing/' target='_blank'>ICCLab RCB Initiative</a><br>
-                <a style='color:black;text-decoration:none;' href='javascript:void(0);' target='_blank'>Open Source License</a><br>
-                <a style='color:black;text-decoration:none;' href='javascript:void(0);' target='_blank'>Development Team</a><br>
-                <a style='color:black;text-decoration:none;' href='javascript:void(0);' target='_blank'>Mobile Cloud Networking</a><br>
-                <a style='color:black;text-decoration:none;' href='javascript:void(0);' target='_blank'>Design Specs</a>
-            </td>
-            <td style='' valign='top'>
-                <a style='color:black;text-decoration:none;' href='http://www.cloudcomp.ch/research/foundation/themes/initiatives/rating-charging-billing/' target='_blank'>ICCLab RCB Initiative</a><br>
-                <a style='color:black;text-decoration:none;' href='javascript:void(0);' target='_blank'>Community Help Page</a><br>
-                <a style='color:black;text-decoration:none;' href='javascript:void(0);' target='_blank'>Developer's API Guide</a><br>
-                <a style='color:black;text-decoration:none;' href='javascript:void(0);' target='_blank'>ICCLab AUP</a><br>
-                <a style='color:black;text-decoration:none;' href='javascript:void(0);' target='_blank'>Contact Us</a>
-            </td>
-        </tr>
-    </table>
-    '''
-    return content
-
-def header():
-    content = '''
-        <div style='padding:0px;width:700px;margin-left:auto;margin-right:auto;margin-bottom:0px;padding:5px;color:white;background:#4A4F65;'>
-            <img src='http://www.cise.ufl.edu/~pharsh/public/rcb-header.png' style='padding:0px;'>
-        </div>
-    '''
-    return content
 
 def startServer(host, port):
     print 'Starting a simple REST server.'
@@ -118,11 +59,11 @@ def initializedb(dbpath):
         cur = con.cursor()
         cur.executescript('''
             DROP TABLE IF EXISTS user;
-            CREATE TABLE user(id INT, username VARCHAR(45), password VARCHAR(128));
+            CREATE TABLE user(id INT, username VARCHAR(45), password VARCHAR(128), cookiekey VARCHAR(128), email VARCHAR(128), isactive INT);
             DROP TABLE IF EXISTS project;
             CREATE TABLE project(id INT, name VARCHAR(45), userid INT, cfile TEXT);
             DROP TABLE IF EXISTS session;
-            CREATE TABLE session(id INT, userid INT, taccess INT, projectid INT, isvalid BOOLEAN);
+            CREATE TABLE session(id INT, userid INT, taccess INT, projectid INT, isvalid INT);
         ''')
         con.commit()
     except db.Error, e:
@@ -165,10 +106,13 @@ def main(argv):
                 print 'Please specify the configuration file name. Use -c flag when using -i option.'
                 sys.exit(2)
     if confFile == None:
-        Config.read("/Users/harh/Codes/ZHAW/Eclipse/workspace/TestPyServer/config.ini")
+        Config.read("/Users/harh/Codes/ZHAW/Eclipse/workspace/icclab-rcb/config.ini")
     else:
         Config.read(confFile)
     dbPath = Config.get("Database", "File")
+
+    config.dbPath = dbPath
+    
     #Now performing sanitaion checks on the database
     dbtest = checkdbconsistency(dbPath)
     dbinitstatus = True
