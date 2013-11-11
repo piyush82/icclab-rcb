@@ -5,6 +5,8 @@
 #@contact: piyush.harsh@zhaw.ch
 #@organization: ICCLab, Zurich University of Applied Sciences
 #@summary: Module to interact with OS-keystone service
+#@var username, tenant-id, password
+#@requires: python 2.7
 #--------------------------------------------------------------
 
 import httplib2 as http
@@ -19,11 +21,12 @@ except ImportError:
     
 def login():
     user = raw_input("Username [%s]: " % getpass.getuser())
+    tenant = raw_input("Tenant Id: ")
     if not user:
         user = getpass.getuser()
     pprompt = lambda: (getpass.getpass())
     p1 = pprompt()
-    return user, p1
+    return user, p1, tenant
 
 def main(argv):
     print "Hello There. This is a simple test application making a test API call to OS"
@@ -35,15 +38,15 @@ def main(argv):
     path = '/v2.0/tokens'
     target = urlparse(uri+path)
     method = 'POST'
-    username, password = login()
+    username, password, tenant = login()
     
-    body = '{"auth":{"passwordCredentials":{"username": "' + username + '", "password": "' + password + '"}}}'
+    body = '{"auth":{"passwordCredentials":{"username": "' + username + '", "password": "' + password + '"},"tenantId":"' + tenant + '"}}'
     
     h = http.Http()
     response, content = h.request(target.geturl(),method,body,headers)
     
     #print response
-    #print "The data received is:\n" + content
+    print "The data received is:\n" + content
     header = json.dumps(response)
     json_header = json.loads(header)
     server_response = json_header["status"].encode('ascii','ignore')

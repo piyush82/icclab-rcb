@@ -39,7 +39,7 @@ def actuator():
             cur = con.cursor()
             cur.execute("SELECT count(*) from user WHERE username='" + username + "'");
             data = cur.fetchone()
-            print 'Count: %d' %data[0]
+            # print 'Count: %d' %data[0]
             if data[0] != 0:
                 content += "<br><p style='color:#EEBDBD;font-family:Times;font-size:11pt;'>This username is already in use! Please use a different id and try again.</p>"
                 content += "<a style='text-decoration:none;color:#8BACD7;' href='Javascript:void(0);' onClick='history.go(-1);'>go back</a><br><br>"
@@ -68,7 +68,38 @@ def actuator():
         except db.Error, e:
             print 'Error %s:' % e.args[0]
             content += "<br><p style='color:#EEBDBD;'>RCB DB error detected!</p><br>"
-            
+    elif actiontype == 'dologin':
+        username = request.forms.get('username')
+        password = request.forms.get('password')
+        try:
+            cur = con.cursor()
+            cur.execute("SELECT id, password, isactive from user WHERE username='" + username + "'");
+            data = cur.fetchone()
+            # print data[0] + ' %d' % data[1]
+            md5sum = hashlib.md5(password.strip()).hexdigest()
+            if data != None and md5sum == data[1]:
+                content += '<p style="font-family:Verdana;font-size:10pt;">Welcome %s!</p>' % username
+                userId = data[0]
+                cur.execute("SELECT * from project WHERE userid=%d" % userId)
+                data = cur.fetchall()
+                if data != None and len(data) != 0:
+                    print 'Found a project'
+                else:
+                    content += "No registered project found. You can create a new project next.<br><br>"
+                    content += "<form style='font-family:Times; font-size:11pt;border:2px;' method='post' action='/rcb/web/doaction'>"
+                    content += "<fieldset><legend>Create a new project:</legend>"
+                    content += "<table cellspacing='2' cellpadding='2' style='font-family:Times;font-size:10pt;color:white;'>"
+                    content += '''
+                        <tr> <td>Project Name <td> <input name='project-name' type='text'> <input type="hidden" name="actiontype" value="createproject">
+                        <tr> <td valign='top'>Project Configuration Data<br>(leave empty if not known)<td><textarea name='project-conf' cols='60' rows='8'></textarea>
+                        <tr><td> <td align='right'><input type='submit' value='create'>
+                    '''
+                    content += "</table></fieldset></form><br><br>"
+            else:
+                content += '<p style="color:#EEBDBD;">Incorrect username / password entered. Please go back and try again.</p>'
+        except db.Error, e:
+            print 'Error %s:' % e.args[0]
+            content += "<br><p style='color:#EEBDBD;'>RCB DB error detected!</p><br>"
     if con:
         con.close()
         
