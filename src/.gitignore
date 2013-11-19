@@ -1,5 +1,0 @@
-#ignoring the .pyc and the database files
-*.pyc
-*.db
-*.ini
-*.DS_Store
