@@ -13,6 +13,7 @@
 import ceilometer_api
 import compute_api
 import keystone_api
+import textwrap
 import sys
 
 def main(argv):
@@ -21,8 +22,18 @@ def main(argv):
     #auth_uri = 'http://160.85.4.11:5000' #internal test-setup, replace it with your own value
     status, token_data = keystone_api.get_token_v2(auth_uri)
     if status:
+        print 'The authentication was successful, below are the data we got:'
+        print '--------------------------------------------------------------------------------------------------------'
+        print '%1s %32s %2s %64s %1s' % ('|', 'key', '|', 'value', '|')
+        print '--------------------------------------------------------------------------------------------------------'
         for key, value in token_data.iteritems():
-            print key, value
+            if key not in {'token-id'}:
+                print '%1s %32s %2s %64s %1s' % ('|', key, '|', value, '|')
+        print '--------------------------------------------------------------------------------------------------------'
+        print 'The authentication token is: ', token_data["token-id"]
+        #wrapped_text = textwrap.wrap(token_data["token-id"], 104)
+        #for i in range(len(wrapped_text)):
+        #    print wrapped_text[i]
     else:
         print "Authentication was not successful."
     if status:

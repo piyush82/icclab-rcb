@@ -42,7 +42,7 @@ def get_meter_list(token, api_endpoint):
         return False, meter_list
     else:
         data = json.loads(content)
-        print "Number of meters found: %d" % len(data) 
+        #print "Number of meters found: %d" % len(data) 
         meter_list = [None]*len(data)
         for i in range(len(data)):
             meter_list[i] = {}
