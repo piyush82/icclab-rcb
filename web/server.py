@@ -15,7 +15,7 @@ import worker
 import config
 
 #list of database tables, this list is used to do DB sanity check whenever needed
-dbtables = ['user', 'project', 'session']
+dbtables = ['user', 'project', 'session', 'projvariables']
 
 def startServer(host, port):
     print 'Starting a simple REST server.'
@@ -64,6 +64,9 @@ def initializedb(dbpath):
             CREATE TABLE project(id INT, name VARCHAR(45), userid INT, cfile TEXT);
             DROP TABLE IF EXISTS session;
             CREATE TABLE session(id INT, userid INT, taccess INT, projectid INT, isvalid INT);
+            DROP TABLE IF EXISTS proj_variables;
+            CREATE TABLE projvariables(id INT, projectid INT, cloudtype VARCHAR(45), cloudrelease VARCHAR(45), clouduser VARCHAR(45), cloudpassword VARCHAR(45), cloudtenant VARCHAR(45));
+            
         ''')
         con.commit()
     except db.Error, e:

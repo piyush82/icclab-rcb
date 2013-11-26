@@ -142,6 +142,8 @@ def actuator():
             projName = request.forms.get("project-name")
             projConf = request.forms.get("project-conf")
             isValid, conf = validate_conf(projConf)
+            #TODO: implement the conf string parser function to extract individual parameters of the extracted configuration
+            
             if isValid and len(projName.strip()) > 0:
                 try:
                     cur = con.cursor()
