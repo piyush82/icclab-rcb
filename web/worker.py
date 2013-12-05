@@ -8,30 +8,29 @@
 
 from bottle import get, post, request, route, run, response
 import ConfigParser
-import sqlite3 as db
 import sys, getopt
+sys.path.append('/Users/harh/Codes/ZHAW/Eclipse/workspace/os_rcb')
 import hashlib
 import uuid
 from web_ui import header
 from web_ui import footer
+from common import db_client
 import config
 
-def validate(username, password, db):
+def validate(username, password):
     userid = -1;
     try:
-            cur = db.cursor()
-            cur.execute("SELECT id, password, isactive from user WHERE username='" + username + "'");
-            data = cur.fetchone()
-            if(data is not None):
-                userid = data[0]
-            md5sum = hashlib.md5(password.strip()).hexdigest()
-            if data != None and md5sum == data[1]:
-                return True, userid
-            else:
-                return False, userid
-    except db.Error, e:
-            print 'Error %s:' % e.args[0]
-            content += "<br><p style='color:#EEBDBD;'>RCB DB error detected!</p><br>"
+        status, data = db_client.query(config.globals[0], "id, password, isactive", "user", "username='" + username + "'", True)
+        if(data is not None):
+            userid = data[0]
+        md5sum = hashlib.md5(password.strip()).hexdigest()
+        if data != None and md5sum == data[1]:
+            return True, userid
+        else:
+            return False, userid
+    except e:
+        print 'Error %s:' % e.args[0]
+        content += "<br><p style='color:#EEBDBD;'>RCB DB error detected!</p><br>"
     return False, userid
 
 def validate_conf(conf):
@@ -56,12 +55,6 @@ def actuator():
     response.set_header('Content-Type', 'text/html')
     actiontype = request.forms.get('actiontype')
     
-    con = None
-    try:
-        con = db.connect(config.dbPath)
-    except db.Error, e:
-        print 'Error %s:' % e.args[0]
-    
     content = ''
     
     if actiontype == 'register':
@@ -71,10 +64,10 @@ def actuator():
         email = request.forms.get('email')
         email1 = request.forms.get('email1')
         try:
-            cur = con.cursor()
-            cur.execute("SELECT count(*) from user WHERE username='" + username + "'");
-            data = cur.fetchone()
-            if data[0] != 0:
+            condition = "username='" + username + "'"
+            status, user_count = db_client.count(config.globals[0], "*", "user", condition)
+            
+            if status and user_count != 0:
                 content += "<br><p style='color:#EEBDBD;font-family:Times;font-size:11pt;'>This username is already in use! Please use a different id and try again.</p>"
                 content += "<a style='text-decoration:none;color:#8BACD7;' href='Javascript:void(0);' onClick='history.go(-1);'>go back</a><br><br>"
             else:
@@ -84,35 +77,34 @@ def actuator():
                     content += "<a style='text-decoration:none;color:#8BACD7;' href='Javascript:void(0);' onClick='history.go(-1);'>go back</a><br><br>"
                 else:
                     md5sum = hashlib.md5(password.strip()).hexdigest()
-                    cur.execute("SELECT max(id) from user")
-                    data = cur.fetchone()
                     id = -1
-                    if data[0] != None:
-                        id = data[0]
-                    id += 1
-                    uid = uuid.uuid4()
-                    values = (id, username, md5sum, uid.hex, email, 0)
-                    statement = "INSERT INTO user VALUES(%d, " % id
-                    statement += "'" + username + "', '" + md5sum + "', '" + uid.hex + "', '" + email + "', 0)"
-                    print statement
-                    cur.execute(statement)
-                    con.commit()
-                    content += "<br><p style='color:##E1F5A9;'>Account successfully created. Soon you will receive an email with activation link in it.</p>"
-                    content += "Proceed back to <a style='text-decoration:none;color:white;' href='/rcb/web/'>home page</a>"
-        except db.Error, e:
+                    status, id = db_client.getMax(config.globals[0], "id", "user")
+                    if status:
+                        id += 1
+                        uid = uuid.uuid4()
+                        values = (id, username, md5sum, uid.hex, email, 0)
+                        values = "%d, " % id
+                        values += "'" + username + "', '" + md5sum + "', '" + uid.hex + "', '" + email + "', 0"
+                        status = db_client.add(config.globals[0], "user", values)
+                        if status:
+                            content += "<br><p style='color:##E1F5A9;'>Account successfully created. Soon you will receive an email with activation link in it.</p>"
+                            content += "Proceed back to <a style='text-decoration:none;color:white;' href='/rcb/web/'>home page</a>"
+                        else:
+                            content += "<br><p style='color:#EEBDBD;'>RCB DB error detected!</p><br>"
+                    else:
+                        content += "<br><p style='color:#EEBDBD;'>RCB DB error detected!</p><br>"
+        except e:
             print 'Error %s:' % e.args[0]
             content += "<br><p style='color:#EEBDBD;'>RCB DB error detected!</p><br>"
     elif actiontype == 'dologin':
         username = request.forms.get('username')
         password = request.forms.get('password')
         try:
-            authenticated, userId = validate(username, password, con)
-            #if data != None and md5sum == data[1]:
+            authenticated, userId = validate(username, password)
             if authenticated:
                 content += '<p style="font-family:Verdana;font-size:10pt;">Welcome %s!</p>' % username
-                cur = con.cursor()
-                cur.execute("SELECT * from project WHERE userid=%d" % userId)
-                data = cur.fetchall()
+                condition = "userid=%d" % userId
+                status, data = db_client.query(config.globals[0], "*", "project", condition, False)
                 if data != None and len(data) != 0:
                     print 'Found a project'
                 else:
@@ -130,13 +122,13 @@ def actuator():
                     content += "</table></fieldset></form><br><br>"
             else:
                 content += '<p style="color:#EEBDBD;">Incorrect username / password entered. Please go back and try again.</p>'
-        except db.Error, e:
+        except e:
             print 'Error %s:' % e.args[0]
             content += "<br><p style='color:#EEBDBD;'>RCB DB error detected!</p><br>"
     elif actiontype == 'createproject':
         username = request.forms.get('username')
         password = request.forms.get('password')
-        authenticated, userId = validate(username, password, con)
+        authenticated, userId = validate(username, password)
         if authenticated:
             print username, password, userId
             projName = request.forms.get("project-name")
@@ -146,22 +138,22 @@ def actuator():
             
             if isValid and len(projName.strip()) > 0:
                 try:
-                    cur = con.cursor()
-                    cur.execute("SELECT max(id) from project")
-                    data = cur.fetchone()
                     id = -1
-                    if data[0] != None:
-                        id = data[0]
-                    id += 1
-                    statement = "INSERT INTO project VALUES(%d, " % id
-                    statement += "'" + projName.strip() + "', %d" % userId
-                    statement += ", '" + conf + "')"
-                    print statement
-                    cur.execute(statement)
-                    con.commit()
-                    content += "<br><p style='color:##E1F5A9;'>Project successfully created.</p>"
-                    content += "Proceed back to <a style='text-decoration:none;color:white;' href='/rcb/web/'>home page</a>"
-                except db.Error, e:
+                    status, id = db_client.getMax(config.globals[0], "id", "project")
+                    if status:
+                        id += 1
+                        values = "%d, " % id
+                        values += "'" + projName.strip() + "', %d" % userId
+                        values += ", '" + conf + "'"
+                        status = db_client.add(config.globals[0], "project", values)
+                        if status:
+                            content += "<br><p style='color:##E1F5A9;'>Project successfully created.</p>"
+                            content += "Proceed back to <a style='text-decoration:none;color:white;' href='/rcb/web/'>home page</a>"
+                        else:
+                            content += "<br><p style='color:#EEBDBD;'>RCB DB error detected!</p><br>"
+                    else:
+                        content += "<br><p style='color:#EEBDBD;'>RCB DB error detected!</p><br>"
+                except e:
                     print 'Error %s:' % e.args[0]
                     content += "<br><p style='color:#EEBDBD;'>RCB DB error detected!</p><br>"
                 print conf
@@ -169,7 +161,5 @@ def actuator():
                 content += '<p style="color:#EEBDBD;">Invalid form data. Please make sure that the data you entered is valid. It is recommended you simply copy and paste your cloud credentials file. Go back and try again.</p>'
         else:
             content += '<p style="color:#EEBDBD;">Incorrect username / password entered. Please go back and try again.</p>'
-    if con:
-        con.close()
         
     return header() + content + footer()

@@ -6,4 +6,6 @@
 #@requires: bottle
 ############################################################
 
-dbPath = None
+def init():
+    global globals
+    globals = []

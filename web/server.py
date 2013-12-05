@@ -78,6 +78,7 @@ def initializedb(dbpath):
     return True
 
 def main(argv):
+    config.init()
     confFile = None
     try:
         opts, args = getopt.getopt(argv, "hc:i", "config=")
@@ -112,9 +113,9 @@ def main(argv):
         Config.read("/Users/harh/Codes/ZHAW/Eclipse/workspace/icclab-rcb/config.ini")
     else:
         Config.read(confFile)
+    
     dbPath = Config.get("Database", "File")
-
-    config.dbPath = dbPath
+    config.globals.append(dbPath)
     
     #Now performing sanitaion checks on the database
     dbtest = checkdbconsistency(dbPath)

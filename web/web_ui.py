@@ -8,7 +8,6 @@
 
 from bottle import get, post, request, route, run, response
 import ConfigParser
-import sqlite3 as db
 import sys, getopt
 
 @get('/rcb/web/')
