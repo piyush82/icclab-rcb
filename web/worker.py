@@ -9,7 +9,7 @@
 from bottle import get, post, request, route, run, response
 import ConfigParser
 import sys, getopt
-sys.path.append('/Users/harh/Codes/ZHAW/Eclipse/workspace/os_rcb')
+sys.path.append('/Users/harh/Codes/ZHAW/Eclipse/workspace/os_rcb')  #change this to point to the correct path where icclab-rcb is located
 import hashlib
 import uuid
 from web_ui import header
