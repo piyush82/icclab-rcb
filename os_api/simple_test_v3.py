@@ -1,7 +1,10 @@
 '''
 Created on Jan 3, 2014
 
-@author: kolv
+@author:  Tea Kolevska
+@contact: tea.kolevska@zhaw.ch
+@organization: ICCLab, Zurich University of Applied Sciences
+
 '''
 
 import ceilometer_api
@@ -48,8 +51,21 @@ def main(argv):
             print '--------------------------------------------------------------------------------------------------------------------------'
             #print meter_list
             #st,stat_list=ceilometer_api.meter_statistics(meter_list[1]["meter-id"],token_data["metering"],token_data["token-id"])
-        st,stat_list=ceilometer_api.meter_statistics(meter_list[0]["meter-name"], token_data["metering"],pom)
-        if status:
+        #st,stat_list=ceilometer_api.meter_statistics(meter_list[0]["meter-name"], token_data["metering"],pom)
+        meter_name=raw_input("Enter meter name: ")
+        #period=raw_input("Do you want to define a time period? Enter 'Y' if yes, 'N' if no.")
+        #if(period=="Y"):
+        #    period_def=raw_input("Enter the desired time period in seconds: ")
+        #else:
+        #    period_def=" "
+        #groupby=raw_input("Do you want to define a group by value? Enter 'Y' if yes, 'N' if no.")  
+        #if (groupby=="Y") :
+        #    groupby_def=raw_input("Enter the desired group by attribute: ")
+        #else:
+        #    groupby_def=" "
+        st,stat_list=ceilometer_api.meter_statistics(meter_name, token_data["metering"],pom)
+        if st:
+            print '--------------------------------------------------------------------------------------------------------------------------'
             print "The statistics for your meters is printed next."
             print '--------------------------------------------------------------------------------------------------------------------------'
             
@@ -67,6 +83,29 @@ def main(argv):
                 print "Sum: " + str(stat_list[i]["sum"]) 
                 print "Unit: " + str(stat_list[i]["unit"]) 
                 print "Group by: " + str(stat_list[i]["group-by"]) 
+            print '--------------------------------------------------------------------------------------------------------------------------'
+        
+        status,sample_list=ceilometer_api.get_meter_samples(meter_name,token_data["metering"],pom)
+        if status:
+            print '--------------------------------------------------------------------------------------------------------------------------'
+            print "The samples for your meter are printed next."
+            print '--------------------------------------------------------------------------------------------------------------------------'
+            
+            for i in range(len(sample_list)):
+                print "Counter name: " + str(sample_list[i]["counter-name"]) 
+                print "Counter unit: " + str(sample_list[i]["counter-unit"])
+                print "Counter volume: "+ str(sample_list[i]["counter-volume"]) 
+                print "Counter type: " + str(sample_list[i]["counter-type"]) 
+                print "Message id: "+ str(sample_list[i]["message-id"]) 
+                print "Project id: " + str(sample_list[i]["project-id"])
+                print "Resource id: " + str(sample_list[i]["resource-id"]) 
+                print "Resource metadata: " 
+                #for key,value in sample_list[i]["resource-metadata"]:
+                #    print key,value
+                print sample_list[i]["resource-metadata"]
+                print "Source: " + str(sample_list[i]["source"]) 
+                print "Timestamp: " + str(sample_list[i]["timestamp"]) 
+                print "User ID: " + str(sample_list[i]["user-id"]) 
             print '--------------------------------------------------------------------------------------------------------------------------'
             
     return True
