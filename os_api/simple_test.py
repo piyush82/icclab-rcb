@@ -5,6 +5,8 @@
 #@author: Piyush Harsh
 #@contact: piyush.harsh@zhaw.ch
 #@organization: ICCLab, Zurich University of Applied Sciences
+#@contributor: Tea Kolevska
+#@contact: tea.kolevska@zhaw.ch
 #@summary: Module to interact with OS-services
 #@var username, tenant-id, password
 #@requires: python 2.7
@@ -52,7 +54,9 @@ def main(argv):
                 print '%1s %16s %2s %10s %2s %10s %2s %70s %1s' % ('|', meter_list[i]["meter-name"], '|', meter_list[i]["meter-type"], '|', meter_list[i]["meter-unit"], '|', meter_list[i]["meter-id"].strip(), '|')
             print '--------------------------------------------------------------------------------------------------------------------------'
             #print meter_list
-            st,stat_list=ceilometer_api.meter_statistics(meter_list[0]["meter-name"], token_data["ceilometer"],token_data["token-id"])
+            
+            meter_name=raw_input("Enter meter name: ")
+            st,stat_list=ceilometer_api.meter_statistics(meter_name, token_data["ceilometer"],token_data["token-id"])
             if status:
                 print "The statistics for your meters is printed next."
                 print '--------------------------------------------------------------------------------------------------------------------------'
@@ -72,6 +76,31 @@ def main(argv):
                     print "Unit: " + str(stat_list[i]["unit"]) 
                     print "Group by: " + str(stat_list[i]["group-by"]) 
                 print '--------------------------------------------------------------------------------------------------------------------------'
+        
+            status,sample_list=ceilometer_api.get_meter_samples(meter_name, token_data["ceilometer"],token_data["token-id"])
+            if status:
+                print '--------------------------------------------------------------------------------------------------------------------------'
+                print "The samples for your meter are printed next."
+                print '--------------------------------------------------------------------------------------------------------------------------'
+            
+                for i in range(len(sample_list)):
+                    print "Counter name: " + str(sample_list[i]["counter-name"]) 
+                    print "Counter unit: " + str(sample_list[i]["counter-unit"])
+                    print "Counter volume: "+ str(sample_list[i]["counter-volume"]) 
+                    print "Counter type: " + str(sample_list[i]["counter-type"]) 
+                    print "Message id: "+ str(sample_list[i]["message-id"]) 
+                    print "Project id: " + str(sample_list[i]["project-id"])
+                    print "Resource id: " + str(sample_list[i]["resource-id"]) 
+                    print "Resource metadata: " 
+                #for key,value in sample_list[i]["resource-metadata"]:
+                #    print key,value
+                    print sample_list[i]["resource-metadata"]
+                    print "Source: " + str(sample_list[i]["source"]) 
+                    print "Timestamp: " + str(sample_list[i]["timestamp"]) 
+                    print "User ID: " + str(sample_list[i]["user-id"]) 
+                    print '--------------------------------------------------------------------------------------------------------------------------'    
+    
+    
     return True
     
 if __name__ == '__main__':
