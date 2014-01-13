@@ -104,7 +104,7 @@ def set_query(from_date,to_date,from_time,to_time,resource_id,project_id,status_
         else:
             if (resource_id != "/"):
                 q=q+'{"field": "resource_id","op": "eq","value": "'+resource_id+'"}'
-                if (project_id != ""):
+                if (project_id != "/"):
                     q=q+',{"field": "project_id","op": "eq","value": "'+project_id+'"}'
             else:
                 if (resource_id != "/"):
@@ -293,8 +293,110 @@ def get_meter_samples(meter_name,api_endpoint,token):
             meter_samples[i]["timestamp"] = data[i]["timestamp"]
             meter_samples[i]["user-id"] = data[i]["user_id"]
         return True, meter_samples
-        
+    
 
+def get_resources(api_endpoint,token):
+    resources_list=[None]
+    headers = {
+               'Content-Type': 'application/json;',
+               'X-Auth-Token': token
+               
+    }
+    from_date,to_date,from_time,to_time,resource_id,project_id,status_q=query()   
+    path = "/v2/resources"
+    target = urlparse(api_endpoint+path)
+    method = 'GET'
+    body="{"
+    if(status_q==True):
+        q=set_query(from_date,to_date,from_time,to_time,resource_id,project_id,status_q)
+        body=body+q
+    body=body+"}"
+        
+    h = http.Http()
+    response, content = h.request(target.geturl(),method,body,headers)
+    header = json.dumps(response)
+    json_header = json.loads(header)
+    
+    server_response = json_header["status"]
+    if server_response not in {'200'}:
+        print "Inside resources_list(): Something went wrong!"
+        return False, resources_list
+    else:
+        data = json.loads(content)
+        resources_list = [None]*len(data)  
+        links_list=[None]      
+        
+        for i in range(len(data)):
+            resources_list[i]={}
+            links_list = [None]*len(data[i]["links"]) 
+            for j in range(len(data[i]["links"])):
+                links_list[j]={}
+                links_list[j]["href"]=data[i]["links"][j]["href"]
+                links_list[j]["rel"]=data[i]["links"][j]["rel"]
+            resources_list[i]["links"] = links_list
+            catalog=data[i]["metadata"]
+            cat_pom = json.dumps(catalog)
+            cat_pom=cat_pom.translate(None,'"{}')
+            resources_list[i]["metadata"]=cat_pom
+            resources_list[i]["project-id"] = data[i]["project_id"]
+            resources_list[i]["resource-id"] = data[i]["resource_id"]
+            resources_list[i]["source"] = data[i]["source"]
+
+            resources_list[i]["user-id"]=data[i]["user_id"]
+        return True, resources_list       
+        
+        
+def get_resources_by_id(api_endpoint,token,rid):
+    resources_list=[None]
+    headers = {
+               'Content-Type': 'application/json;',
+               'X-Auth-Token': token
+               
+    }
+    from_date,to_date,from_time,to_time,resource_id,project_id,status_q=query()   
+    path = "/v2/resources/"+rid
+    target = urlparse(api_endpoint+path)
+    method = 'GET'
+    body="{"
+    if(status_q==True):
+        q=set_query(from_date,to_date,from_time,to_time,resource_id,project_id,status_q)
+        body=body+q
+    body=body+"}"
+        
+    h = http.Http()
+    response, content = h.request(target.geturl(),method,body,headers)
+    header = json.dumps(response)
+    json_header = json.loads(header)
+    
+    server_response = json_header["status"]
+    if server_response not in {'200'}:
+        print "Inside resources_list(): Something went wrong!"
+        return False, resources_list
+    else:
+        data = json.loads(content)
+        resources_list = [None]*len(data)  
+        links_list=[None]      
+        
+        for i in range(len(data)):
+            resources_list[i]={}
+            links_list = [None]*len(data[i]["links"]) 
+            for j in range(len(data[i]["links"])):
+                links_list[j]={}
+                links_list[j]["href"]=data[i]["links"][j]["href"]
+                links_list[j]["rel"]=data[i]["links"][j]["rel"]
+            resources_list[i]["links"] = links_list
+            catalog=data[i]["metadata"]
+            cat_pom = json.dumps(catalog)
+            cat_pom=cat_pom.translate(None,'"{}')
+            resources_list[i]["metadata"]=cat_pom
+            resources_list[i]["project-id"] = data[i]["project_id"]
+            resources_list[i]["resource-id"] = data[i]["resource_id"]
+            resources_list[i]["source"] = data[i]["source"]
+
+            resources_list[i]["user-id"]=data[i]["user_id"]
+        return True, resources_list       
+        
+    
     
     
     
