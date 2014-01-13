@@ -99,7 +99,48 @@ def main(argv):
                     print "Timestamp: " + str(sample_list[i]["timestamp"]) 
                     print "User ID: " + str(sample_list[i]["user-id"]) 
                     print '--------------------------------------------------------------------------------------------------------------------------'    
-    
+
+            status,resources_list=ceilometer_api.get_resources(token_data["ceilometer"], token_data["token-id"])
+            if status:
+                print '--------------------------------------------------------------------------------------------------------------------------'
+                print "The resources for your meter are printed next."
+                print '--------------------------------------------------------------------------------------------------------------------------'
+            
+                for i in range(len(resources_list)):
+                    print "Resource id: " + str(resources_list[i]["resource-id"])
+                    print "Links: " 
+                    for j in range(len(resources_list[i]["links"])):
+                        print "Href: " + str(resources_list[i]["links"][j]["href"])
+                        print "Rel: " + str(resources_list[i]["links"][j]["rel"])
+                    print "Project id: " + str(resources_list[i]["project-id"])       
+                    print "Resource metadata: " 
+                    print resources_list[i]["metadata"]
+                    print "Source: " + str(resources_list[i]["source"]) 
+                    print "User ID: " + str(resources_list[i]["user-id"]) 
+                    print '--------------------------------------------------------------------------------------------------------------------------'         
+  
+            resource_id=raw_input("Enter resource id: ")
+            status,resources_list=ceilometer_api.get_resources_by_id(token_data["ceilometer"], token_data["token-id"],resource_id)
+            if status:
+                print '--------------------------------------------------------------------------------------------------------------------------'
+                print "The resources for your meter are printed next."
+                print '--------------------------------------------------------------------------------------------------------------------------'
+            
+                for i in range(len(resources_list)):
+                    print "Resource id: " + str(resources_list[i]["resource-id"])
+                    print "Links: " 
+                    for j in range(len(resources_list[i]["links"])):
+                        print "Href: " + str(resources_list[i]["links"][j]["href"])
+                        print "Rel: " + str(resources_list[i]["links"][j]["rel"])
+                        print "Project id: " + str(resources_list[i]["project-id"])
+                 
+                        print "Resource metadata: " 
+                        print resources_list[i]["metadata"]
+                        print "Source: " + str(resources_list[i]["source"]) 
+
+                        print "User ID: " + str(resources_list[i]["user-id"]) 
+                        print '--------------------------------------------------------------------------------------------------------------------------'         
+              
     
     return True
     
