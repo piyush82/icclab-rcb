@@ -49,20 +49,9 @@ def main(argv):
             for i in range(len(meter_list)):
                 print '%1s %16s %2s %10s %2s %10s %2s %70s %1s' % ('|', meter_list[i]["meter-name"], '|', meter_list[i]["meter-type"], '|', meter_list[i]["meter-unit"], '|', meter_list[i]["meter-id"].strip(), '|')
             print '--------------------------------------------------------------------------------------------------------------------------'
-            #print meter_list
-            #st,stat_list=ceilometer_api.meter_statistics(meter_list[1]["meter-id"],token_data["metering"],token_data["token-id"])
-        #st,stat_list=ceilometer_api.meter_statistics(meter_list[0]["meter-name"], token_data["metering"],pom)
+ 
         meter_name=raw_input("Enter meter name: ")
-        #period=raw_input("Do you want to define a time period? Enter 'Y' if yes, 'N' if no.")
-        #if(period=="Y"):
-        #    period_def=raw_input("Enter the desired time period in seconds: ")
-        #else:
-        #    period_def=" "
-        #groupby=raw_input("Do you want to define a group by value? Enter 'Y' if yes, 'N' if no.")  
-        #if (groupby=="Y") :
-        #    groupby_def=raw_input("Enter the desired group by attribute: ")
-        #else:
-        #    groupby_def=" "
+
         st,stat_list=ceilometer_api.meter_statistics(meter_name, token_data["metering"],pom)
         if st:
             print '--------------------------------------------------------------------------------------------------------------------------'
@@ -83,6 +72,7 @@ def main(argv):
                 print "Sum: " + str(stat_list[i]["sum"]) 
                 print "Unit: " + str(stat_list[i]["unit"]) 
                 print "Group by: " + str(stat_list[i]["group-by"]) 
+                print '--------------------------------------------------------------------------------------------------------------------------'         
             print '--------------------------------------------------------------------------------------------------------------------------'
         
         status,sample_list=ceilometer_api.get_meter_samples(meter_name,token_data["metering"],pom)
@@ -106,8 +96,54 @@ def main(argv):
                 print "Source: " + str(sample_list[i]["source"]) 
                 print "Timestamp: " + str(sample_list[i]["timestamp"]) 
                 print "User ID: " + str(sample_list[i]["user-id"]) 
+                print '--------------------------------------------------------------------------------------------------------------------------'         
+            print '--------------------------------------------------------------------------------------------------------------------------'
+        
+        status,resources_list=ceilometer_api.get_resources(token_data["metering"], pom)
+        if status:
+            print '--------------------------------------------------------------------------------------------------------------------------'
+            print "The resources for your meter are printed next."
             print '--------------------------------------------------------------------------------------------------------------------------'
             
+            for i in range(len(resources_list)):
+                print "Resource id: " + str(resources_list[i]["resource-id"])
+                print "Links: " 
+                for j in range(len(resources_list[i]["links"])):
+                    print "Href: " + str(resources_list[i]["links"][j]["href"])
+                    print "Rel: " + str(resources_list[i]["links"][j]["rel"])
+                print "Project id: " + str(resources_list[i]["project-id"])
+                 
+                print "Resource metadata: " 
+                print resources_list[i]["metadata"]
+                print "Source: " + str(resources_list[i]["source"]) 
+
+                print "User ID: " + str(resources_list[i]["user-id"]) 
+                print '--------------------------------------------------------------------------------------------------------------------------'         
+        
+            
+        resource_id=raw_input("Enter resource id: ")
+        status,resources_list=ceilometer_api.get_resources_by_id(token_data["metering"], pom,resource_id)
+        if status:
+            print '--------------------------------------------------------------------------------------------------------------------------'
+            print "The resources for your meter are printed next."
+            print '--------------------------------------------------------------------------------------------------------------------------'
+            
+            for i in range(len(resources_list)):
+                print "Resource id: " + str(resources_list[i]["resource-id"])
+                print "Links: " 
+                for j in range(len(resources_list[i]["links"])):
+                    print "Href: " + str(resources_list[i]["links"][j]["href"])
+                    print "Rel: " + str(resources_list[i]["links"][j]["rel"])
+                print "Project id: " + str(resources_list[i]["project-id"])
+                 
+                print "Resource metadata: " 
+                print resources_list[i]["metadata"]
+                print "Source: " + str(resources_list[i]["source"]) 
+
+                print "User ID: " + str(resources_list[i]["user-id"]) 
+                print '--------------------------------------------------------------------------------------------------------------------------'         
+        
+        
     return True
     
 if __name__ == '__main__':
