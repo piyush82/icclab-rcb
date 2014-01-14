@@ -99,18 +99,22 @@ def set_query(from_date,to_date,from_time,to_time,resource_id,project_id,status_
                 if (project_id != "/"):
                     q=q+',{"field": "project_id","op": "eq","value": "'+project_id+'"}'
             else:
-                if (resource_id != "/"):
-                    q=q+'{"field": "resource_id","op": "eq","value": "'+resource_id+'"}'
+                if (project_id != "/"):
+                    q=q+'{"field": "project_id","op": "eq","value": "'+project_id+'"}'
         else:
             if (resource_id != "/"):
                 q=q+'{"field": "resource_id","op": "eq","value": "'+resource_id+'"}'
                 if (project_id != "/"):
                     q=q+',{"field": "project_id","op": "eq","value": "'+project_id+'"}'
             else:
-                if (resource_id != "/"):
-                    q=q+'{"field": "resource_id","op": "eq","value": "'+resource_id+'"}'
+                if (project_id != "/"):
+                    q=q+'{"field": "project_id","op": "eq","value": "'+project_id+'"}'
         q=q+']'
     return q
+
+
+
+
 
 def meter_statistics(meter_id,api_endpoint,token):
     meter_stat = [None]
@@ -140,7 +144,7 @@ def meter_statistics(meter_id,api_endpoint,token):
         if (groupby=="Y") :
             rid=raw_input("Do you want to group by the resource id? If yes, enter 'Y', else enter 'N'. ")
             if(rid=="Y"):
-                    groupby_def='",groupby":['
+                    groupby_def=',"groupby":['
                     groupby_def=groupby_def+'"resource_id"'
                     pid=raw_input("Do you want to group by the project id? If yes, enter 'Y', else enter 'N'. ")
                     if(pid=="Y"):
@@ -150,7 +154,7 @@ def meter_statistics(meter_id,api_endpoint,token):
             else:
                 pid=raw_input("Do you want to group by the project id? If yes, enter 'Y', else enter 'N'. ")
                 if(pid=="Y"):
-                    groupby_def='",groupby":['
+                    groupby_def=',"groupby":['
                     groupby_def=groupby_def+'"project_id"'  
                     groupby_def=groupby_def+']'
                     body=body+groupby_def
@@ -164,7 +168,7 @@ def meter_statistics(meter_id,api_endpoint,token):
 
             rid=raw_input("Do you want to group by the resource id? If yes, enter 'Y', else enter 'N'. ")
             if(rid=="Y"):
-                groupby_def='",groupby":['
+                groupby_def=',"groupby":['
                 groupby_def=groupby_def+'"resource_id"'
                 pid=raw_input("Do you want to group by the project id? If yes, enter 'Y', else enter 'N'. ")
                 if(pid=="Y"):
@@ -174,7 +178,7 @@ def meter_statistics(meter_id,api_endpoint,token):
                 else:
                     pid=raw_input("Do you want to group by the project id? If yes, enter 'Y', else enter 'N'. ")
                     if(pid=="Y"):
-                        groupby_def='",groupby":['
+                        groupby_def=',"groupby":['
                         groupby_def=groupby_def+'"project_id"'  
                         groupby_def=groupby_def+']'
                         body=body+groupby_def
@@ -348,19 +352,18 @@ def get_resources(api_endpoint,token):
         
 def get_resources_by_id(api_endpoint,token,rid):
     resources_list=[None]
+    resources_list={}
     headers = {
                'Content-Type': 'application/json;',
                'X-Auth-Token': token
                
     }
-    from_date,to_date,from_time,to_time,resource_id,project_id,status_q=query()   
+ 
     path = "/v2/resources/"+rid
     target = urlparse(api_endpoint+path)
     method = 'GET'
     body="{"
-    if(status_q==True):
-        q=set_query(from_date,to_date,from_time,to_time,resource_id,project_id,status_q)
-        body=body+q
+
     body=body+"}"
         
     h = http.Http()
@@ -379,21 +382,23 @@ def get_resources_by_id(api_endpoint,token,rid):
         
         for i in range(len(data)):
             resources_list[i]={}
-            links_list = [None]*len(data[i]["links"]) 
-            for j in range(len(data[i]["links"])):
+            links_list = [None]*len(data["links"]) 
+            for j in range(len(data["links"])):
                 links_list[j]={}
-                links_list[j]["href"]=data[i]["links"][j]["href"]
-                links_list[j]["rel"]=data[i]["links"][j]["rel"]
+                links_list[j]["href"]=data["links"][j]["href"]
+                links_list[j]["rel"]=data["links"][j]["rel"]
             resources_list[i]["links"] = links_list
-            catalog=data[i]["metadata"]
+            catalog=data["metadata"]
             cat_pom = json.dumps(catalog)
             cat_pom=cat_pom.translate(None,'"{}')
             resources_list[i]["metadata"]=cat_pom
-            resources_list[i]["project-id"] = data[i]["project_id"]
-            resources_list[i]["resource-id"] = data[i]["resource_id"]
-            resources_list[i]["source"] = data[i]["source"]
+            resources_list[i]["project-id"] = data["project_id"]
+            resources_list[i]["resource-id"] = data["resource_id"]
+            resources_list[i]["source"] = data["source"]
+            resources_list[i]["first-sample-timestamp"]=data["first_sample_timestamp"]
+            resources_list[i]["last-sample-timestamp"]=data["last_sample_timestamp"]
 
-            resources_list[i]["user-id"]=data[i]["user_id"]
+            resources_list[i]["user-id"]=data["user_id"]
         return True, resources_list       
         
     
