@@ -64,11 +64,11 @@ def main(argv):
             
             for i in range(len(price_def)):
                 if i==0:   
-                     if price_def[i] in ["+","-","*","/","%"]:     
-                         print "You can not start the function with a mathematical operation. "  
-                         status_ret=False           
+                     if price_def[i].isdigit():     
+                         price=price+float(price_def[i]) 
+                                  
                      else:
-                         price=price+float(price_def[i])
+                         status_ret=False  
                 if i%2!=0:
                     if price_def[i] in ["+","-","*","/","%"]:
    
@@ -90,7 +90,8 @@ def main(argv):
                                     print "Division by zero."
                                     status_ret=False
                             if price_def[i]=="%":
-                                price=price%x
+                                price=price*x/100.0
+                                print price
                     else:
                         status_ret=False
                 else:
