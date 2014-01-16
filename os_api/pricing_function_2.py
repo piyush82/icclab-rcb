@@ -13,6 +13,13 @@ import keystone_api
 import textwrap
 import sys
 
+def is_number(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
+
 def main(argv):
     print "Hello There. This is a simple test pricing function."
     auth_uri = 'http://160.85.231.210:5000' #internal test-setup, replace it with your own value
@@ -54,7 +61,7 @@ def main(argv):
                         for n,m in enumerate(price_def):
                             if m==price_def[i]:
                                 for k in range(len(sample_list)):
-                                    price_def[n]=str(int(sample_list[k]["counter-volume"]))                                 
+                                    price_def[n]=str(sample_list[k]["counter-volume"])                                 
                         break
                     else:
                         j=j+1
@@ -64,7 +71,7 @@ def main(argv):
             
             for i in range(len(price_def)):
                 if i==0:   
-                     if price_def[i].isdigit():     
+                     if is_number(price_def[i]):    
                          price=price+float(price_def[i]) 
                                   
                      else:
@@ -72,8 +79,10 @@ def main(argv):
                 if i%2!=0:
                     if price_def[i] in ["+","-","*","/","%"]:
    
-                            if price_def[i+1].isdigit():
-                                x=float(price_def[i+1])
+                            #if price_def[i+1].isdigit():
+                            if is_number(price_def[i+1]):
+                                 x=float(price_def[i+1])
+                                
                             else:
                                 status_ret=False
                             
