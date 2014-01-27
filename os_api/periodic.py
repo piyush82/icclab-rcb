@@ -160,7 +160,7 @@ def pricing(metering,meter_list,pom):
                 print "The price value is: " + str(price)
             else:
                 print "Error. Poorly defined pricing function."
-            return True,meters_used
+            return status_ret,meters_used
          
                 
 
