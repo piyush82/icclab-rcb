@@ -76,18 +76,36 @@ def get_meter_samples_periodic(meter_name,api_endpoint,token):
             meter_samples[i]["user-id"] = data[i]["user_id"]
         return True, meter_samples
     
+#periodic_counts = [None]
 
-def periodic_counter(meters_used,metering,pom):
+def periodic_counter(meters_used,metering,pom,periodic_counts,reden_br,time):
+
+    
     for i in range(len(meters_used)):
+        
+        #periodic_counts[i]=[]
         status,sample_list=get_meter_samples_periodic(str(meters_used[i]),metering,pom)
         if status:
             print '--------------------------------------------------------------------------------------------------------------------------' 
-            for i in range(len(sample_list)):     
-                print "Resource id: " + str(sample_list[i]["resource-id"]) 
-                print "Counter volume: "+ str(sample_list[i]["counter-volume"]) 
-                print "Timestamp: " + str(sample_list[i]["timestamp"])
-
-    t = Timer(5,periodic_counter,args=[meters_used,metering,pom])
+            for j in range(len(sample_list)):     
+                print "Resource id: " + str(sample_list[j]["resource-id"]) 
+                print "Counter volume: "+ str(sample_list[j]["counter-volume"]) 
+                print "Timestamp: " + str(sample_list[j]["timestamp"])
+          
+    
+                periodic_counts[i].append(sample_list[j]["counter-volume"])
+                
+                #json.dumps(periodic_counts)
+            #for k in range(len(periodic_counts)):
+                #if k==0:
+                    
+                    #print "Delta: 0.0" 
+                #else:
+                    
+                print "Delta: " +str(periodic_counts[i][reden_br]-periodic_counts[i][reden_br-1])
+    reden_br+=1
+    
+    t = Timer(float(time),periodic_counter,args=[meters_used,metering,pom,periodic_counts,reden_br,time])
     t.start()
     return status
 
@@ -95,8 +113,8 @@ def pricing(metering,meter_list,pom):
             price=0
             price_def=raw_input("Define the pricing function. Use only the meters from above and numbers as arguments. Use the following signs: '+' for sum, '-' for substraction, '*' for multiplying, '/' for division or '%' for percentage. Use whitespace in between. ")
             price_def=price_def.split(" ")
-            
-            meters_used=[None]
+
+            meters_used=[]
             
             for i in range(len(price_def)):
                 j=0
@@ -189,7 +207,12 @@ def main(argv):
             #print '--------------------------------------------------------------------------------------------------------------------------'
             status,meters_used=pricing(token_data["metering"],meter_list,pom)
             if status:
-                periodic_counter(meters_used,token_data["metering"],pom) 
+                time=raw_input("Enter the desired time interval in seconds. ")
+                periodic_counts = [None]*len(meters_used)
+                for i in range(len(meters_used)):
+                    periodic_counts[i]=[]
+                periodic_counter(meters_used,token_data["metering"],pom,periodic_counts,0,time) 
+                
 
     return True
     
