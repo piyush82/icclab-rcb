@@ -344,7 +344,7 @@ def get_resources(api_endpoint,token):
             resources_list[i]["metadata"]=cat_pom
             resources_list[i]["project-id"] = data[i]["project_id"]
             resources_list[i]["resource-id"] = data[i]["resource_id"]
-            resources_list[i]["source"] = data[i]["source"]
+            #resources_list[i]["source"] = data[i]["source"]
 
             resources_list[i]["user-id"]=data[i]["user_id"]
         return True, resources_list       
@@ -394,9 +394,9 @@ def get_resources_by_id(api_endpoint,token,rid):
             resources_list[i]["metadata"]=cat_pom
             resources_list[i]["project-id"] = data["project_id"]
             resources_list[i]["resource-id"] = data["resource_id"]
-            resources_list[i]["source"] = data["source"]
-            resources_list[i]["first-sample-timestamp"]=data["first_sample_timestamp"]
-            resources_list[i]["last-sample-timestamp"]=data["last_sample_timestamp"]
+            #resources_list[i]["source"] = data["source"]
+            #resources_list[i]["first-sample-timestamp"]=data["first_sample_timestamp"]
+            #resources_list[i]["last-sample-timestamp"]=data["last_sample_timestamp"]
 
             resources_list[i]["user-id"]=data["user_id"]
         return True, resources_list       

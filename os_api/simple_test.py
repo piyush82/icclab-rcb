@@ -20,7 +20,7 @@ import sys
 
 def main(argv):
     print "Hello There. This is a simple test application making a test API call to OpenStack"
-    auth_uri = 'http://160.85.231.210:5000' #internal test-setup, replace it with your own value
+    auth_uri = 'http://160.85.4.10:5000' #internal test-setup, replace it with your own value
     #auth_uri = 'http://160.85.4.11:5000' #internal test-setup, replace it with your own value
     status, token_data = keystone_api.get_token_v2(auth_uri)
     if status:
@@ -115,7 +115,7 @@ def main(argv):
                     print "Project id: " + str(resources_list[i]["project-id"])       
                     print "Resource metadata: " 
                     print resources_list[i]["metadata"]
-                    print "Source: " + str(resources_list[i]["source"]) 
+                    #print "Source: " + str(resources_list[i]["source"]) 
                     
                     print "User ID: " + str(resources_list[i]["user-id"]) 
                     print '--------------------------------------------------------------------------------------------------------------------------'         
@@ -137,9 +137,9 @@ def main(argv):
                  
                         print "Resource metadata: " 
                         print resources_list[i]["metadata"]
-                        print "Source: " + str(resources_list[i]["source"]) 
-                        print "First sample timestamp: " + str(resources_list[i]["first-sample-timestamp"]) 
-                        print "Last sample timestamp: " + str(resources_list[i]["last-sample-timestamp"]) 
+                       # print "Source: " + str(resources_list[i]["source"]) 
+                        #print "First sample timestamp: " + str(resources_list[i]["first-sample-timestamp"]) 
+                        #print "Last sample timestamp: " + str(resources_list[i]["last-sample-timestamp"]) 
                         print "User ID: " + str(resources_list[i]["user-id"]) 
                         print '--------------------------------------------------------------------------------------------------------------------------'         
               
