@@ -19,7 +19,8 @@ from collections import namedtuple
 from threading import Timer
 from time import sleep
 import sqlite3
-
+import datetime
+from time import gmtime, strftime
 try:
     from urlparse import urlparse
 except ImportError:
@@ -79,8 +80,10 @@ def get_meter_samples_periodic(meter_name,api_endpoint,token):
     
 
 
-def periodic_counter(meters_used,metering,pom,periodic_counts,reden_br,time,meters_ids):
+def periodic_counter(meters_used,metering,pom,periodic_counts,reden_br,time,meters_ids,input,meter_list):
 
+    global conn    
+    conn = sqlite3.connect('meters.db',check_same_thread=False)
     
     for i in range(len(meters_used)):
         
@@ -93,38 +96,57 @@ def periodic_counter(meters_used,metering,pom,periodic_counts,reden_br,time,mete
                 print "Counter volume: "+ str(sample_list[j]["counter-volume"]) 
                 print "Timestamp: " + str(sample_list[j]["timestamp"])
           
-                datetime=str(sample_list[j]["timestamp"]).split("T")
+                datetime1=str(sample_list[j]["timestamp"]).split("T")
                 periodic_counts[i].append(sample_list[j]["counter-volume"])
 
-                global conn    
-                conn = sqlite3.connect('meters.db',check_same_thread=False)
+ 
                 print "Delta: " +str(periodic_counts[i][reden_br]-periodic_counts[i][reden_br-1])
                 cursor = conn.execute("SELECT max(ID)  from METERS_COUNTER")
                 row_count=conn.execute("SELECT COUNT(*) from METERS_COUNTER ")
                 result=row_count.fetchone()
                 number_of_rows=result[0]
-                #print number_of_rows
+
                 if number_of_rows==0:
                     conn.execute("INSERT INTO METERS_COUNTER (ID,METER_ID,METER_NAME,USER_ID,RESOURCE_ID,COUNTER_VOLUME,UNIT,TIMESTAMP) \
-                          VALUES (1, '"+ str(meters_ids[i]) +"', '"+ str(meters_used[i]) +"','" + str(sample_list[j]["user-id"]) +" ','"+ str(sample_list[j]["resource-id"]) +"' ,' "+ str(sample_list[j]["counter-volume"])+"' ,' "+ str(sample_list[j]["counter-unit"]) +"' ,' "+ str(datetime[0])+" "+str(datetime[1])+" ')")
+                          VALUES (1, '"+ str(meters_ids[i]) +"', '"+ str(meters_used[i]) +"','" + str(sample_list[j]["user-id"]) +" ','"+ str(sample_list[j]["resource-id"]) +"' ,' "+ str(sample_list[j]["counter-volume"])+"' ,' "+ str(sample_list[j]["counter-unit"]) +"' ,' "+ str(datetime1[0])+" "+str(datetime1[1])+" ')")
                 else:
                     id_last = cursor.fetchone()[0]+1
                     conn.execute("INSERT INTO METERS_COUNTER (ID,METER_ID,METER_NAME,USER_ID,RESOURCE_ID,COUNTER_VOLUME,UNIT,TIMESTAMP) \
-                            VALUES ("+str(id_last)+",' "+ str(meters_ids[i]) +"', '"+ str(meters_used[i]) +"','" + str(sample_list[j]["user-id"]) +" ','"+ str(sample_list[j]["resource-id"]) +"' ,' "+ str(sample_list[j]["counter-volume"])+"' ,' "+ str(sample_list[j]["counter-unit"]) +"' ,' "+ str(datetime[0])+" "+str(datetime[1])+" ')")    
+                            VALUES ("+str(id_last)+",' "+ str(meters_ids[i]) +"', '"+ str(meters_used[i]) +"','" + str(sample_list[j]["user-id"]) +" ','"+ str(sample_list[j]["resource-id"]) +"' ,' "+ str(sample_list[j]["counter-volume"])+"' ,' "+ str(sample_list[j]["counter-unit"]) +"' ,' "+ str(datetime1[0])+" "+str(datetime1[1])+" ')")    
                
-#                 id_last+=1
+
                 conn.commit()
     reden_br+=1
     
-    t = Timer(float(time),periodic_counter,args=[meters_used,metering,pom,periodic_counts,reden_br,time,meters_ids])
+    status2,meters_used2,meters_ids2,func,price=pricing(metering,meter_list,pom,input)
+    if status2:
+        cursor2 = conn.execute("SELECT max(ID)  from PRICE_FUNC")
+        row2_count=conn.execute("SELECT COUNT(*) from PRICE_FUNC ")
+        result2=row2_count.fetchone()
+        number_of_rows2=result2[0]
+        datetime2=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        if number_of_rows2==0:
+            conn.execute("INSERT INTO PRICE_FUNC(ID,PRICE,TIMESTAMP) \
+                    VALUES (1, '"+ str(price) +"' ,' "+ str(datetime2)+" ')")
+        else:
+            id_last2 = cursor2.fetchone()[0]+1
+            conn.execute("INSERT INTO PRICE_FUNC (ID,PRICE,TIMESTAMP) \
+                    VALUES ("+str(id_last2)+",' "+ str(price)  +"' ,' "+ str(datetime2)+" ')")    
+               
+
+        conn.commit()
+    t = Timer(float(time),periodic_counter,args=[meters_used,metering,pom,periodic_counts,reden_br,time,meters_ids,input,meter_list])
     t.start()
     return status
 
-def pricing(metering,meter_list,pom):                        
+def pricing(metering,meter_list,pom,input):                        
             price=0
-            price_def=raw_input("Define the pricing function. Use only the meters from above and numbers as arguments. Use the following signs: '+' for sum, '-' for substraction, '*' for multiplying, '/' for division or '%' for percentage. Use whitespace in between. ")
-            price_def=price_def.split(" ")
-
+            if input==None:
+                price_def=raw_input("Define the pricing function. Use only the meters from above and numbers as arguments. Use the following signs: '+' for sum, '-' for substraction, '*' for multiplying, '/' for division or '%' for percentage. Use whitespace in between. ")
+                price_def=price_def.split(" ")
+                input=price_def
+            else:
+                price_def=input
             meters_used=[]
             meters_ids=[]
             
@@ -143,7 +165,8 @@ def pricing(metering,meter_list,pom):
                         for n,m in enumerate(price_def):
                             if m==price_def[i]:
                                 for k in range(len(sample_list)):
-                                    price_def[n]=str(sample_list[k]["counter-volume"])                                 
+                                    price_def[n]=str(sample_list[k]["counter-volume"]) 
+                                                                  
                         break
                     else:
                         j=j+1
@@ -191,7 +214,7 @@ def pricing(metering,meter_list,pom):
                 print "The price value is: " + str(price)
             else:
                 print "Error. Poorly defined pricing function."
-            return status_ret,meters_used,meters_ids
+            return status_ret,meters_used,meters_ids,input,price
          
 conn = sqlite3.connect('meters.db',check_same_thread=False)
 print "Opened database successfully"           
@@ -220,13 +243,13 @@ def main(argv):
             for i in range(len(meter_list)):
                 print '%1s %16s %2s %10s %2s %10s %2s %70s %1s' % ('|', meter_list[i]["meter-name"], '|', meter_list[i]["meter-type"], '|', meter_list[i]["meter-unit"], '|', meter_list[i]["meter-id"].strip(), '|')         
 
-            status,meters_used,meters_ids=pricing(token_data["metering"],meter_list,pom)
+            status,meters_used,meters_ids,input,price=pricing(token_data["metering"],meter_list,pom,None)
             if status:
                 time=raw_input("Enter the desired time interval in seconds. ")                
                 periodic_counts = [None]*len(meters_used)
                 for i in range(len(meters_used)):
                     periodic_counts[i]=[]
-                periodic_counter(meters_used,token_data["metering"],pom,periodic_counts,0,time,meters_ids) 
+                periodic_counter(meters_used,token_data["metering"],pom,periodic_counts,0,time,meters_ids,input,meter_list) 
                 conn.close()
 
     return True
