@@ -87,6 +87,7 @@ def main(argv):
                                 
                             else:
                                 status_ret=False
+                                break
                             
                             if price_def[i]=="+":
                                 price=price+x

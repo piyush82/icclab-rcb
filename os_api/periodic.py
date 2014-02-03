@@ -190,6 +190,7 @@ def pricing(metering,meter_list,pom,input):
                                 
                             else:
                                 status_ret=False
+                                break
                             
                             if price_def[i]=="+":
                                 price=price+x
