@@ -18,6 +18,7 @@ import json
 from collections import namedtuple
 from threading import Timer
 from time import sleep
+import sqlite3
 
 try:
     from urlparse import urlparse
@@ -76,14 +77,14 @@ def get_meter_samples_periodic(meter_name,api_endpoint,token):
             meter_samples[i]["user-id"] = data[i]["user_id"]
         return True, meter_samples
     
-#periodic_counts = [None]
 
-def periodic_counter(meters_used,metering,pom,periodic_counts,reden_br,time):
+
+def periodic_counter(meters_used,metering,pom,periodic_counts,reden_br,time,meters_ids):
 
     
     for i in range(len(meters_used)):
         
-        #periodic_counts[i]=[]
+
         status,sample_list=get_meter_samples_periodic(str(meters_used[i]),metering,pom)
         if status:
             print '--------------------------------------------------------------------------------------------------------------------------' 
@@ -92,20 +93,30 @@ def periodic_counter(meters_used,metering,pom,periodic_counts,reden_br,time):
                 print "Counter volume: "+ str(sample_list[j]["counter-volume"]) 
                 print "Timestamp: " + str(sample_list[j]["timestamp"])
           
-    
+                datetime=str(sample_list[j]["timestamp"]).split("T")
                 periodic_counts[i].append(sample_list[j]["counter-volume"])
-                
-                #json.dumps(periodic_counts)
-            #for k in range(len(periodic_counts)):
-                #if k==0:
-                    
-                    #print "Delta: 0.0" 
-                #else:
-                    
+
+                global conn    
+                conn = sqlite3.connect('meters.db',check_same_thread=False)
                 print "Delta: " +str(periodic_counts[i][reden_br]-periodic_counts[i][reden_br-1])
+                cursor = conn.execute("SELECT max(ID)  from METERS_COUNTER")
+                row_count=conn.execute("SELECT COUNT(*) from METERS_COUNTER ")
+                result=row_count.fetchone()
+                number_of_rows=result[0]
+                print number_of_rows
+                if number_of_rows==0:
+                    conn.execute("INSERT INTO METERS_COUNTER (ID,METER_ID,METER_NAME,USER_ID,RESOURCE_ID,COUNTER_VOLUME,UNIT,TIMESTAMP) \
+                          VALUES (1, '"+ str(meters_ids[i]) +"', '"+ str(meters_used[i]) +"','" + str(sample_list[j]["user-id"]) +" ','"+ str(sample_list[j]["resource-id"]) +"' ,' "+ str(sample_list[j]["counter-volume"])+"' ,' "+ str(sample_list[j]["counter-unit"]) +"' ,' "+ str(datetime[0])+" "+str(datetime[1])+" ')")
+                else:
+                    id_last = cursor.fetchone()[0]+1
+                    conn.execute("INSERT INTO METERS_COUNTER (ID,METER_ID,METER_NAME,USER_ID,RESOURCE_ID,COUNTER_VOLUME,UNIT,TIMESTAMP) \
+                            VALUES ("+str(id_last)+",' "+ str(meters_ids[i]) +"', '"+ str(meters_used[i]) +"','" + str(sample_list[j]["user-id"]) +" ','"+ str(sample_list[j]["resource-id"]) +"' ,' "+ str(sample_list[j]["counter-volume"])+"' ,' "+ str(sample_list[j]["counter-unit"]) +"' ,' "+ str(datetime[0])+" "+str(datetime[1])+" ')")    
+               
+#                 id_last+=1
+                conn.commit()
     reden_br+=1
     
-    t = Timer(float(time),periodic_counter,args=[meters_used,metering,pom,periodic_counts,reden_br,time])
+    t = Timer(float(time),periodic_counter,args=[meters_used,metering,pom,periodic_counts,reden_br,time,meters_ids])
     t.start()
     return status
 
@@ -115,12 +126,14 @@ def pricing(metering,meter_list,pom):
             price_def=price_def.split(" ")
 
             meters_used=[]
+            meters_ids=[]
             
             for i in range(len(price_def)):
                 j=0
                 while j<len(meter_list):
                     if price_def[i]==meter_list[j]["meter-name"]:
                         meters_used.append(price_def[i])
+                        meters_ids.append(meter_list[j]["meter-id"])
 
                         status,sample_list=get_meter_samples_periodic(price_def[i],metering,pom)
                         if sample_list==[]:
@@ -178,9 +191,10 @@ def pricing(metering,meter_list,pom):
                 print "The price value is: " + str(price)
             else:
                 print "Error. Poorly defined pricing function."
-            return status_ret,meters_used
+            return status_ret,meters_used,meters_ids
          
-                
+conn = sqlite3.connect('meters.db',check_same_thread=False)
+print "Opened database successfully"           
 
           
  
@@ -202,17 +216,18 @@ def main(argv):
             print '--------------------------------------------------------------------------------------------------------------------------'
             print '%1s %16s %2s %10s %2s %10s %2s %70s %1s' % ('|','meter-name', '|', 'meter-type', '|', 'meter-unit', '|', 'meter-id', '|')
             print '--------------------------------------------------------------------------------------------------------------------------'
+
             for i in range(len(meter_list)):
-                print '%1s %16s %2s %10s %2s %10s %2s %70s %1s' % ('|', meter_list[i]["meter-name"], '|', meter_list[i]["meter-type"], '|', meter_list[i]["meter-unit"], '|', meter_list[i]["meter-id"].strip(), '|')
-            #print '--------------------------------------------------------------------------------------------------------------------------'
-            status,meters_used=pricing(token_data["metering"],meter_list,pom)
+                print '%1s %16s %2s %10s %2s %10s %2s %70s %1s' % ('|', meter_list[i]["meter-name"], '|', meter_list[i]["meter-type"], '|', meter_list[i]["meter-unit"], '|', meter_list[i]["meter-id"].strip(), '|')         
+
+            status,meters_used,meters_ids=pricing(token_data["metering"],meter_list,pom)
             if status:
-                time=raw_input("Enter the desired time interval in seconds. ")
+                time=raw_input("Enter the desired time interval in seconds. ")                
                 periodic_counts = [None]*len(meters_used)
                 for i in range(len(meters_used)):
                     periodic_counts[i]=[]
-                periodic_counter(meters_used,token_data["metering"],pom,periodic_counts,0,time) 
-                
+                periodic_counter(meters_used,token_data["metering"],pom,periodic_counts,0,time,meters_ids) 
+                conn.close()
 
     return True
     
