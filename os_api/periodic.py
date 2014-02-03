@@ -103,7 +103,7 @@ def periodic_counter(meters_used,metering,pom,periodic_counts,reden_br,time,mete
                 row_count=conn.execute("SELECT COUNT(*) from METERS_COUNTER ")
                 result=row_count.fetchone()
                 number_of_rows=result[0]
-                print number_of_rows
+                #print number_of_rows
                 if number_of_rows==0:
                     conn.execute("INSERT INTO METERS_COUNTER (ID,METER_ID,METER_NAME,USER_ID,RESOURCE_ID,COUNTER_VOLUME,UNIT,TIMESTAMP) \
                           VALUES (1, '"+ str(meters_ids[i]) +"', '"+ str(meters_used[i]) +"','" + str(sample_list[j]["user-id"]) +" ','"+ str(sample_list[j]["resource-id"]) +"' ,' "+ str(sample_list[j]["counter-volume"])+"' ,' "+ str(sample_list[j]["counter-unit"]) +"' ,' "+ str(datetime[0])+" "+str(datetime[1])+" ')")
