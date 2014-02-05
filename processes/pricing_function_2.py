@@ -23,7 +23,8 @@ def is_number(s):
 
 def main(argv):
     print "Hello There. This is a simple test pricing function."
-    auth_uri = 'http://160.85.4.10:5000' #internal test-setup, replace it with your own value
+    #auth_uri = 'http://160.85.4.10:5000' #internal test-setup, replace it with your own value
+    auth_uri = 'http://160.85.231.233:5000' #internal test-setup, replace it with your own value
     status, token_data = keystone_api.get_token_v3(auth_uri)
     if status:
         print 'The authentication was successful.'
@@ -56,7 +57,7 @@ def main(argv):
                     if price_def[i]==meter_list[j]["meter-name"]:
                         meters_used.append(price_def[i])
                         print "Enter query arguments."
-                        status,sample_list=ceilometer_api.get_meter_samples(price_def[i],token_data["metering"],pom)
+                        status,sample_list=ceilometer_api.get_meter_samples(price_def[i],token_data["metering"],pom,True)
                         if sample_list==[]:
                             price_def[i]=str(0)
 

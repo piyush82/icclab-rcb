@@ -21,7 +21,9 @@ try:
     from urlparse import urlparse
 except ImportError:
     from urllib.parse import urlparse
-
+    
+    
+#get the list of available meters
 def get_meter_list(token, api_endpoint):
     meter_list = [None]
     headers = {
@@ -57,9 +59,9 @@ def get_meter_list(token, api_endpoint):
             meter_list[i]["tenant-id"] = data[i]["project_id"]
             meter_list[i]["meter-type"] = data[i]["type"]
             meter_list[i]["meter-unit"] = data[i]["unit"]
-        #print data
     return True, meter_list
 
+#define the query details
 def query():
     status=False
     
@@ -114,8 +116,7 @@ def set_query(from_date,to_date,from_time,to_time,resource_id,project_id,status_
 
 
 
-
-
+#get the statistics for the specified meter
 def meter_statistics(meter_id,api_endpoint,token):
     meter_stat = [None]
     headers = {
@@ -128,9 +129,6 @@ def meter_statistics(meter_id,api_endpoint,token):
     path = "/v2/meters/"+meter_id+"/statistics"
     target = urlparse(api_endpoint+path)
     method = 'GET'
-    #body = '{"q":[{"field": "timestamp","op": "ge","value": "'+from_date+'T'+from_time+'"},{"field": "timestamp","op": "lt","value": "'+to_date+'T'+to_time+'"}]}'
-    
-    #body='{"q": [{"field": "timestamp","op": "ge","value": "2013-12-28T00:00:00"},{"field": "timestamp","op": "lt","value": "2014-01-05T00:00:00"}]}'
     
         
     if(status_q==True):
@@ -235,33 +233,36 @@ def meter_statistics(meter_id,api_endpoint,token):
             meter_stat[i]["group-by"] = data[i]["groupby"]
         return True, meter_stat
     
-    
-def get_meter_samples(meter_name,api_endpoint,token):
+#get the samples for the specified meter  
+def get_meter_samples(meter_name,api_endpoint,token,bool_query):
     meter_samples=[None]
     headers = {
                'Content-Type': 'application/json;',
                'X-Auth-Token': token
                
-    }
-    from_date,to_date,from_time,to_time,resource_id,project_id,status_q=query()   
+    }   
     path = "/v2/meters/"+meter_name
     target = urlparse(api_endpoint+path)
     method = 'GET'
-    if(status_q==True):
-        q=set_query(from_date,to_date,from_time,to_time,resource_id,project_id,status_q)
-        body="{"+q
-        limit=raw_input("Do you want to set a limit to the number of samples that gets returned? Enter 'Y' if yes, 'N' if no.")
-        if(limit=="Y"):
-            limit_def=raw_input("Enter the desired limit for the number of samples: ")
-            body=body+',"limit":'+limit_def
-        body=body+"}"
+    if bool_query==True:
+        from_date,to_date,from_time,to_time,resource_id,project_id,status_q=query()
+        if(status_q==True):
+            q=set_query(from_date,to_date,from_time,to_time,resource_id,project_id,status_q)
+            body="{"+q
+            limit=raw_input("Do you want to set a limit to the number of samples that gets returned? Enter 'Y' if yes, 'N' if no.")
+            if(limit=="Y"):
+                limit_def=raw_input("Enter the desired limit for the number of samples: ")
+                body=body+',"limit":'+limit_def
+            body=body+"}"
+        else:
+            body="{"
+            limit=raw_input("Do you want to set a limit to the number of samples that gets returned? Enter 'Y' if yes, 'N' if no.")
+            if(limit=="Y"):
+                limit_def=raw_input("Enter the desired limit for the number of samples: ")
+                body=body+'"limit":'+limit_def
+            body=body+"}"
     else:
-        body="{"
-        limit=raw_input("Do you want to set a limit to the number of samples that gets returned? Enter 'Y' if yes, 'N' if no.")
-        if(limit=="Y"):
-            limit_def=raw_input("Enter the desired limit for the number of samples: ")
-            body=body+'"limit":'+limit_def
-        body=body+"}"
+        body='{"limit": 1 }'
     
     h = http.Http()
     response, content = h.request(target.geturl(),method,body,headers)
@@ -286,19 +287,15 @@ def get_meter_samples(meter_name,api_endpoint,token):
             meter_samples[i]["project-id"] = data[i]["project_id"]
             meter_samples[i]["resource-id"] = data[i]["resource_id"]
             catalog=data[i]["resource_metadata"]
-            #for key,value in catalog.iteritems():
-            #    meter_samples[i]["resource-metadata"][catalog[key]] = catalog[key]
-            #meter_samples[i]["resource-metadata"]=data[i]["resource_metadata"]
             cat_pom = json.dumps(catalog)
             cat_pom=cat_pom.translate(None,'"{}')
-            #meter_samples[i]["resource-metadata"] = dict(e.split(': ') for e in cat_pom.split(','))
             meter_samples[i]["resource-metadata"]=cat_pom
             meter_samples[i]["source"] = data[i]["source"]
             meter_samples[i]["timestamp"] = data[i]["timestamp"]
             meter_samples[i]["user-id"] = data[i]["user_id"]
         return True, meter_samples
-    
-
+ 
+#get the list of available resources    
 def get_resources(api_endpoint,token):
     resources_list=[None]
     headers = {
@@ -345,61 +342,65 @@ def get_resources(api_endpoint,token):
             resources_list[i]["project-id"] = data[i]["project_id"]
             resources_list[i]["resource-id"] = data[i]["resource_id"]
             #resources_list[i]["source"] = data[i]["source"]
-
             resources_list[i]["user-id"]=data[i]["user_id"]
         return True, resources_list       
-        
-        
+
+#get details for a certain resource               
 def get_resources_by_id(api_endpoint,token,rid):
     resources_list=[None]
     resources_list={}
-    headers = {
+    if rid=="":
+        print "Resource id required!"
+        return False,{}
+
+    else:    
+        headers = {
                'Content-Type': 'application/json;',
                'X-Auth-Token': token
                
-    }
+        }
  
-    path = "/v2/resources/"+rid
-    target = urlparse(api_endpoint+path)
-    method = 'GET'
-    body="{"
+        path = "/v2/resources/"+rid
+        target = urlparse(api_endpoint+path)
+        method = 'GET'
+        body="{"
 
-    body=body+"}"
+        body=body+"}"
         
-    h = http.Http()
-    response, content = h.request(target.geturl(),method,body,headers)
-    header = json.dumps(response)
-    json_header = json.loads(header)
+        h = http.Http()
+        response, content = h.request(target.geturl(),method,body,headers)
+        header = json.dumps(response)
+        json_header = json.loads(header)
     
-    server_response = json_header["status"]
-    if server_response not in {'200'}:
-        print "Inside resources_list(): Something went wrong!"
-        return False, resources_list
-    else:
-        data = json.loads(content)
-        resources_list = [None]*len(data)  
-        links_list=[None]      
+        server_response = json_header["status"]
+        if server_response not in {'200'}:
+            print "Inside resources_list(): Something went wrong!"
+            return False, resources_list
+        else:
+            data = json.loads(content)
+            resources_list = [None]*len(data)  
+            links_list=[None]      
         
-        for i in range(len(data)):
-            resources_list[i]={}
-            links_list = [None]*len(data["links"]) 
-            for j in range(len(data["links"])):
-                links_list[j]={}
-                links_list[j]["href"]=data["links"][j]["href"]
-                links_list[j]["rel"]=data["links"][j]["rel"]
-            resources_list[i]["links"] = links_list
-            catalog=data["metadata"]
-            cat_pom = json.dumps(catalog)
-            cat_pom=cat_pom.translate(None,'"{}')
-            resources_list[i]["metadata"]=cat_pom
-            resources_list[i]["project-id"] = data["project_id"]
-            resources_list[i]["resource-id"] = data["resource_id"]
-            #resources_list[i]["source"] = data["source"]
-            #resources_list[i]["first-sample-timestamp"]=data["first_sample_timestamp"]
-            #resources_list[i]["last-sample-timestamp"]=data["last_sample_timestamp"]
+            for i in range(len(data)):
+                resources_list[i]={}
+                links_list = [None]*len(data["links"]) 
+                for j in range(len(data["links"])):
+                    links_list[j]={}
+                    links_list[j]["href"]=data["links"][j]["href"]
+                    links_list[j]["rel"]=data["links"][j]["rel"]
+                resources_list[i]["links"] = links_list
+                catalog=data["metadata"]
+                cat_pom = json.dumps(catalog)
+                cat_pom=cat_pom.translate(None,'"{}')
+                resources_list[i]["metadata"]=cat_pom
+                resources_list[i]["project-id"] = data["project_id"]
+                resources_list[i]["resource-id"] = data["resource_id"]
+                #resources_list[i]["source"] = data["source"]
+                #resources_list[i]["first-sample-timestamp"]=data["first_sample_timestamp"]
+                #resources_list[i]["last-sample-timestamp"]=data["last_sample_timestamp"]
 
-            resources_list[i]["user-id"]=data["user_id"]
-        return True, resources_list       
+                resources_list[i]["user-id"]=data["user_id"]
+                return True, resources_list       
         
     
     

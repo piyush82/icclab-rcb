@@ -16,8 +16,8 @@ import keystone_api
 
 def main(argv):
     print "Hello There. This is a simple test application making a test API call to OpenStack"
-    auth_uri = 'http://160.85.4.10:5000' #internal test-setup, replace it with your own value
-    #auth_uri = 'http://160.85.4.11:5000' #internal test-setup, replace it with your own value
+#     auth_uri = 'http://160.85.4.10:5000' #internal test-setup, replace it with your own value
+    auth_uri = 'http://160.85.231.233:5000' #internal test-setup, replace it with your own value
     status, token_data = keystone_api.get_token_v3(auth_uri)
     if status:
         print 'The authentication was successful, below are the data we got:'
@@ -30,9 +30,7 @@ def main(argv):
         print '--------------------------------------------------------------------------------------------------------'
         print 'The authentication token is: ', token_data["token-id"]
         pom=token_data["token-id"]
-        #wrapped_text = textwrap.wrap(token_data["token-id"], 104)
-        #for i in range(len(wrapped_text)):
-        #    print wrapped_text[i]
+
     else:
         print "Authentication was not successful."
     if status:
@@ -41,8 +39,8 @@ def main(argv):
         #if status:
          #   print "The list of servers are printed next."
          #   print server_list
-#         status, meter_list = ceilometer_api.get_meter_list(pom, token_data["metering"])
-        status, meter_list = ceilometer_api.get_meter_list(pom, "http://160.85.4.10:8777")
+        status, meter_list = ceilometer_api.get_meter_list(pom, token_data["metering"])
+        #status, meter_list = ceilometer_api.get_meter_list(pom, "http://160.85.4.10:8777")
 
         if status:
             print "The list of available meters are printed next."
@@ -55,8 +53,8 @@ def main(argv):
  
         meter_name=raw_input("Enter meter name: ")
 
-        #st,stat_list=ceilometer_api.meter_statistics(meter_name, token_data["metering"],pom)
-        st,stat_list=ceilometer_api.meter_statistics(meter_name, "http://160.85.4.10:8777",pom)
+        st,stat_list=ceilometer_api.meter_statistics(meter_name, token_data["metering"],pom)
+        #st,stat_list=ceilometer_api.meter_statistics(meter_name, "http://160.85.4.10:8777",pom)
         if st:
             print '--------------------------------------------------------------------------------------------------------------------------'
             print "The statistics for your meters is printed next."
@@ -80,8 +78,8 @@ def main(argv):
             print '--------------------------------------------------------------------------------------------------------------------------'
         
         print "Query initialization for meter samples function."
-        #status,sample_list=ceilometer_api.get_meter_samples(meter_name,token_data["metering"],pom)
-        status,sample_list=ceilometer_api.get_meter_samples(meter_name,"http://160.85.4.10:8777",pom,True)
+        status,sample_list=ceilometer_api.get_meter_samples(meter_name,token_data["metering"],pom,True)
+        #status,sample_list=ceilometer_api.get_meter_samples(meter_name,"http://160.85.4.10:8777",pom,True)
         if status:
             print '--------------------------------------------------------------------------------------------------------------------------'
             print "The samples for your meter are printed next."
@@ -96,8 +94,6 @@ def main(argv):
                 print "Project id: " + str(sample_list[i]["project-id"])
                 print "Resource id: " + str(sample_list[i]["resource-id"]) 
                 print "Resource metadata: " 
-                #for key,value in sample_list[i]["resource-metadata"]:
-                #    print key,value
                 print sample_list[i]["resource-metadata"]
                 print "Source: " + str(sample_list[i]["source"]) 
                 print "Timestamp: " + str(sample_list[i]["timestamp"]) 
@@ -106,8 +102,8 @@ def main(argv):
             print '--------------------------------------------------------------------------------------------------------------------------'
         
         print "Query initialization for get resources function."
-        #status,resources_list=ceilometer_api.get_resources(token_data["metering"], pom)
-        status,resources_list=ceilometer_api.get_resources("http://160.85.4.10:8777", pom)
+        status,resources_list=ceilometer_api.get_resources(token_data["metering"], pom)
+        #status,resources_list=ceilometer_api.get_resources("http://160.85.4.10:8777", pom)
         if status:
             print '--------------------------------------------------------------------------------------------------------------------------'
             print "The resources for your meter are printed next."

@@ -89,7 +89,7 @@ def periodic_counter(meters_used,metering,pom,periodic_counts,reden_br,time,mete
     for i in range(len(meters_used)):
         
 
-        status,sample_list=get_meter_samples(str(meters_used[i]),metering,pom,False)
+        status,sample_list=ceilometer_api.get_meter_samples(str(meters_used[i]),metering,pom,False)
         if status:
             print '--------------------------------------------------------------------------------------------------------------------------' 
             for j in range(len(sample_list)):     
@@ -166,7 +166,7 @@ def pricing(metering,meter_list,pom,input):
                         meters_used.append(price_def[i])
                         meters_ids.append(meter_list[j]["meter-id"])
 
-                        status,sample_list=get_meter_samples_periodic(price_def[i],metering,pom)
+                        status,sample_list=ceilometer_api.get_meter_samples(price_def[i],metering,pom,False)
                         if sample_list==[]:
                             price_def[i]=str(0)
 
@@ -233,7 +233,9 @@ print "Opened database successfully"
  
 def main(argv):
     print "Hello there. This is a simple periodic counter."
-    auth_uri = 'http://160.85.4.10:5000' #internal test-setup, replace it with your own value
+#   auth_uri = 'http://160.85.4.10:5000' #internal test-setup, replace it with your own value
+    auth_uri = 'http://160.85.231.233:5000' #internal test-setup, replace it with your own value
+                    
     status, token_data = keystone_api.get_token_v3(auth_uri)
     if status:
         print 'The authentication was successful.'

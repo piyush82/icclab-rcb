@@ -22,8 +22,8 @@ import textwrap
 
 def main(argv):
     print "Hello There. This is a simple test application making a test API call to OpenStack"
-    auth_uri = 'http://160.85.4.10:5000' #internal test-setup, replace it with your own value
-    #auth_uri = 'http://160.85.4.11:5000' #internal test-setup, replace it with your own value
+   # auth_uri = 'http://160.85.4.10:5000' #internal test-setup, replace it with your own value
+    auth_uri = 'http://160.85.231.233:5000' #internal test-setup, replace it with your own value
     status, token_data = keystone_api.get_token_v2(auth_uri)
     if status:
         print 'The authentication was successful, below are the data we got:'
@@ -35,9 +35,7 @@ def main(argv):
                 print '%1s %32s %2s %64s %1s' % ('|', key, '|', value, '|')
         print '--------------------------------------------------------------------------------------------------------'
         print 'The authentication token is: ', token_data["token-id"]
-        #wrapped_text = textwrap.wrap(token_data["token-id"], 104)
-        #for i in range(len(wrapped_text)):
-        #    print wrapped_text[i]
+
     else:
         print "Authentication was not successful."
     if status:
@@ -55,7 +53,7 @@ def main(argv):
             for i in range(len(meter_list)):
                 print '%1s %16s %2s %10s %2s %10s %2s %70s %1s' % ('|', meter_list[i]["meter-name"], '|', meter_list[i]["meter-type"], '|', meter_list[i]["meter-unit"], '|', meter_list[i]["meter-id"].strip(), '|')
             print '--------------------------------------------------------------------------------------------------------------------------'
-            #print meter_list
+
             
             meter_name=raw_input("Enter meter name: ")
             st,stat_list=ceilometer_api.meter_statistics(meter_name, token_data["ceilometer"],token_data["token-id"])
@@ -94,8 +92,7 @@ def main(argv):
                     print "Project id: " + str(sample_list[i]["project-id"])
                     print "Resource id: " + str(sample_list[i]["resource-id"]) 
                     print "Resource metadata: " 
-                #for key,value in sample_list[i]["resource-metadata"]:
-                #    print key,value
+
                     print sample_list[i]["resource-metadata"]
                     print "Source: " + str(sample_list[i]["source"]) 
                     print "Timestamp: " + str(sample_list[i]["timestamp"]) 

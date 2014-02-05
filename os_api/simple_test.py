@@ -137,7 +137,7 @@ def main(argv):
                  
                         print "Resource metadata: " 
                         print resources_list[i]["metadata"]
-                       # print "Source: " + str(resources_list[i]["source"]) 
+                        #print "Source: " + str(resources_list[i]["source"]) 
                         #print "First sample timestamp: " + str(resources_list[i]["first-sample-timestamp"]) 
                         #print "Last sample timestamp: " + str(resources_list[i]["last-sample-timestamp"]) 
                         print "User ID: " + str(resources_list[i]["user-id"]) 
