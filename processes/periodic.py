@@ -35,49 +35,7 @@ def is_number(s):
     except ValueError:
         return False
 
-def get_meter_samples_periodic(meter_name,api_endpoint,token):
-    meter_samples=[None]
-    headers = {
-               'Content-Type': 'application/json;',
-               'X-Auth-Token': token
-               
-    }
-  
-    path = "/v2/meters/"+meter_name
-    target = urlparse(api_endpoint+path)
-    method = 'GET'  
-    body='{"limit": 1 }'
-    
-    h = http.Http()
-    response, content = h.request(target.geturl(),method,body,headers)
-    header = json.dumps(response)
-    json_header = json.loads(header)
-    
-    server_response = json_header["status"]
-    if server_response not in {'200'}:
-        print "Inside meter_samples(): Something went wrong!"
-        return False, meter_samples
-    else:
-        data = json.loads(content)
-        meter_samples = [None]*len(data)
 
-        for i in range(len(data)):
-            meter_samples[i]={}
-            meter_samples[i]["counter-name"] = data[i]["counter_name"]
-            meter_samples[i]["counter-type"] = data[i]["counter_type"]
-            meter_samples[i]["counter-unit"] = data[i]["counter_unit"]
-            meter_samples[i]["counter-volume"] = data[i]["counter_volume"]
-            meter_samples[i]["message-id"] = data[i]["message_id"]
-            meter_samples[i]["project-id"] = data[i]["project_id"]
-            meter_samples[i]["resource-id"] = data[i]["resource_id"]
-            catalog=data[i]["resource_metadata"]
-            cat_pom = json.dumps(catalog)
-            cat_pom=cat_pom.translate(None,'"{}')
-            meter_samples[i]["resource-metadata"]=cat_pom
-            meter_samples[i]["source"] = data[i]["source"]
-            meter_samples[i]["timestamp"] = data[i]["timestamp"]
-            meter_samples[i]["user-id"] = data[i]["user_id"]
-        return True, meter_samples
     
 
 #counter thats called periodically and inserts the metered data in one table and the calculated price in another
