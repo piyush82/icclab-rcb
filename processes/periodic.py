@@ -34,9 +34,7 @@ def is_number(s):
         return True
     except ValueError:
         return False
-
-
-    
+  
 
 #counter thats called periodically and inserts the metered data in one table and the calculated price in another
 def periodic_counter(meters_used,metering,pom,periodic_counts,reden_br,time,meters_ids,input,meter_list):
@@ -87,17 +85,17 @@ def periodic_counter(meters_used,metering,pom,periodic_counts,reden_br,time,mete
     
     status2,meters_used2,meters_ids2,func,price=pricing(metering,meter_list,pom,input)
     if status2:
-        cursor2 = conn.execute("SELECT max(ID)  from PRICE_FUNC")
-        row2_count=conn.execute("SELECT COUNT(*) from PRICE_FUNC ")
+        cursor2 = conn.execute("SELECT max(ID)  from PRICE_LOOP")
+        row2_count=conn.execute("SELECT COUNT(*) from PRICE_LOOP ")
         result2=row2_count.fetchone()
         number_of_rows2=result2[0]
         datetime2=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         if number_of_rows2==0:
-            conn.execute("INSERT INTO PRICE_FUNC(ID,PRICE,TIMESTAMP,TENANT_ID) \
+            conn.execute("INSERT INTO PRICE_LOOP(ID,PRICE,TIMESTAMP,TENANT_ID) \
                     VALUES (1, '"+ str(price) +"' ,' "+ str(datetime2)+"' ,' "+tenant+" ')")
         else:
             id_last2 = cursor2.fetchone()[0]+1
-            conn.execute("INSERT INTO PRICE_FUNC (ID,PRICE,TIMESTAMP,TENANT_ID) \
+            conn.execute("INSERT INTO PRICE_LOOP (ID,PRICE,TIMESTAMP,TENANT_ID) \
                     VALUES ("+str(id_last2)+",' "+ str(price)  +"' ,' "+ str(datetime2)+"' ,' "+tenant+" ')")    
                
 
@@ -111,6 +109,9 @@ def pricing(metering,meter_list,pom,input):
             if input==None:
                 price_def=raw_input("Define the pricing function. Use only the meters from above and numbers as arguments. Use the following signs: '+' for sum, '-' for substraction, '*' for multiplying, '/' for division or '%' for percentage. Use whitespace in between. ")
                 price_def=price_def.split(" ")
+                if len(price_def)>9:
+                    print "You can use only 5 parameters"
+                    price_def=raw_input("Define the pricing function. Use only the meters from above and numbers as arguments. Use the following signs: '+' for sum, '-' for substraction, '*' for multiplying, '/' for division or '%' for percentage. Use whitespace in between. ")
                 input=price_def
             else:
                 price_def=input
@@ -200,6 +201,7 @@ def main(argv):
         print '--------------------------------------------------------------------------------------------------------'
         print 'The authentication token is: ', token_data["token-id"]
         pom=token_data["token-id"]
+        user=token_data["user-id"]
     else:
         print "Authentication was not successful."
     if status:
@@ -214,6 +216,14 @@ def main(argv):
                 print '%1s %16s %2s %10s %2s %10s %2s %70s %1s' % ('|', meter_list[i]["meter-name"], '|', meter_list[i]["meter-type"], '|', meter_list[i]["meter-unit"], '|', meter_list[i]["meter-id"].strip(), '|')         
 
             status,meters_used,meters_ids,input,price=pricing(token_data["metering"],meter_list,pom,None)
+            global conn    
+            conn = sqlite3.connect('meters.db',check_same_thread=False)
+            func=[None]*9
+            for i in range(len(input)):
+                func[i]=input[i]
+            conn.execute("INSERT INTO PRICING_FUNC (USER_ID,PARAM1,SIGN1,PARAM2,SIGN2,PARAM3,SIGN3,PARAM4,SIGN4,PARAM5) \
+                       VALUES ( '"+ str(user) +"', '"+ str(func[0]) +"','" +str(func[1]) +"','" +str(func[2]) +"','" + str(func[3]) +" ','"+ str(func[4]) +"' ,' "+ str(func[5])+"' ,' "+ str(func[6]) +"' ,' "+ str(func[7])+"' ,' "+str(func[8])+" ')")
+            conn.commit()
             if status:
                 time=raw_input("Enter the desired time interval in seconds. ")                
                 periodic_counts = [None]*len(meters_used)

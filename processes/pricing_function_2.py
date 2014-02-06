@@ -48,6 +48,9 @@ def main(argv):
             price=0
             price_def=raw_input("Define the pricing function. Use only the meters from above and numbers as arguments. Use the following signs: '+' for sum, '-' for substraction, '*' for multiplying, '/' for division or '%' for percentage. Use whitespace in between. ")
             price_def=price_def.split(" ")
+            if len(price_def)>9:
+                print "You can use only 5 parameters"
+                price_def=raw_input("Define the pricing function. Use only the meters from above and numbers as arguments. Use the following signs: '+' for sum, '-' for substraction, '*' for multiplying, '/' for division or '%' for percentage. Use whitespace in between. ")            
             
             meters_used=[None]
             
