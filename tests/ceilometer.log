@@ -1,0 +1,22 @@
+2014-02-07 14:40:24,104 - ceilometer_api - INFO - Path is /v2/meters
+2014-02-07 14:40:24,325 - ceilometer_api - INFO - Return meter list 
+
+2014-02-07 14:40:52,963 - ceilometer_api - INFO - Inside meter-statistics: Path is /v2/meters/cpu_util % 10 + port/statistics
+2014-02-07 14:40:53,642 - ceilometer_api - INFO - Inside meter_statistics: body is  {}
+2014-02-07 14:40:53,668 - ceilometer_api - INFO - Getting the meter statistics 
+
+2014-02-07 14:41:12,670 - ceilometer_api - INFO - Path is /v2/meters
+2014-02-07 14:41:12,876 - ceilometer_api - INFO - Return meter list 
+
+2014-02-07 14:41:15,986 - ceilometer_api - INFO - Inside meter-statistics: Path is /v2/meters/cpu/statistics
+2014-02-07 14:41:16,506 - ceilometer_api - INFO - Inside meter_statistics: body is  {}
+2014-02-07 14:41:16,558 - ceilometer_api - INFO - Getting the meter statistics 
+
+2014-02-07 14:41:16,558 - ceilometer_api - INFO - Inside get_meter_sample: Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters/cpu', params='', query='', fragment='')
+2014-02-07 14:41:17,266 - ceilometer_api - INFO - Inside get_meter_samples: Body is {}
+2014-02-07 14:41:20,545 - ceilometer_api - INFO - Fetching meter samples 
+
+2014-02-07 14:41:23,074 - ceilometer_api - INFO - Inside get_resources: Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/resources', params='', query='', fragment='')
+2014-02-07 14:41:23,075 - ceilometer_api - INFO - Inside get_resources: Body is {}
+2014-02-07 14:41:26,206 - ceilometer_api - INFO - Fetching resources 
+

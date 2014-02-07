@@ -15,29 +15,42 @@ import textwrap
 import sqlite3
 import json
 import os
+import logging
+
 
 def main(argv):
     
+    logging.basicConfig(level=logging.DEBUG)
+    logger = logging.getLogger(__name__)
+    handler = logging.FileHandler('init.log')
+    handler.setLevel(logging.DEBUG)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    #if database doesnt exist, create it
     if not os.path.isfile('meters.db'):
-        print "Creating database"
+        logger.info('Creating database')
+
         conn = sqlite3.connect('meters.db')
-        create_tables(conn)
-        
+        create_tables(conn)        
         conn.close()
+    #if database exists, check if tables match the original, if not, drop all tables and create them again   
     else:
         conn = sqlite3.connect('meters.db')
-        print "The database exists"
+        logger.info('The database exists')
+
         all=[]
         default=["meters_counter","pricing_func","users","units","price_loop"]
-        print "Opened database successfully"
+        logger.info('Opened database successfully')
+
         count=conn.execute("SELECT count(*) FROM sqlite_master WHERE type = 'table' AND name != 'android_metadata' AND name != 'sqlite_sequence'")
         for i in count:
             total=i[0]
-        print total
+
         tables=conn.execute("SELECT * FROM sqlite_master WHERE type = 'table' AND name != 'android_metadata' AND name != 'sqlite_sequence'")
         for i in tables:        
             all.append(i[2])
-        print all
+
     
         for i in range(len(all)):
             all[i]=all[i].lower()     
@@ -46,17 +59,19 @@ def main(argv):
         pom=pom.translate(None,'"[] " "')
         pom=pom.split(",")
         all=pom
-        print all 
+
         x=set(all)
-        print x
+
         y=set(default)
-        print y
+
         if x!=y:
             for i in range(len(all)):
                 conn.execute("DROP TABLE "+str(all[i])) 
                 create_tables(conn)
+            logger.info('Drop all tables')
             
-            print "Records created successfully";
+            logger.info('Records created  successfully')
+
 
         conn.close()    
             
@@ -71,13 +86,15 @@ def create_tables(conn):
            UNIT TEXT NOT NULL,
            TIMESTAMP DATETIME NOT NULL,
            TENANT_ID TEXT NOT NULL);''')
-        print "Table created successfully"
+        logger.info('Table created successfully')
+
         conn.execute('''CREATE TABLE PRICE_LOOP
            (ID INT PRIMARY KEY  NOT NULL,
            PRICE REAL NOT NULL,
            TIMESTAMP DATETIME NOT NULL,
            TENANT_ID TEXT NOT NULL);''')
-        print "Table created successfully"
+        logger.info('Table created successfully')
+
         conn.execute('''CREATE TABLE PRICING_FUNC
            (ID INTEGER PRIMARY KEY AUTOINCREMENT,
            USER_ID TEXT NOT NULL,
@@ -90,18 +107,21 @@ def create_tables(conn):
            PARAM4 TEXT,
            SIGN4 TEXT,
            PARAM5 TEXT);''')
-        print "Table created successfully" 
+        logger.info('Table created successfully')
+
         conn.execute('''CREATE TABLE UNITS
            (ID INTEGER PRIMARY KEY,
            METER_NAME TEXT NOT NULL,
            METER_TYPE TEXT NOT NULL,
            METER_UNIT TEXT NOT NULL);''')
-        print "Table created successfully"
+        logger.info('Table created successfully')
+
         conn.execute('''CREATE TABLE USERS
            (ID INT PRIMARY KEY  NOT NULL,
            USER_ID TEXT NOT NULL,
            TENANT_ID TEXT NOT NULL);''')
-        print "Table created successfully"
+        logger.info('Table created successfully')
+
         conn.commit()
         return True
                       

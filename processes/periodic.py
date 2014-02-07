@@ -11,7 +11,9 @@ import textwrap
 import threading,time
 import httplib2 as http
 import sys, re
-sys.path.append('/home/kolv/workspace/icc-lab-master/os_api')
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'os_api')))
+#sys.path.append('/home/kolv/workspace/icc-lab-master/os_api')
 import ceilometer_api
 import compute_api
 import keystone_api
@@ -21,6 +23,7 @@ from threading import Timer
 from time import sleep
 import sqlite3
 import datetime
+import logging
 from time import gmtime, strftime
 try:
     from urlparse import urlparse
@@ -35,6 +38,15 @@ def is_number(s):
     except ValueError:
         return False
   
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+handler = logging.FileHandler('periodic.log')
+handler.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+logger.propagate = False
+
 
 #counter thats called periodically and inserts the metered data in one table and the calculated price in another
 def periodic_counter(meters_used,metering,pom,periodic_counts,reden_br,time,meters_ids,input,meter_list):
@@ -46,6 +58,7 @@ def periodic_counter(meters_used,metering,pom,periodic_counts,reden_br,time,mete
         
 
         status,sample_list=ceilometer_api.get_meter_samples(str(meters_used[i]),metering,pom,False)
+        logger.info('In periodic: Getting meter samples')
         if status:
             print '--------------------------------------------------------------------------------------------------------------------------' 
             for j in range(len(sample_list)):     
@@ -81,6 +94,7 @@ def periodic_counter(meters_used,metering,pom,periodic_counts,reden_br,time,mete
                
 
                 conn.commit()
+                logger.info('Insert data in meters_counter ')
     reden_br+=1
     
     status2,meters_used2,meters_ids2,func,price=pricing(metering,meter_list,pom,input)
@@ -100,6 +114,7 @@ def periodic_counter(meters_used,metering,pom,periodic_counts,reden_br,time,mete
                
 
         conn.commit()
+        logger.info('Insert data in price_loop ')
     t = Timer(float(time),periodic_counter,args=[meters_used,metering,pom,periodic_counts,reden_br,time,meters_ids,input,meter_list])
     t.start()
     return status
@@ -111,6 +126,7 @@ def pricing(metering,meter_list,pom,input):
                 price_def=price_def.split(" ")
                 if len(price_def)>9:
                     print "You can use only 5 parameters"
+                    logger.warn('More than 5 parameters used')
                     price_def=raw_input("Define the pricing function. Use only the meters from above and numbers as arguments. Use the following signs: '+' for sum, '-' for substraction, '*' for multiplying, '/' for division or '%' for percentage. Use whitespace in between. ")
                 input=price_def
             else:
@@ -126,6 +142,7 @@ def pricing(metering,meter_list,pom,input):
                         meters_ids.append(meter_list[j]["meter-id"])
 
                         status,sample_list=ceilometer_api.get_meter_samples(price_def[i],metering,pom,False)
+                        logger.info('In pricing: Getting meter samples')
                         if sample_list==[]:
                             price_def[i]=str(0)
 
@@ -171,6 +188,8 @@ def pricing(metering,meter_list,pom,input):
                                     price=price/x
                                 else:
                                     print "Division by zero."
+                                    logger.warn('Division by zero')
+                                    
                                     status_ret=False
                             if price_def[i]=="%":
                                 price=price*x/100.0
@@ -181,8 +200,11 @@ def pricing(metering,meter_list,pom,input):
                     continue
             if status_ret==True:
                 print "The price value is: " + str(price)
+                logger.info('Price is %s', price)
             else:
                 print "Error. Poorly defined pricing function."
+                logger.warn('Not properly defined pricing function')
+                
             return status_ret,meters_used,meters_ids,input,price
          
 conn = sqlite3.connect('meters.db',check_same_thread=False)
@@ -191,9 +213,12 @@ print "Opened database successfully"
           
  
 def main(argv):
+
     print "Hello there. This is a simple periodic counter."
-#   auth_uri = 'http://160.85.4.10:5000' #internal test-setup, replace it with your own value
-    auth_uri = 'http://160.85.231.233:5000' #internal test-setup, replace it with your own value
+    logger.info('--------------- \n')
+    logger.info('Starting periodic ')
+    auth_uri = 'http://160.85.4.10:5000' #internal test-setup, replace it with your own value
+    #auth_uri = 'http://160.85.231.233:5000' #internal test-setup, replace it with your own value
                     
     status, token_data = keystone_api.get_token_v3(auth_uri)
     if status:
@@ -202,11 +227,14 @@ def main(argv):
         print 'The authentication token is: ', token_data["token-id"]
         pom=token_data["token-id"]
         user=token_data["user-id"]
+        logger.info('Successful authentication for user %s', user)
     else:
         print "Authentication was not successful."
+        logger.warn('Authentication not successful')
     if status:
         status, meter_list = ceilometer_api.get_meter_list(pom, token_data["metering"])
         if status:
+            logger.info('Printing meters')
             print "The list of available meters are printed next."
             print '--------------------------------------------------------------------------------------------------------------------------'
             print '%1s %16s %2s %10s %2s %10s %2s %70s %1s' % ('|','meter-name', '|', 'meter-type', '|', 'meter-unit', '|', 'meter-id', '|')
@@ -214,8 +242,9 @@ def main(argv):
 
             for i in range(len(meter_list)):
                 print '%1s %16s %2s %10s %2s %10s %2s %70s %1s' % ('|', meter_list[i]["meter-name"], '|', meter_list[i]["meter-type"], '|', meter_list[i]["meter-unit"], '|', meter_list[i]["meter-id"].strip(), '|')         
-
+                logger.info('Meter list %s', meter_list[i]["meter-name"])
             status,meters_used,meters_ids,input,price=pricing(token_data["metering"],meter_list,pom,None)
+            logger.info('Defining pricing function. %s', input)
             global conn    
             conn = sqlite3.connect('meters.db',check_same_thread=False)
             func=[None]*9
@@ -224,13 +253,18 @@ def main(argv):
             conn.execute("INSERT INTO PRICING_FUNC (USER_ID,PARAM1,SIGN1,PARAM2,SIGN2,PARAM3,SIGN3,PARAM4,SIGN4,PARAM5) \
                        VALUES ( '"+ str(user) +"', '"+ str(func[0]) +"','" +str(func[1]) +"','" +str(func[2]) +"','" + str(func[3]) +" ','"+ str(func[4]) +"' ,' "+ str(func[5])+"' ,' "+ str(func[6]) +"' ,' "+ str(func[7])+"' ,' "+str(func[8])+" ')")
             conn.commit()
+            logger.info('Insert pricing function in database')
             if status:
-                time=raw_input("Enter the desired time interval in seconds. ")                
+                time=raw_input("Enter the desired time interval in seconds. ")
+                if time=="":
+                    time=10                
                 periodic_counts = [None]*len(meters_used)
                 for i in range(len(meters_used)):
                     periodic_counts[i]=[]
                 periodic_counter(meters_used,token_data["metering"],pom,periodic_counts,0,time,meters_ids,input,meter_list) 
+                logger.info('Starting counter. Time interval is %s ', time)
                 conn.close()
+               
 
     return True
     

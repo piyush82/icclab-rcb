@@ -43,8 +43,6 @@ conn.execute('''CREATE TABLE PRICE_FUNC
        TIMESTAMP DATETIME NOT NULL);''')
 print "Table created successfully";
 
-#conn.execute("INSERT INTO UNITS (ID,METER_NAME,METER_TYPE,METER_UNIT) \
-#      VALUES (1, 'cpu', 'cumulative', 'ns' )");
 
 conn.commit()
 print "Records created successfully";

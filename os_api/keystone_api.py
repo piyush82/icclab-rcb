@@ -50,8 +50,8 @@ def get_endpoints(tokenId, uri):
                'Content-Type': 'application/json;'
     }
     # uri = 'http://160.85.4.11:5000' #replace this with the API end-point of your setup
-    #uri="http://160.85.4.10:5000"
-    uri = 'http://160.85.231.233:5000' #internal test-setup, replace it with your own value
+    uri="http://160.85.4.10:5000"
+    #uri = 'http://160.85.4.64:5000' #internal test-setup, replace it with your own value
     path = '/v2.0/tokens/' + tokenId + '/endpoints'
     target = urlparse(uri+path)
     method = 'GET'

@@ -15,13 +15,23 @@
 import httplib2 as http
 import sys, re
 import json
+import logging
 from collections import namedtuple
 
 try:
     from urlparse import urlparse
 except ImportError:
     from urllib.parse import urlparse
-    
+ 
+ 
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+handler = logging.FileHandler('ceilometer.log')
+handler.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+logger.propagate = False      
     
 #get the list of available meters
 def get_meter_list(token, api_endpoint):
@@ -33,6 +43,7 @@ def get_meter_list(token, api_endpoint):
     }
     path = "/v2/meters"
     target = urlparse(api_endpoint+path)
+    logger.info('Path is %s',target)
     method = 'GET'
     body = ''
     h = http.Http()
@@ -44,10 +55,11 @@ def get_meter_list(token, api_endpoint):
     server_response = json_header["status"]
     if server_response not in {'200'}:
         print "Inside get_server_list(): Something went wrong!"
+        logger.warn('Not a valid response')
         return False, meter_list
     else:
         data = json.loads(content)
-        #print "Number of meters found: %d" % len(data) 
+        logger.info('Return meter list \n')
         meter_list = [None]*len(data)
         for i in range(len(data)):
             meter_list[i] = {}
@@ -129,7 +141,7 @@ def meter_statistics(meter_id,api_endpoint,token):
     path = "/v2/meters/"+meter_id+"/statistics"
     target = urlparse(api_endpoint+path)
     method = 'GET'
-    
+    logger.info('Inside meter-statistics: Path is %s',target)
         
     if(status_q==True):
         q=set_query(from_date,to_date,from_time,to_time,resource_id,project_id,status_q)
@@ -203,7 +215,7 @@ def meter_statistics(meter_id,api_endpoint,token):
         
  
             
-            
+    logger.info('Inside meter_statistics: body is  %s',body)        
     h = http.Http()
     response, content = h.request(target.geturl(),method,body,headers)
     header = json.dumps(response)
@@ -212,8 +224,10 @@ def meter_statistics(meter_id,api_endpoint,token):
     server_response = json_header["status"]
     if server_response not in {'200'}:
         print "Inside meter_statistics(): Something went wrong!"
+        logger.warn('Inside meter_statistics: not a valid response ')
         return False, meter_stat
     else:
+        logger.info('Getting the meter statistics \n')
         data = json.loads(content)
         meter_stat = [None]*len(data)
         for i in range(len(data)):
@@ -243,6 +257,7 @@ def get_meter_samples(meter_name,api_endpoint,token,bool_query):
     }   
     path = "/v2/meters/"+meter_name
     target = urlparse(api_endpoint+path)
+    logger.info('Inside get_meter_sample: Path is %s',target)
     method = 'GET'
     if bool_query==True:
         from_date,to_date,from_time,to_time,resource_id,project_id,status_q=query()
@@ -264,6 +279,7 @@ def get_meter_samples(meter_name,api_endpoint,token,bool_query):
     else:
         body='{"limit": 1 }'
     
+    logger.info('Inside get_meter_samples: Body is %s', body)
     h = http.Http()
     response, content = h.request(target.geturl(),method,body,headers)
     header = json.dumps(response)
@@ -272,8 +288,10 @@ def get_meter_samples(meter_name,api_endpoint,token,bool_query):
     server_response = json_header["status"]
     if server_response not in {'200'}:
         print "Inside meter_samples(): Something went wrong!"
+        logger.warn('Inside meter_samples: not a valid response ')
         return False, meter_samples
     else:
+        logger.info('Fetching meter samples \n')
         data = json.loads(content)
         meter_samples = [None]*len(data)
 
@@ -306,13 +324,15 @@ def get_resources(api_endpoint,token):
     from_date,to_date,from_time,to_time,resource_id,project_id,status_q=query()   
     path = "/v2/resources"
     target = urlparse(api_endpoint+path)
+    logger.info('Inside get_resources: Path is %s',target)
     method = 'GET'
     body="{"
     if(status_q==True):
         q=set_query(from_date,to_date,from_time,to_time,resource_id,project_id,status_q)
         body=body+q
     body=body+"}"
-        
+      
+    logger.info('Inside get_resources: Body is %s', body)   
     h = http.Http()
     response, content = h.request(target.geturl(),method,body,headers)
     header = json.dumps(response)
@@ -321,8 +341,10 @@ def get_resources(api_endpoint,token):
     server_response = json_header["status"]
     if server_response not in {'200'}:
         print "Inside resources_list(): Something went wrong!"
+        logger.warn('Inside resources_list: not a valid response ')
         return False, resources_list
     else:
+        logger.info('Fetching resources \n')
         data = json.loads(content)
         resources_list = [None]*len(data)  
         links_list=[None]      
@@ -362,6 +384,7 @@ def get_resources_by_id(api_endpoint,token,rid):
  
         path = "/v2/resources/"+rid
         target = urlparse(api_endpoint+path)
+        logger.info('Inside get_resources_by_id: Path is %s',target)
         method = 'GET'
         body="{"
 
@@ -375,8 +398,10 @@ def get_resources_by_id(api_endpoint,token,rid):
         server_response = json_header["status"]
         if server_response not in {'200'}:
             print "Inside resources_list(): Something went wrong!"
+            logger.warn('Inside resources_by_id: not a valid response ')
             return False, resources_list
         else:
+            logger.info('Fetching resources for id \n')
             data = json.loads(content)
             resources_list = [None]*len(data)  
             links_list=[None]      

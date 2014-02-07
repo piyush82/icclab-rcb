@@ -1,0 +1,179 @@
+2014-02-07 14:17:05,127 - __main__ - INFO - Starting periodic 
+2014-02-07 14:17:21,670 - __main__ - INFO - Successful authentication for user eaacb526eb0048668c37c40bf4063242
+2014-02-07 14:17:21,773 - __main__ - INFO - Printing meters
+2014-02-07 14:17:21,773 - __main__ - INFO - Meter list image
+2014-02-07 14:17:21,774 - __main__ - INFO - Meter list image.size
+2014-02-07 14:17:21,774 - __main__ - INFO - Meter list image
+2014-02-07 14:17:21,774 - __main__ - INFO - Meter list image.size
+2014-02-07 14:17:21,774 - __main__ - INFO - Meter list image
+2014-02-07 14:17:21,775 - __main__ - INFO - Meter list image.size
+2014-02-07 14:17:25,823 - __main__ - INFO - In pricing: Getting meter samples
+2014-02-07 14:17:25,824 - __main__ - INFO - Price is 131243.0
+2014-02-07 14:17:25,824 - __main__ - INFO - Defining pricing function. ['1.0', '*', '131243']
+2014-02-07 14:17:26,062 - __main__ - INFO - Insert pricing function in database
+2014-02-07 14:17:27,806 - __main__ - INFO - In periodic: Getting meter samples
+2014-02-07 14:17:27,952 - __main__ - INFO - Insert data in meters_counter 
+2014-02-07 14:17:27,952 - __main__ - INFO - Price is 131243.0
+2014-02-07 14:17:28,465 - __main__ - INFO - Insert data in price_loop 
+
+2014-02-07 14:17:28,465 - __main__ - INFO - Starting counter. Time interval is 5 
+2014-02-07 14:17:33,493 - __main__ - INFO - In periodic: Getting meter samples
+2014-02-07 14:17:33,650 - __main__ - INFO - Insert data in meters_counter 
+2014-02-07 14:17:33,650 - __main__ - INFO - Price is 131243.0
+2014-02-07 14:17:33,776 - __main__ - INFO - Insert data in price_loop 
+
+2014-02-07 14:17:38,805 - __main__ - INFO - In periodic: Getting meter samples
+2014-02-07 14:17:38,948 - __main__ - INFO - Insert data in meters_counter 
+2014-02-07 14:17:38,948 - __main__ - INFO - Price is 131243.0
+2014-02-07 14:17:39,099 - __main__ - INFO - Insert data in price_loop 
+
+2014-02-07 14:20:49,667 - __main__ - INFO - Starting periodic 
+2014-02-07 14:20:55,736 - __main__ - INFO - Successful authentication for user eaacb526eb0048668c37c40bf4063242
+2014-02-07 14:20:55,831 - __main__ - INFO - Printing meters
+2014-02-07 14:20:55,832 - __main__ - INFO - Meter list image
+2014-02-07 14:20:55,832 - __main__ - INFO - Meter list image.size
+2014-02-07 14:20:55,832 - __main__ - INFO - Meter list image
+2014-02-07 14:20:55,832 - __main__ - INFO - Meter list image.size
+2014-02-07 14:20:55,833 - __main__ - INFO - Meter list image
+2014-02-07 14:20:55,833 - __main__ - INFO - Meter list image.size
+2014-02-07 14:20:58,499 - __main__ - INFO - In pricing: Getting meter samples
+2014-02-07 14:20:58,500 - __main__ - INFO - Price is 1243.0
+2014-02-07 14:20:58,500 - __main__ - INFO - Defining pricing function. ['1.0', '*', '1243']
+2014-02-07 14:20:58,636 - __main__ - INFO - Insert pricing function in database
+2014-02-07 14:21:00,318 - __main__ - INFO - In periodic: Getting meter samples
+2014-02-07 14:21:00,540 - __main__ - INFO - Insert data in meters_counter 
+2014-02-07 14:21:00,540 - __main__ - INFO - Price is 1243.0
+2014-02-07 14:21:00,691 - __main__ - INFO - Insert data in price_loop 
+2014-02-07 14:21:00,692 - __main__ - INFO - Starting counter. Time interval is 5 
+2014-02-07 14:21:00,692 - __main__ - INFO - Connection closed 
+
+2014-02-07 14:21:05,720 - __main__ - INFO - In periodic: Getting meter samples
+2014-02-07 14:21:05,860 - __main__ - INFO - Insert data in meters_counter 
+2014-02-07 14:21:05,860 - __main__ - INFO - Price is 1243.0
+2014-02-07 14:21:05,994 - __main__ - INFO - Insert data in price_loop 
+2014-02-07 14:21:11,024 - __main__ - INFO - In periodic: Getting meter samples
+2014-02-07 14:21:11,166 - __main__ - INFO - Insert data in meters_counter 
+2014-02-07 14:21:11,166 - __main__ - INFO - Price is 1243.0
+2014-02-07 14:21:11,317 - __main__ - INFO - Insert data in price_loop 
+2014-02-07 14:23:40,465 - __main__ - INFO - Starting periodic 
+
+2014-02-07 14:23:47,916 - __main__ - INFO - Successful authentication for user eaacb526eb0048668c37c40bf4063242
+2014-02-07 14:23:48,006 - __main__ - INFO - Printing meters
+2014-02-07 14:23:48,006 - __main__ - INFO - Meter list image
+2014-02-07 14:23:48,007 - __main__ - INFO - Meter list image.size
+2014-02-07 14:23:48,007 - __main__ - INFO - Meter list image
+2014-02-07 14:23:48,007 - __main__ - INFO - Meter list image.size
+2014-02-07 14:23:48,007 - __main__ - INFO - Meter list image
+2014-02-07 14:23:48,007 - __main__ - INFO - Meter list image.size
+2014-02-07 14:23:51,685 - __main__ - INFO - In pricing: Getting meter samples
+2014-02-07 14:23:51,685 - __main__ - INFO - Price is 1342.0
+2014-02-07 14:23:51,685 - __main__ - INFO - Defining pricing function. ['1.0', '*', '1342']
+2014-02-07 14:23:51,812 - __main__ - INFO - Insert pricing function in database
+2014-02-07 14:23:53,443 - __main__ - INFO - In periodic: Getting meter samples
+2014-02-07 14:23:53,581 - __main__ - INFO - Insert data in meters_counter 
+2014-02-07 14:23:53,581 - __main__ - INFO - Price is 1342.0
+2014-02-07 14:23:53,749 - __main__ - INFO - Insert data in price_loop 
+2014-02-07 14:23:53,749 - __main__ - INFO - Starting counter. Time interval is 5 
+2014-02-07 14:23:58,777 - __main__ - INFO - In periodic: Getting meter samples
+2014-02-07 14:23:58,953 - __main__ - INFO - Insert data in meters_counter 
+2014-02-07 14:23:58,953 - __main__ - INFO - Price is 1342.0
+2014-02-07 14:23:59,096 - __main__ - INFO - Insert data in price_loop 
+2014-02-07 14:24:04,124 - __main__ - INFO - In periodic: Getting meter samples
+2014-02-07 14:24:04,282 - __main__ - INFO - Insert data in meters_counter 
+2014-02-07 14:24:04,282 - __main__ - INFO - Price is 1342.0
+2014-02-07 14:24:04,416 - __main__ - INFO - Insert data in price_loop 
+2014-02-07 14:25:03,676 - __main__ - INFO - --------------- 
+
+2014-02-07 14:25:03,677 - __main__ - INFO - Starting periodic 
+2014-02-07 14:25:12,228 - __main__ - INFO - Successful authentication for user eaacb526eb0048668c37c40bf4063242
+2014-02-07 14:25:12,329 - __main__ - INFO - Printing meters
+2014-02-07 14:25:12,329 - __main__ - INFO - Meter list image
+2014-02-07 14:25:12,330 - __main__ - INFO - Meter list image.size
+2014-02-07 14:25:12,330 - __main__ - INFO - Meter list image
+2014-02-07 14:25:12,330 - __main__ - INFO - Meter list image.size
+2014-02-07 14:25:12,330 - __main__ - INFO - Meter list image
+2014-02-07 14:25:12,330 - __main__ - INFO - Meter list image.size
+2014-02-07 14:25:17,229 - __main__ - INFO - In pricing: Getting meter samples
+2014-02-07 14:25:17,229 - __main__ - INFO - Price is 1324.0
+2014-02-07 14:25:17,230 - __main__ - INFO - Defining pricing function. ['1.0', '*', '1324']
+2014-02-07 14:25:17,362 - __main__ - INFO - Insert pricing function in database
+2014-02-07 14:25:19,706 - __main__ - INFO - In periodic: Getting meter samples
+2014-02-07 14:25:19,843 - __main__ - INFO - Insert data in meters_counter 
+2014-02-07 14:25:19,844 - __main__ - INFO - Price is 1324.0
+2014-02-07 14:25:19,994 - __main__ - INFO - Insert data in price_loop 
+2014-02-07 14:25:19,995 - __main__ - INFO - Starting counter. Time interval is 3 
+2014-02-07 14:25:23,023 - __main__ - INFO - In periodic: Getting meter samples
+2014-02-07 14:25:23,146 - __main__ - INFO - Insert data in meters_counter 
+2014-02-07 14:25:23,147 - __main__ - INFO - Price is 1324.0
+2014-02-07 14:25:23,297 - __main__ - INFO - Insert data in price_loop 
+2014-02-07 14:25:26,317 - __main__ - INFO - In periodic: Getting meter samples
+2014-02-07 14:25:26,445 - __main__ - INFO - Insert data in meters_counter 
+2014-02-07 14:25:26,445 - __main__ - INFO - Price is 1324.0
+2014-02-07 14:25:26,587 - __main__ - INFO - Insert data in price_loop 
+2014-02-07 14:43:25,224 - __main__ - INFO - --------------- 
+
+2014-02-07 14:43:25,224 - __main__ - INFO - Starting periodic 
+2014-02-07 14:43:38,471 - __main__ - INFO - Successful authentication for user a9eeff23809e4b3ead1c98d550879c76
+2014-02-07 14:43:38,689 - __main__ - INFO - Printing meters
+2014-02-07 14:43:38,689 - __main__ - INFO - Meter list cpu
+2014-02-07 14:43:38,689 - __main__ - INFO - Meter list cpu_util
+2014-02-07 14:43:38,690 - __main__ - INFO - Meter list disk.ephemeral.size
+2014-02-07 14:43:38,690 - __main__ - INFO - Meter list disk.read.bytes
+2014-02-07 14:43:38,690 - __main__ - INFO - Meter list disk.read.requests
+2014-02-07 14:43:38,690 - __main__ - INFO - Meter list disk.root.size
+2014-02-07 14:43:38,690 - __main__ - INFO - Meter list disk.write.bytes
+2014-02-07 14:43:38,691 - __main__ - INFO - Meter list disk.write.requests
+2014-02-07 14:43:38,691 - __main__ - INFO - Meter list instance
+2014-02-07 14:43:38,691 - __main__ - INFO - Meter list instance:m1.small
+2014-02-07 14:43:38,691 - __main__ - INFO - Meter list memory
+2014-02-07 14:43:38,691 - __main__ - INFO - Meter list network.incoming.bytes
+2014-02-07 14:43:38,692 - __main__ - INFO - Meter list network.incoming.packets
+2014-02-07 14:43:38,692 - __main__ - INFO - Meter list network.outgoing.bytes
+2014-02-07 14:43:38,692 - __main__ - INFO - Meter list network.outgoing.packets
+2014-02-07 14:43:38,692 - __main__ - INFO - Meter list vcpus
+2014-02-07 14:43:38,692 - __main__ - INFO - Meter list network
+2014-02-07 14:43:38,693 - __main__ - INFO - Meter list network.create
+2014-02-07 14:43:38,693 - __main__ - INFO - Meter list subnet
+2014-02-07 14:43:38,693 - __main__ - INFO - Meter list subnet.create
+2014-02-07 14:43:38,693 - __main__ - INFO - Meter list cpu
+2014-02-07 14:43:38,693 - __main__ - INFO - Meter list cpu_util
+2014-02-07 14:43:38,694 - __main__ - INFO - Meter list disk.ephemeral.size
+2014-02-07 14:43:38,694 - __main__ - INFO - Meter list disk.read.bytes
+2014-02-07 14:43:38,694 - __main__ - INFO - Meter list disk.read.requests
+2014-02-07 14:43:38,694 - __main__ - INFO - Meter list disk.root.size
+2014-02-07 14:43:38,694 - __main__ - INFO - Meter list disk.write.bytes
+2014-02-07 14:43:38,695 - __main__ - INFO - Meter list disk.write.requests
+2014-02-07 14:43:38,695 - __main__ - INFO - Meter list instance
+2014-02-07 14:43:38,695 - __main__ - INFO - Meter list instance:m1.small
+2014-02-07 14:43:38,695 - __main__ - INFO - Meter list memory
+2014-02-07 14:43:38,696 - __main__ - INFO - Meter list vcpus
+2014-02-07 14:43:38,696 - __main__ - INFO - Meter list ip.floating
+2014-02-07 14:43:38,696 - __main__ - INFO - Meter list ip.floating.create
+2014-02-07 14:43:38,696 - __main__ - INFO - Meter list ip.floating.update
+2014-02-07 14:43:38,696 - __main__ - INFO - Meter list port
+2014-02-07 14:43:38,697 - __main__ - INFO - Meter list port.create
+2014-02-07 14:43:38,697 - __main__ - INFO - Meter list port
+2014-02-07 14:43:38,697 - __main__ - INFO - Meter list port.create
+2014-02-07 14:43:38,697 - __main__ - INFO - Meter list router
+2014-02-07 14:43:38,697 - __main__ - INFO - Meter list router.create
+2014-02-07 14:43:38,698 - __main__ - INFO - Meter list router.update
+2014-02-07 14:43:38,698 - __main__ - INFO - Meter list network.incoming.bytes
+2014-02-07 14:43:38,698 - __main__ - INFO - Meter list network.incoming.packets
+2014-02-07 14:43:38,698 - __main__ - INFO - Meter list network.outgoing.bytes
+2014-02-07 14:43:38,698 - __main__ - INFO - Meter list network.outgoing.packets
+2014-02-07 14:43:38,699 - __main__ - INFO - Meter list network.incoming.bytes
+2014-02-07 14:43:38,699 - __main__ - INFO - Meter list network.incoming.packets
+2014-02-07 14:43:38,699 - __main__ - INFO - Meter list network.outgoing.bytes
+2014-02-07 14:43:38,699 - __main__ - INFO - Meter list network.outgoing.packets
+2014-02-07 14:43:53,965 - __main__ - INFO - In pricing: Getting meter samples
+2014-02-07 14:43:53,998 - __main__ - INFO - In pricing: Getting meter samples
+2014-02-07 14:43:53,998 - __main__ - INFO - Price is 1.8015
+2014-02-07 14:43:53,998 - __main__ - INFO - Defining pricing function. ['5.34333333333', '%', '15', '+', '1.0']
+2014-02-07 14:43:54,121 - __main__ - INFO - Insert pricing function in database
+2014-02-07 14:43:56,557 - __main__ - INFO - In periodic: Getting meter samples
+2014-02-07 14:43:56,698 - __main__ - INFO - Insert data in meters_counter 
+2014-02-07 14:43:56,728 - __main__ - INFO - In periodic: Getting meter samples
+2014-02-07 14:43:56,882 - __main__ - INFO - Insert data in meters_counter 
+2014-02-07 14:43:56,883 - __main__ - INFO - Price is 1.8015
+2014-02-07 14:43:57,016 - __main__ - INFO - Insert data in price_loop 
+2014-02-07 14:43:57,017 - __main__ - INFO - Starting counter. Time interval is 5 

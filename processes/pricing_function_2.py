@@ -12,7 +12,7 @@ import ceilometer_api
 import compute_api
 import keystone_api
 import textwrap
-
+import logging
 
 def is_number(s):
     try:
@@ -20,19 +20,30 @@ def is_number(s):
         return True
     except ValueError:
         return False
+    
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+handler = logging.FileHandler('pricing_func.log')
+handler.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+logger.propagate = False    
 
 def main(argv):
     print "Hello There. This is a simple test pricing function."
-    #auth_uri = 'http://160.85.4.10:5000' #internal test-setup, replace it with your own value
-    auth_uri = 'http://160.85.231.233:5000' #internal test-setup, replace it with your own value
+    auth_uri = 'http://160.85.4.10:5000' #internal test-setup, replace it with your own value
+    #auth_uri = 'http://160.85.231.233:5000' #internal test-setup, replace it with your own value
     status, token_data = keystone_api.get_token_v3(auth_uri)
     if status:
         print 'The authentication was successful.'
         print '--------------------------------------------------------------------------------------------------------'
         print 'The authentication token is: ', token_data["token-id"]
         pom=token_data["token-id"]
+        logger.info('Authentication was successful')
     else:
         print "Authentication was not successful."
+        logger.info('Authentication was not successful')
     if status:
         status, meter_list = ceilometer_api.get_meter_list(pom, token_data["metering"])
         if status:
@@ -50,6 +61,7 @@ def main(argv):
             price_def=price_def.split(" ")
             if len(price_def)>9:
                 print "You can use only 5 parameters"
+                logger.warn('Pricing function not properly defined')
                 price_def=raw_input("Define the pricing function. Use only the meters from above and numbers as arguments. Use the following signs: '+' for sum, '-' for substraction, '*' for multiplying, '/' for division or '%' for percentage. Use whitespace in between. ")            
             
             meters_used=[None]
@@ -61,6 +73,7 @@ def main(argv):
                         meters_used.append(price_def[i])
                         print "Enter query arguments."
                         status,sample_list=ceilometer_api.get_meter_samples(price_def[i],token_data["metering"],pom,True)
+                        logger.info('Getting meter samples')
                         if sample_list==[]:
                             price_def[i]=str(0)
 
@@ -105,6 +118,7 @@ def main(argv):
                                     price=price/x
                                 else:
                                     print "Division by zero."
+                                    logger.warn('Division by zero')
                                     status_ret=False
                             if price_def[i]=="%":
                                 price=price*x/100.0
@@ -115,8 +129,10 @@ def main(argv):
                     continue
             if status_ret==True:
                 print "The price value is: " + str(price)
+                logger.info('Calculated price is: %s',price)
             else:
                 print "Error. Poorly defined pricing function."
+                logger.warn('Pricing function not properly defined')
     return status_ret,meters_used
 
 

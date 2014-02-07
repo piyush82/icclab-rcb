@@ -1,0 +1,26 @@
+2014-02-07 14:43:38,471 - ceilometer_api - INFO - Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters', params='', query='', fragment='')
+2014-02-07 14:43:38,688 - ceilometer_api - INFO - Return meter list 
+
+2014-02-07 14:43:53,931 - ceilometer_api - INFO - Inside get_meter_sample: Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters/cpu_util', params='', query='', fragment='')
+2014-02-07 14:43:53,931 - ceilometer_api - INFO - Inside get_meter_samples: Body is {"limit": 1 }
+2014-02-07 14:43:53,964 - ceilometer_api - INFO - Fetching meter samples 
+
+2014-02-07 14:43:53,966 - ceilometer_api - INFO - Inside get_meter_sample: Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters/port', params='', query='', fragment='')
+2014-02-07 14:43:53,966 - ceilometer_api - INFO - Inside get_meter_samples: Body is {"limit": 1 }
+2014-02-07 14:43:53,997 - ceilometer_api - INFO - Fetching meter samples 
+
+2014-02-07 14:43:56,523 - ceilometer_api - INFO - Inside get_meter_sample: Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters/cpu_util', params='', query='', fragment='')
+2014-02-07 14:43:56,523 - ceilometer_api - INFO - Inside get_meter_samples: Body is {"limit": 1 }
+2014-02-07 14:43:56,556 - ceilometer_api - INFO - Fetching meter samples 
+
+2014-02-07 14:43:56,699 - ceilometer_api - INFO - Inside get_meter_sample: Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters/port', params='', query='', fragment='')
+2014-02-07 14:43:56,699 - ceilometer_api - INFO - Inside get_meter_samples: Body is {"limit": 1 }
+2014-02-07 14:43:56,728 - ceilometer_api - INFO - Fetching meter samples 
+
+2014-02-07 14:45:45,586 - ceilometer_api - INFO - Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters', params='', query='', fragment='')
+2014-02-07 14:45:45,805 - ceilometer_api - INFO - Return meter list 
+
+2014-02-07 14:45:54,995 - ceilometer_api - INFO - Inside get_meter_sample: Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters/port', params='', query='', fragment='')
+2014-02-07 14:45:58,514 - ceilometer_api - INFO - Inside get_meter_samples: Body is {}
+2014-02-07 14:45:58,581 - ceilometer_api - INFO - Fetching meter samples 
+
