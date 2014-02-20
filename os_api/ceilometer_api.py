@@ -20,16 +20,17 @@ import sys, re
 import json
 import logging
 from collections import namedtuple
+import os
 
 try:
     from urlparse import urlparse
 except ImportError:
     from urllib.parse import urlparse
  
- 
+path=(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'logs'))) 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
-handler = logging.FileHandler('ceilometer.log')
+handler = logging.FileHandler(path+'/ceilometer.log')
 handler.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 handler.setFormatter(formatter)
