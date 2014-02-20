@@ -1,0 +1,12 @@
+2014-02-20 09:30:21,584 - __main__ - INFO - Creating database
+2014-02-20 09:32:24,456 - __main__ - INFO - The database exists
+2014-02-20 09:32:24,456 - __main__ - INFO - Opened database successfully
+2014-02-20 09:32:24,661 - __main__ - INFO - Table created successfully
+2014-02-20 09:32:24,762 - __main__ - INFO - Table created successfully
+2014-02-20 09:32:24,863 - __main__ - INFO - Table created successfully
+2014-02-20 09:32:24,963 - __main__ - INFO - Table created successfully
+2014-02-20 09:32:25,064 - __main__ - INFO - Table created successfully
+2014-02-20 09:32:25,064 - __main__ - INFO - Drop all tables
+2014-02-20 09:32:25,064 - __main__ - INFO - Records created  successfully
+2014-02-20 09:35:32,914 - __main__ - INFO - The database exists
+2014-02-20 09:35:32,914 - __main__ - INFO - Opened database successfully

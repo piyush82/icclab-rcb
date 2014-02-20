@@ -49,9 +49,10 @@ def is_number(s):
     except ValueError:
         return False
   
+path=(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'logs')))  
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
-handler = logging.FileHandler('periodic.log')
+handler = logging.FileHandler(path+'/periodic.log')
 handler.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 handler.setFormatter(formatter)
