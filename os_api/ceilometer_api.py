@@ -1,16 +1,19 @@
-# -*- coding: ascii -*-
-#--------------------------------------------------------------
-#Created on Nov 21, 2013
-#
-#@author: Piyush Harsh
-#@contact: piyush.harsh@zhaw.ch
-#@organization: ICCLab, Zurich University of Applied Sciences
-#@summary: Module to interact with OS-ceilometer service
-#@contributor: Tea Kolevska
-#@contact: tea.kolevska@zhaw.ch
-#@var username, tenant-id, password
-#@requires: python 2.7
-#--------------------------------------------------------------
+'''
+
+-*- coding: ascii -*-
+--------------------------------------------------------------
+Created on Nov 21, 2013
+
+@author: Piyush Harsh
+@contact: piyush.harsh@zhaw.ch
+@organization: ICCLab, Zurich University of Applied Sciences
+@summary: Module to interact with OS-ceilometer service
+@contributor: Tea Kolevska
+@contact: tea.kolevska@zhaw.ch
+@var username, tenant-id, password
+@requires: python 2.7
+
+'''
 
 import httplib2 as http
 import sys, re
@@ -33,8 +36,20 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 logger.propagate = False      
     
-#get the list of available meters
 def get_meter_list(token, api_endpoint):
+    """
+
+    Get the list of available meters.
+    
+    Args:
+      token(string): X-Auth-token.
+      api_endpoint(string): The api endpoint for the ceilometer service.
+      
+    Returns:
+      bool: True if successful, False otherwise.
+      list: The list with the available meters.
+      
+    """    
     meter_list = [None]
     headers = {
                'Accept': 'application/json',
@@ -73,8 +88,45 @@ def get_meter_list(token, api_endpoint):
             meter_list[i]["meter-unit"] = data[i]["unit"]
     return True, meter_list
 
-#define the query details
+
+def is_in_mlist(meter_name,meter_list):
+    """
+
+    Check if the meter is in the list of available meters.
+    
+    Args:
+      meter_name(string): The name of the meter that is being checked.
+      meter_list(string): The list of available meters.
+      
+    Returns:
+      bool: True if successful, False otherwise.
+      
+    """ 
+    status=False
+    for i in range(len(meter_list)):
+        if meter_name==meter_list[i]["meter-name"]:
+            status=True 
+    return status
+
+
 def query():
+    """
+
+    Get the query details.
+    
+    Args:
+      None.
+      
+    Returns:
+      string: Defined starting date.
+      string: Defined starting time.
+      string: Defined ending date.
+      string: Defined ending time.
+      string: Defined resource id.
+      string: Defined project id.
+      bool: True if successful, False otherwise.
+      
+    """       
     status=False
     
     period=raw_input("Do you want to define the starting and ending time? If yes, enter 'Y',else enter 'N'. ")
@@ -103,7 +155,25 @@ def query():
         project_id="/"
     return from_date,to_date,from_time,to_time,resource_id,project_id,status
 
+
 def set_query(from_date,to_date,from_time,to_time,resource_id,project_id,status_q):
+    """
+
+    Define the query.
+    
+    Args:
+      string: Defined starting date.
+      string: Defined starting time.
+      string: Defined ending date.
+      string: Defined ending time.
+      string: Defined resource id.
+      string: Defined project id.
+      bool: True if successful, False otherwise.
+      
+    Returns:
+      string: Properly defined query field for the api call.
+      
+    """       
     if(status_q==True):
         q='"q":['
         if (from_date not in "/"):
@@ -128,8 +198,22 @@ def set_query(from_date,to_date,from_time,to_time,resource_id,project_id,status_
 
 
 
-#get the statistics for the specified meter
-def meter_statistics(meter_id,api_endpoint,token):
+def meter_statistics(meter_id,api_endpoint,token,meter_list):
+    """
+
+    Get the statistics for the specified meter.
+    
+    Args:
+      meter_id(string): The meter name.
+      api_endpoint(string): The api endpoint for the ceilometer service.
+      token(string): X-Auth-token.
+      meter_list(list): The list of available meters.
+      
+    Returns:
+      bool: True if successful, False otherwise.
+      list: The list with the meter statistics.
+      
+    """      
     meter_stat = [None]
     headers = {
                #'Accept': 'application/json',
@@ -213,125 +297,168 @@ def meter_statistics(meter_id,api_endpoint,token):
             body=body+"}"
             
         
- 
-            
-    logger.info('Inside meter_statistics: body is  %s',body)        
-    h = http.Http()
-    response, content = h.request(target.geturl(),method,body,headers)
-    header = json.dumps(response)
-    json_header = json.loads(header)
+    if is_in_mlist(meter_id,meter_list):        
+        logger.info('Inside meter_statistics: body is  %s',body)        
+        h = http.Http()
+        response, content = h.request(target.geturl(),method,body,headers)
+        header = json.dumps(response)
+        json_header = json.loads(header)
     
-    server_response = json_header["status"]
-    if server_response not in {'200'}:
-        print "Inside meter_statistics(): Something went wrong!"
-        logger.warn('Inside meter_statistics: not a valid response ')
-        return False, meter_stat
+        server_response = json_header["status"]
+        if server_response not in {'200'}:
+            print "Inside meter_statistics(): Something went wrong!"
+            logger.warn('Inside meter_statistics: not a valid response ')
+            return False, meter_stat
+        else:
+            logger.info('Getting the meter statistics \n')
+            data = json.loads(content)
+            meter_stat = [None]*len(data)
+            for i in range(len(data)):
+                meter_stat[i]={}
+                meter_stat[i]["average"] = data[i]["avg"]
+                meter_stat[i]["count"] = data[i]["count"]
+                meter_stat[i]["duration"] = data[i]["duration"]
+                meter_stat[i]["duration-end"] = data[i]["duration_end"]
+                meter_stat[i]["duration-start"] = data[i]["duration_start"]
+                meter_stat[i]["max"] = data[i]["max"]
+                meter_stat[i]["min"] = data[i]["min"]
+                meter_stat[i]["period"] = data[i]["period"]
+                meter_stat[i]["period-end"] = data[i]["period_end"]
+                meter_stat[i]["period-start"] = data[i]["period_start"]
+                meter_stat[i]["sum"] = data[i]["sum"]
+                meter_stat[i]["unit"] = data[i]["unit"]
+                meter_stat[i]["group-by"] = data[i]["groupby"]
+            return True, meter_stat
     else:
-        logger.info('Getting the meter statistics \n')
-        data = json.loads(content)
-        meter_stat = [None]*len(data)
-        for i in range(len(data)):
-            meter_stat[i]={}
-            meter_stat[i]["average"] = data[i]["avg"]
-            meter_stat[i]["count"] = data[i]["count"]
-            meter_stat[i]["duration"] = data[i]["duration"]
-            meter_stat[i]["duration-end"] = data[i]["duration_end"]
-            meter_stat[i]["duration-start"] = data[i]["duration_start"]
-            meter_stat[i]["max"] = data[i]["max"]
-            meter_stat[i]["min"] = data[i]["min"]
-            meter_stat[i]["period"] = data[i]["period"]
-            meter_stat[i]["period-end"] = data[i]["period_end"]
-            meter_stat[i]["period-start"] = data[i]["period_start"]
-            meter_stat[i]["sum"] = data[i]["sum"]
-            meter_stat[i]["unit"] = data[i]["unit"]
-            meter_stat[i]["group-by"] = data[i]["groupby"]
-        return True, meter_stat
+        logger.warn("Inside meter statistics: not an existing meter name")  
+        print "Choose a meter from the meter list!"
+        return False,meter_stat
+      
+
+def get_meter_samples(meter_name,api_endpoint,token,bool_query,meter_list):
+    """
+
+    Get the samples for the specified meter.
     
-#get the samples for the specified meter  
-def get_meter_samples(meter_name,api_endpoint,token,bool_query):
+    Args:
+      meter_name(string): The meter name.
+      api_endpoint(string): The api endpoint for the ceilometer service.
+      token(string): X-Auth-token.
+      bool_query(bool): True if query needs to be specified, False otherwise.
+      meter_list(list): The list of available meters.
+      
+    Returns:
+      bool: True if successful, False otherwise.
+      list: The list with the meter samples.
+      
+    """          
     meter_samples=[None]
-    headers = {
+    if is_in_mlist(meter_name,meter_list): 
+
+        headers = {
                'Content-Type': 'application/json;',
                'X-Auth-Token': token
                
-    }   
-    path = "/v2/meters/"+meter_name
-    target = urlparse(api_endpoint+path)
-    logger.info('Inside get_meter_sample: Path is %s',target)
-    method = 'GET'
-    if bool_query==True:
-        from_date,to_date,from_time,to_time,resource_id,project_id,status_q=query()
-        if(status_q==True):
-            q=set_query(from_date,to_date,from_time,to_time,resource_id,project_id,status_q)
-            body="{"+q
-            limit=raw_input("Do you want to set a limit to the number of samples that gets returned? Enter 'Y' if yes, 'N' if no.")
-            if(limit=="Y"):
-                limit_def=raw_input("Enter the desired limit for the number of samples: ")
-                body=body+',"limit":'+limit_def
-            body=body+"}"
+        }   
+        path = "/v2/meters/"+meter_name
+        target = urlparse(api_endpoint+path)
+        logger.info('Inside get_meter_sample: Path is %s',target)
+        method = 'GET'
+        if bool_query==True:
+            from_date,to_date,from_time,to_time,resource_id,project_id,status_q=query()
+            if(status_q==True):
+                q=set_query(from_date,to_date,from_time,to_time,resource_id,project_id,status_q)
+                body="{"+q
+                limit=raw_input("Do you want to set a limit to the number of samples that gets returned? Enter 'Y' if yes, 'N' if no.")
+                if(limit=="Y"):
+                    limit_def=raw_input("Enter the desired limit for the number of samples: ")
+                    body=body+',"limit":'+limit_def
+                body=body+"}"
+            else:
+                body="{"
+                limit=raw_input("Do you want to set a limit to the number of samples that gets returned? Enter 'Y' if yes, 'N' if no.")
+                if(limit=="Y"):
+                    limit_def=raw_input("Enter the desired limit for the number of samples: ")
+                    body=body+'"limit":'+limit_def
+                body=body+"}"
         else:
-            body="{"
-            limit=raw_input("Do you want to set a limit to the number of samples that gets returned? Enter 'Y' if yes, 'N' if no.")
-            if(limit=="Y"):
-                limit_def=raw_input("Enter the desired limit for the number of samples: ")
-                body=body+'"limit":'+limit_def
-            body=body+"}"
-    else:
-        body='{"limit": 1 }'
+            body='{"limit": 1 }'
     
-    logger.info('Inside get_meter_samples: Body is %s', body)
-    h = http.Http()
-    response, content = h.request(target.geturl(),method,body,headers)
-    header = json.dumps(response)
-    json_header = json.loads(header)
+        logger.info('Inside get_meter_samples: Body is %s', body)
+        h = http.Http()
+        response, content = h.request(target.geturl(),method,body,headers)
+        header = json.dumps(response)
+        json_header = json.loads(header)
     
-    server_response = json_header["status"]
-    if server_response not in {'200'}:
-        print "Inside meter_samples(): Something went wrong!"
-        logger.warn('Inside meter_samples: not a valid response ')
-        return False, meter_samples
-    else:
-        logger.info('Fetching meter samples \n')
-        data = json.loads(content)
-        meter_samples = [None]*len(data)
+        server_response = json_header["status"]
+        if server_response not in {'200'}:
+            print "Inside meter_samples(): Something went wrong!"
+            logger.warn('Inside meter_samples: not a valid response ')
+            return False, meter_samples
+        else:
+            logger.info('Fetching meter samples \n')
+            data = json.loads(content)
+            meter_samples = [None]*len(data)
 
-        for i in range(len(data)):
-            meter_samples[i]={}
-            meter_samples[i]["counter-name"] = data[i]["counter_name"]
-            meter_samples[i]["counter-type"] = data[i]["counter_type"]
-            meter_samples[i]["counter-unit"] = data[i]["counter_unit"]
-            meter_samples[i]["counter-volume"] = data[i]["counter_volume"]
-            meter_samples[i]["message-id"] = data[i]["message_id"]
-            meter_samples[i]["project-id"] = data[i]["project_id"]
-            meter_samples[i]["resource-id"] = data[i]["resource_id"]
-            catalog=data[i]["resource_metadata"]
-            cat_pom = json.dumps(catalog)
-            cat_pom=cat_pom.translate(None,'"{}')
-            meter_samples[i]["resource-metadata"]=cat_pom
-            meter_samples[i]["source"] = data[i]["source"]
-            meter_samples[i]["timestamp"] = data[i]["timestamp"]
-            meter_samples[i]["user-id"] = data[i]["user_id"]
-        return True, meter_samples
- 
-#get the list of available resources    
-def get_resources(api_endpoint,token):
+            for i in range(len(data)):
+                meter_samples[i]={}
+                meter_samples[i]["counter-name"] = data[i]["counter_name"]
+                meter_samples[i]["counter-type"] = data[i]["counter_type"]
+                meter_samples[i]["counter-unit"] = data[i]["counter_unit"]
+                meter_samples[i]["counter-volume"] = data[i]["counter_volume"]
+                meter_samples[i]["message-id"] = data[i]["message_id"]
+                meter_samples[i]["project-id"] = data[i]["project_id"]
+                meter_samples[i]["resource-id"] = data[i]["resource_id"]
+                catalog=data[i]["resource_metadata"]
+                cat_pom = json.dumps(catalog)
+                cat_pom=cat_pom.translate(None,'"{}')
+                meter_samples[i]["resource-metadata"]=cat_pom
+                meter_samples[i]["source"] = data[i]["source"]
+                meter_samples[i]["timestamp"] = data[i]["timestamp"]
+                meter_samples[i]["user-id"] = data[i]["user_id"]
+            return True, meter_samples
+    else:
+        logger.warn("Inside meter statistics: not an existing meter name")  
+        print "Choose a meter from the meter list!"
+        return False,meter_samples
+        
+   
+def get_resources(api_endpoint,token,bool_query):
+    """
+
+    Get the list of available resources.
+    
+    Args:
+      api_endpoint(string): The api endpoint for the ceilometer service.
+      token(string): X-Auth-token.
+      bool_query(bool): True if query needs to be specified, False otherwise.
+      
+    Returns:
+      bool: True if successful, False otherwise.
+      list: The list with the available resources.
+      
+    """       
     resources_list=[None]
     headers = {
                'Content-Type': 'application/json;',
                'X-Auth-Token': token
                
     }
-    from_date,to_date,from_time,to_time,resource_id,project_id,status_q=query()   
+ 
     path = "/v2/resources"
     target = urlparse(api_endpoint+path)
     logger.info('Inside get_resources: Path is %s',target)
     method = 'GET'
-    body="{"
-    if(status_q==True):
-        q=set_query(from_date,to_date,from_time,to_time,resource_id,project_id,status_q)
-        body=body+q
-    body=body+"}"
-      
+    
+    if bool_query:
+        from_date,to_date,from_time,to_time,resource_id,project_id,status_q=query()  
+        body="{"
+        if(status_q==True):
+            q=set_query(from_date,to_date,from_time,to_time,resource_id,project_id,status_q)
+            body=body+q
+        body=body+"}"
+    else:
+         body='{}'
     logger.info('Inside get_resources: Body is %s', body)   
     h = http.Http()
     response, content = h.request(target.geturl(),method,body,headers)
@@ -367,8 +494,23 @@ def get_resources(api_endpoint,token):
             resources_list[i]["user-id"]=data[i]["user_id"]
         return True, resources_list       
 
-#get details for a certain resource               
+               
 def get_resources_by_id(api_endpoint,token,rid):
+    """
+
+    Get the details for a certain resource.
+    
+    Args:
+      api_endpoint(string): The api endpoint for the ceilometer service.
+      token(string): X-Auth-token.
+      rid(string): The id of the soecified resource.
+      
+    Returns:
+      bool: True if successful, False otherwise.
+      list: The list with the resources.
+      
+    """      
+    
     resources_list=[None]
     resources_list={}
     if rid=="":

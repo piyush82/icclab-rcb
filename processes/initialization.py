@@ -4,6 +4,7 @@ Created on Feb 5, 2014
 @author:  Tea Kolevska
 @contact: tea.kolevska@zhaw.ch
 @organization: ICCLab, Zurich University of Applied Sciences
+@summary: Initialize the database.
 
 '''
 import sys

@@ -21,11 +21,30 @@ except ImportError:
     from urllib.parse import urlparse
 
 def strip_non_ascii(string):
-    ''' Returns the string without non ASCII characters'''
+    ''' 
+    Returns the string without non ASCII characters.
+    
+    Args:
+      string: The string to be converted.
+      
+    Returns:
+      string  
+    
+    '''
     stripped = (c for c in string if 0 < ord(c) < 127)
     return ''.join(stripped)
 
 def login():
+    ''' 
+    Returns the user credidentials.
+    
+      
+    Returns:
+      string: The user name.
+      string: The password.
+      string: The tenant id. 
+    
+    '''    
     user = raw_input("Username [%s]: " % getpass.getuser())
     tenant = raw_input("Tenant Id: ")
     if not user:
@@ -35,6 +54,16 @@ def login():
     return user, p1, tenant
 
 def login_v3():
+    ''' 
+    Returns the user crededentials.
+      
+    Returns:
+      string: User name.
+      string: The password.
+      string: The domain name.
+      string; The project name.
+            
+    '''    
     user = raw_input("Username [%s]: " % getpass.getuser())
     domain = raw_input("Domain name: ")
     project = raw_input("Project name: ")
@@ -45,13 +74,20 @@ def login_v3():
     return user, p1, domain,project
 
 def get_endpoints(tokenId, uri):
+    ''' 
+    Returns the endpoints for the services.
+    
+    Args:
+      tokenId: X-Auth-String.
+      uri: The identity service uri.
+       
+    
+    '''    
     headers = {
                'Accept': 'application/json',
                'Content-Type': 'application/json;'
     }
-    # uri = 'http://160.85.4.11:5000' #replace this with the API end-point of your setup
     uri="http://160.85.4.10:5000"
-    #uri = 'http://160.85.4.64:5000' #internal test-setup, replace it with your own value
     path = '/v2.0/tokens/' + tokenId + '/endpoints'
     target = urlparse(uri+path)
     method = 'GET'
@@ -59,9 +95,19 @@ def get_endpoints(tokenId, uri):
     h = http.Http()
     response, content = h.request(target.geturl(),method,body,headers)
     print "Endpoints:\n" + content
-
-#TODO: write the get token method with API v3    
+   
 def get_token_v3(uri):
+    ''' 
+    Returns the authentication token for v3 keystone.
+    
+    Args:
+      uri: The endpoint to the identity service.
+      
+    Returns:
+      bool: True if successful, False otherwise.
+      dict: List of the authentication data.  
+    
+    '''    
     auth_data = {}
     headers = {
                'Accept': 'application/json',
@@ -94,12 +140,22 @@ def get_token_v3(uri):
         auth_data["user-id"] = data["token"]["user"]["id"]
         for i in range(len(data["token"]["catalog"])):
             catalog_element =  data["token"]["catalog"][i]
-            #print catalog_element["name"] + ", " + catalog_element["type"] + ", endpoint: " + catalog_element["endpoints"][0]["publicURL"]
             auth_data[catalog_element["type"]] = catalog_element["endpoints"][0]["url"]
     return True, auth_data 
     
     
 def get_token_v2(uri):
+    ''' 
+    Returns the authentication token for v2 keystone.
+    
+    Args:
+      uri: The endpoint to the identity service.
+      
+    Returns:
+      bool: True if successful, False otherwise.
+      dict: List of the authentication data.  
+    
+    '''       
     auth_data = {}     #an empty dictionary
     headers = {
                'Accept': 'application/json',
@@ -133,6 +189,5 @@ def get_token_v2(uri):
         auth_data["user-id"] = data["access"]["user"]["id"]
         for i in range(len(data["access"]["serviceCatalog"])):
             catalog_element =  data["access"]["serviceCatalog"][i]
-            #print catalog_element["name"] + ", " + catalog_element["type"] + ", endpoint: " + catalog_element["endpoints"][0]["publicURL"]
             auth_data[catalog_element["name"]] = catalog_element["endpoints"][0]["publicURL"]
     return True, auth_data 

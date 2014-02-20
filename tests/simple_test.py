@@ -23,7 +23,6 @@ import textwrap
 def main(argv):
     print "Hello There. This is a simple test application making a test API call to OpenStack"
     auth_uri = 'http://160.85.4.10:5000' #internal test-setup, replace it with your own value
-    #auth_uri = 'http://160.85.231.233:5000' #internal test-setup, replace it with your own value
     status, token_data = keystone_api.get_token_v2(auth_uri)
     if status:
         print 'The authentication was successful, below are the data we got:'
@@ -56,7 +55,7 @@ def main(argv):
 
             
             meter_name=raw_input("Enter meter name: ")
-            st,stat_list=ceilometer_api.meter_statistics(meter_name, token_data["ceilometer"],token_data["token-id"])
+            st,stat_list=ceilometer_api.meter_statistics(meter_name, token_data["ceilometer"],token_data["token-id"],meter_list)
             if status:
                 print "The statistics for your meters is printed next."
                 print '--------------------------------------------------------------------------------------------------------------------------'
@@ -77,7 +76,7 @@ def main(argv):
                     print "Group by: " + str(stat_list[i]["group-by"]) 
                 print '--------------------------------------------------------------------------------------------------------------------------'
         
-            status,sample_list=ceilometer_api.get_meter_samples(meter_name, token_data["ceilometer"],token_data["token-id"],True)
+            status,sample_list=ceilometer_api.get_meter_samples(meter_name, token_data["ceilometer"],token_data["token-id"],True,meter_list)
             if status:
                 print '--------------------------------------------------------------------------------------------------------------------------'
                 print "The samples for your meter are printed next."
@@ -99,7 +98,7 @@ def main(argv):
                     print "User ID: " + str(sample_list[i]["user-id"]) 
                     print '--------------------------------------------------------------------------------------------------------------------------'    
 
-            status,resources_list=ceilometer_api.get_resources(token_data["ceilometer"], token_data["token-id"])
+            status,resources_list=ceilometer_api.get_resources(token_data["ceilometer"], token_data["token-id"],True)
             if status:
                 print '--------------------------------------------------------------------------------------------------------------------------'
                 print "The resources for your meter are printed next."

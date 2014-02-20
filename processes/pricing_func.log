@@ -5,3 +5,10 @@
 2014-02-07 14:45:45,586 - __main__ - INFO - Authentication was successful
 2014-02-07 14:45:58,582 - __main__ - INFO - Getting meter samples
 2014-02-07 14:45:58,583 - __main__ - WARNING - Pricing function not properly defined
+2014-02-18 18:01:31,365 - __main__ - INFO - Authentication was successful
+2014-02-18 18:01:44,367 - __main__ - INFO - Getting meter samples
+2014-02-18 18:01:48,081 - __main__ - INFO - Getting meter samples
+2014-02-18 18:01:48,081 - __main__ - INFO - Calculated price is: 7090000001.0
+2014-02-18 18:02:10,291 - __main__ - INFO - Authentication was successful
+2014-02-18 18:02:20,304 - __main__ - INFO - Getting meter samples
+2014-02-18 18:02:20,304 - __main__ - WARNING - Pricing function not properly defined

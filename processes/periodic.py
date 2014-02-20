@@ -32,6 +32,17 @@ except ImportError:
 
 
 def is_number(s):
+    """
+
+    Check if it is a number.
+    
+    Args:
+      s: The variable that needs to be checked.
+      
+    Returns:
+      bool: True if float, False otherwise.
+      
+    """    
     try:
         float(s)
         return True
@@ -48,8 +59,26 @@ logger.addHandler(handler)
 logger.propagate = False
 
 
-#counter thats called periodically and inserts the metered data in one table and the calculated price in another
 def periodic_counter(meters_used,metering,pom,periodic_counts,reden_br,time,meters_ids,input,meter_list):
+    """
+
+    Counter thats called periodically and inserts the metered data in one table and the calculated price in another.
+    
+    Args:
+      meters_used(list): The list of the meters used in the pricing function.
+      metering(string): The api endpoint for the ceilometer service.
+      pom(string): X-Auth-token.
+      periodic_counts(list): List with a list of the metered data from every count for each separate meter thats used in the pricing function.
+      reden_br(int):Number of meter.
+      time(float): Seconds till the next periodic count.
+      meter_ids(list): List of the ids of every meter used.
+      input: Flag indicating whether we want to define the pricing function or use the previous one already defined.
+      meter_list: List with the available meters.
+      
+    Returns:
+      bool: True if successful, False otherwise.
+      
+    """    
 
     global conn    
     conn = sqlite3.connect('meters.db',check_same_thread=False)
@@ -57,7 +86,7 @@ def periodic_counter(meters_used,metering,pom,periodic_counts,reden_br,time,mete
     for i in range(len(meters_used)):
         
 
-        status,sample_list=ceilometer_api.get_meter_samples(str(meters_used[i]),metering,pom,False)
+        status,sample_list=ceilometer_api.get_meter_samples(str(meters_used[i]),metering,pom,False,meter_list)
         logger.info('In periodic: Getting meter samples')
         if status:
             print '--------------------------------------------------------------------------------------------------------------------------' 
@@ -119,7 +148,25 @@ def periodic_counter(meters_used,metering,pom,periodic_counts,reden_br,time,mete
     t.start()
     return status
 
-def pricing(metering,meter_list,pom,input):                        
+def pricing(metering,meter_list,pom,input):     
+            """
+
+            Method for defining the pricing function.
+    
+            Args:
+              metering(string): The api endpoint for the ceilometer service.
+              pom(string): X-Auth-token.
+              meter_list: List with the available meters.              
+              input: Flag indicating whether we want to define the pricing function or use the previous one already defined.
+      
+            Returns:
+              bool: True if successful, False otherwise.
+              list: List of the meters used in the pricing function.
+              list: List of the meter's ids.
+              string: The user input for the pricing function.
+              float: The price.
+      
+            """                         
             price=0
             if input==None:
                 price_def=raw_input("Define the pricing function. Use only the meters from above and numbers as arguments. Use the following signs: '+' for sum, '-' for substraction, '*' for multiplying, '/' for division or '%' for percentage. Use whitespace in between. ")
@@ -141,7 +188,7 @@ def pricing(metering,meter_list,pom,input):
                         meters_used.append(price_def[i])
                         meters_ids.append(meter_list[j]["meter-id"])
 
-                        status,sample_list=ceilometer_api.get_meter_samples(price_def[i],metering,pom,False)
+                        status,sample_list=ceilometer_api.get_meter_samples(price_def[i],metering,pom,False,meter_list)
                         logger.info('In pricing: Getting meter samples')
                         if sample_list==[]:
                             price_def[i]=str(0)

@@ -177,3 +177,194 @@
 2014-02-07 14:43:56,883 - __main__ - INFO - Price is 1.8015
 2014-02-07 14:43:57,016 - __main__ - INFO - Insert data in price_loop 
 2014-02-07 14:43:57,017 - __main__ - INFO - Starting counter. Time interval is 5 
+2014-02-18 18:02:27,744 - __main__ - INFO - --------------- 
+
+2014-02-18 18:02:27,755 - __main__ - INFO - Starting periodic 
+2014-02-18 18:02:37,337 - __main__ - INFO - Successful authentication for user a9eeff23809e4b3ead1c98d550879c76
+2014-02-18 18:02:37,613 - __main__ - INFO - Printing meters
+2014-02-18 18:02:37,613 - __main__ - INFO - Meter list cpu
+2014-02-18 18:02:37,613 - __main__ - INFO - Meter list cpu_util
+2014-02-18 18:02:37,613 - __main__ - INFO - Meter list disk.ephemeral.size
+2014-02-18 18:02:37,614 - __main__ - INFO - Meter list disk.read.bytes
+2014-02-18 18:02:37,614 - __main__ - INFO - Meter list disk.read.requests
+2014-02-18 18:02:37,614 - __main__ - INFO - Meter list disk.root.size
+2014-02-18 18:02:37,614 - __main__ - INFO - Meter list disk.write.bytes
+2014-02-18 18:02:37,614 - __main__ - INFO - Meter list disk.write.requests
+2014-02-18 18:02:37,615 - __main__ - INFO - Meter list instance
+2014-02-18 18:02:37,615 - __main__ - INFO - Meter list instance:m1.small
+2014-02-18 18:02:37,615 - __main__ - INFO - Meter list memory
+2014-02-18 18:02:37,615 - __main__ - INFO - Meter list network.incoming.bytes
+2014-02-18 18:02:37,615 - __main__ - INFO - Meter list network.incoming.packets
+2014-02-18 18:02:37,616 - __main__ - INFO - Meter list network.outgoing.bytes
+2014-02-18 18:02:37,616 - __main__ - INFO - Meter list network.outgoing.packets
+2014-02-18 18:02:37,616 - __main__ - INFO - Meter list vcpus
+2014-02-18 18:02:37,616 - __main__ - INFO - Meter list network
+2014-02-18 18:02:37,617 - __main__ - INFO - Meter list network.create
+2014-02-18 18:02:37,617 - __main__ - INFO - Meter list subnet
+2014-02-18 18:02:37,617 - __main__ - INFO - Meter list subnet.create
+2014-02-18 18:02:37,617 - __main__ - INFO - Meter list cpu
+2014-02-18 18:02:37,617 - __main__ - INFO - Meter list cpu_util
+2014-02-18 18:02:37,618 - __main__ - INFO - Meter list disk.ephemeral.size
+2014-02-18 18:02:37,618 - __main__ - INFO - Meter list disk.read.bytes
+2014-02-18 18:02:37,618 - __main__ - INFO - Meter list disk.read.requests
+2014-02-18 18:02:37,618 - __main__ - INFO - Meter list disk.root.size
+2014-02-18 18:02:37,618 - __main__ - INFO - Meter list disk.write.bytes
+2014-02-18 18:02:37,619 - __main__ - INFO - Meter list disk.write.requests
+2014-02-18 18:02:37,619 - __main__ - INFO - Meter list instance
+2014-02-18 18:02:37,619 - __main__ - INFO - Meter list instance:m1.small
+2014-02-18 18:02:37,619 - __main__ - INFO - Meter list memory
+2014-02-18 18:02:37,619 - __main__ - INFO - Meter list vcpus
+2014-02-18 18:02:37,620 - __main__ - INFO - Meter list ip.floating
+2014-02-18 18:02:37,620 - __main__ - INFO - Meter list ip.floating.create
+2014-02-18 18:02:37,620 - __main__ - INFO - Meter list ip.floating.update
+2014-02-18 18:02:37,620 - __main__ - INFO - Meter list port
+2014-02-18 18:02:37,620 - __main__ - INFO - Meter list port.create
+2014-02-18 18:02:37,620 - __main__ - INFO - Meter list port
+2014-02-18 18:02:37,620 - __main__ - INFO - Meter list port.create
+2014-02-18 18:02:37,621 - __main__ - INFO - Meter list router
+2014-02-18 18:02:37,621 - __main__ - INFO - Meter list router.create
+2014-02-18 18:02:37,621 - __main__ - INFO - Meter list router.update
+2014-02-18 18:02:37,621 - __main__ - INFO - Meter list network.incoming.bytes
+2014-02-18 18:02:37,621 - __main__ - INFO - Meter list network.incoming.packets
+2014-02-18 18:02:37,621 - __main__ - INFO - Meter list network.outgoing.bytes
+2014-02-18 18:02:37,621 - __main__ - INFO - Meter list network.outgoing.packets
+2014-02-18 18:02:37,621 - __main__ - INFO - Meter list network.incoming.bytes
+2014-02-18 18:02:37,621 - __main__ - INFO - Meter list network.incoming.packets
+2014-02-18 18:02:37,621 - __main__ - INFO - Meter list network.outgoing.bytes
+2014-02-18 18:02:37,621 - __main__ - INFO - Meter list network.outgoing.packets
+2014-02-18 18:02:45,607 - __main__ - INFO - In pricing: Getting meter samples
+2014-02-18 18:02:45,607 - __main__ - WARNING - Not properly defined pricing function
+2014-02-18 18:02:45,608 - __main__ - INFO - Defining pricing function. ['7090000000.0', '+', 'netwrok']
+2014-02-18 18:02:45,809 - __main__ - INFO - Insert pricing function in database
+2014-02-18 18:02:50,556 - __main__ - INFO - --------------- 
+
+2014-02-18 18:02:50,556 - __main__ - INFO - Starting periodic 
+2014-02-18 18:02:58,941 - __main__ - INFO - Successful authentication for user a9eeff23809e4b3ead1c98d550879c76
+2014-02-18 18:02:59,205 - __main__ - INFO - Printing meters
+2014-02-18 18:02:59,205 - __main__ - INFO - Meter list cpu
+2014-02-18 18:02:59,206 - __main__ - INFO - Meter list cpu_util
+2014-02-18 18:02:59,206 - __main__ - INFO - Meter list disk.ephemeral.size
+2014-02-18 18:02:59,206 - __main__ - INFO - Meter list disk.read.bytes
+2014-02-18 18:02:59,206 - __main__ - INFO - Meter list disk.read.requests
+2014-02-18 18:02:59,206 - __main__ - INFO - Meter list disk.root.size
+2014-02-18 18:02:59,207 - __main__ - INFO - Meter list disk.write.bytes
+2014-02-18 18:02:59,207 - __main__ - INFO - Meter list disk.write.requests
+2014-02-18 18:02:59,207 - __main__ - INFO - Meter list instance
+2014-02-18 18:02:59,207 - __main__ - INFO - Meter list instance:m1.small
+2014-02-18 18:02:59,207 - __main__ - INFO - Meter list memory
+2014-02-18 18:02:59,208 - __main__ - INFO - Meter list network.incoming.bytes
+2014-02-18 18:02:59,208 - __main__ - INFO - Meter list network.incoming.packets
+2014-02-18 18:02:59,208 - __main__ - INFO - Meter list network.outgoing.bytes
+2014-02-18 18:02:59,208 - __main__ - INFO - Meter list network.outgoing.packets
+2014-02-18 18:02:59,208 - __main__ - INFO - Meter list vcpus
+2014-02-18 18:02:59,209 - __main__ - INFO - Meter list network
+2014-02-18 18:02:59,209 - __main__ - INFO - Meter list network.create
+2014-02-18 18:02:59,209 - __main__ - INFO - Meter list subnet
+2014-02-18 18:02:59,209 - __main__ - INFO - Meter list subnet.create
+2014-02-18 18:02:59,210 - __main__ - INFO - Meter list cpu
+2014-02-18 18:02:59,210 - __main__ - INFO - Meter list cpu_util
+2014-02-18 18:02:59,210 - __main__ - INFO - Meter list disk.ephemeral.size
+2014-02-18 18:02:59,210 - __main__ - INFO - Meter list disk.read.bytes
+2014-02-18 18:02:59,210 - __main__ - INFO - Meter list disk.read.requests
+2014-02-18 18:02:59,211 - __main__ - INFO - Meter list disk.root.size
+2014-02-18 18:02:59,211 - __main__ - INFO - Meter list disk.write.bytes
+2014-02-18 18:02:59,211 - __main__ - INFO - Meter list disk.write.requests
+2014-02-18 18:02:59,211 - __main__ - INFO - Meter list instance
+2014-02-18 18:02:59,211 - __main__ - INFO - Meter list instance:m1.small
+2014-02-18 18:02:59,212 - __main__ - INFO - Meter list memory
+2014-02-18 18:02:59,212 - __main__ - INFO - Meter list vcpus
+2014-02-18 18:02:59,212 - __main__ - INFO - Meter list ip.floating
+2014-02-18 18:02:59,212 - __main__ - INFO - Meter list ip.floating.create
+2014-02-18 18:02:59,212 - __main__ - INFO - Meter list ip.floating.update
+2014-02-18 18:02:59,213 - __main__ - INFO - Meter list port
+2014-02-18 18:02:59,213 - __main__ - INFO - Meter list port.create
+2014-02-18 18:02:59,213 - __main__ - INFO - Meter list port
+2014-02-18 18:02:59,213 - __main__ - INFO - Meter list port.create
+2014-02-18 18:02:59,213 - __main__ - INFO - Meter list router
+2014-02-18 18:02:59,214 - __main__ - INFO - Meter list router.create
+2014-02-18 18:02:59,214 - __main__ - INFO - Meter list router.update
+2014-02-18 18:02:59,214 - __main__ - INFO - Meter list network.incoming.bytes
+2014-02-18 18:02:59,214 - __main__ - INFO - Meter list network.incoming.packets
+2014-02-18 18:02:59,214 - __main__ - INFO - Meter list network.outgoing.bytes
+2014-02-18 18:02:59,215 - __main__ - INFO - Meter list network.outgoing.packets
+2014-02-18 18:02:59,215 - __main__ - INFO - Meter list network.incoming.bytes
+2014-02-18 18:02:59,215 - __main__ - INFO - Meter list network.incoming.packets
+2014-02-18 18:02:59,215 - __main__ - INFO - Meter list network.outgoing.bytes
+2014-02-18 18:02:59,215 - __main__ - INFO - Meter list network.outgoing.packets
+2014-02-18 18:03:05,279 - __main__ - INFO - In pricing: Getting meter samples
+2014-02-18 18:03:05,315 - __main__ - INFO - In pricing: Getting meter samples
+2014-02-18 18:03:05,315 - __main__ - INFO - Price is 7090000001.0
+2014-02-18 18:03:05,316 - __main__ - INFO - Defining pricing function. ['7090000000.0', '+', '1.0']
+2014-02-18 18:03:05,444 - __main__ - INFO - Insert pricing function in database
+2014-02-18 18:03:09,288 - __main__ - INFO - In periodic: Getting meter samples
+2014-02-18 18:03:09,420 - __main__ - INFO - Insert data in meters_counter 
+2014-02-18 18:03:09,452 - __main__ - INFO - In periodic: Getting meter samples
+2014-02-18 18:03:09,588 - __main__ - INFO - Insert data in meters_counter 
+2014-02-18 18:03:09,588 - __main__ - INFO - Price is 7090000001.0
+2014-02-18 18:03:09,723 - __main__ - INFO - Insert data in price_loop 
+2014-02-18 18:03:09,723 - __main__ - INFO - Starting counter. Time interval is 3 
+2014-02-18 18:03:12,758 - __main__ - INFO - In periodic: Getting meter samples
+2014-02-18 18:03:12,899 - __main__ - INFO - Insert data in meters_counter 
+2014-02-18 18:03:12,931 - __main__ - INFO - In periodic: Getting meter samples
+2014-02-18 18:03:13,067 - __main__ - INFO - Insert data in meters_counter 
+2014-02-18 18:03:13,067 - __main__ - INFO - Price is 7090000001.0
+2014-02-18 18:03:13,201 - __main__ - INFO - Insert data in price_loop 
+2014-02-18 18:03:16,677 - __main__ - INFO - --------------- 
+
+2014-02-18 18:03:16,677 - __main__ - INFO - Starting periodic 
+2014-02-18 18:03:25,424 - __main__ - INFO - Successful authentication for user a9eeff23809e4b3ead1c98d550879c76
+2014-02-18 18:03:25,689 - __main__ - INFO - Printing meters
+2014-02-18 18:03:25,689 - __main__ - INFO - Meter list cpu
+2014-02-18 18:03:25,690 - __main__ - INFO - Meter list cpu_util
+2014-02-18 18:03:25,690 - __main__ - INFO - Meter list disk.ephemeral.size
+2014-02-18 18:03:25,690 - __main__ - INFO - Meter list disk.read.bytes
+2014-02-18 18:03:25,690 - __main__ - INFO - Meter list disk.read.requests
+2014-02-18 18:03:25,690 - __main__ - INFO - Meter list disk.root.size
+2014-02-18 18:03:25,690 - __main__ - INFO - Meter list disk.write.bytes
+2014-02-18 18:03:25,691 - __main__ - INFO - Meter list disk.write.requests
+2014-02-18 18:03:25,691 - __main__ - INFO - Meter list instance
+2014-02-18 18:03:25,691 - __main__ - INFO - Meter list instance:m1.small
+2014-02-18 18:03:25,691 - __main__ - INFO - Meter list memory
+2014-02-18 18:03:25,691 - __main__ - INFO - Meter list network.incoming.bytes
+2014-02-18 18:03:25,692 - __main__ - INFO - Meter list network.incoming.packets
+2014-02-18 18:03:25,692 - __main__ - INFO - Meter list network.outgoing.bytes
+2014-02-18 18:03:25,692 - __main__ - INFO - Meter list network.outgoing.packets
+2014-02-18 18:03:25,692 - __main__ - INFO - Meter list vcpus
+2014-02-18 18:03:25,692 - __main__ - INFO - Meter list network
+2014-02-18 18:03:25,693 - __main__ - INFO - Meter list network.create
+2014-02-18 18:03:25,693 - __main__ - INFO - Meter list subnet
+2014-02-18 18:03:25,693 - __main__ - INFO - Meter list subnet.create
+2014-02-18 18:03:25,693 - __main__ - INFO - Meter list cpu
+2014-02-18 18:03:25,693 - __main__ - INFO - Meter list cpu_util
+2014-02-18 18:03:25,694 - __main__ - INFO - Meter list disk.ephemeral.size
+2014-02-18 18:03:25,694 - __main__ - INFO - Meter list disk.read.bytes
+2014-02-18 18:03:25,694 - __main__ - INFO - Meter list disk.read.requests
+2014-02-18 18:03:25,694 - __main__ - INFO - Meter list disk.root.size
+2014-02-18 18:03:25,695 - __main__ - INFO - Meter list disk.write.bytes
+2014-02-18 18:03:25,695 - __main__ - INFO - Meter list disk.write.requests
+2014-02-18 18:03:25,695 - __main__ - INFO - Meter list instance
+2014-02-18 18:03:25,695 - __main__ - INFO - Meter list instance:m1.small
+2014-02-18 18:03:25,695 - __main__ - INFO - Meter list memory
+2014-02-18 18:03:25,696 - __main__ - INFO - Meter list vcpus
+2014-02-18 18:03:25,696 - __main__ - INFO - Meter list ip.floating
+2014-02-18 18:03:25,696 - __main__ - INFO - Meter list ip.floating.create
+2014-02-18 18:03:25,696 - __main__ - INFO - Meter list ip.floating.update
+2014-02-18 18:03:25,696 - __main__ - INFO - Meter list port
+2014-02-18 18:03:25,696 - __main__ - INFO - Meter list port.create
+2014-02-18 18:03:25,697 - __main__ - INFO - Meter list port
+2014-02-18 18:03:25,697 - __main__ - INFO - Meter list port.create
+2014-02-18 18:03:25,697 - __main__ - INFO - Meter list router
+2014-02-18 18:03:25,697 - __main__ - INFO - Meter list router.create
+2014-02-18 18:03:25,697 - __main__ - INFO - Meter list router.update
+2014-02-18 18:03:25,698 - __main__ - INFO - Meter list network.incoming.bytes
+2014-02-18 18:03:25,698 - __main__ - INFO - Meter list network.incoming.packets
+2014-02-18 18:03:25,698 - __main__ - INFO - Meter list network.outgoing.bytes
+2014-02-18 18:03:25,698 - __main__ - INFO - Meter list network.outgoing.packets
+2014-02-18 18:03:25,698 - __main__ - INFO - Meter list network.incoming.bytes
+2014-02-18 18:03:25,699 - __main__ - INFO - Meter list network.incoming.packets
+2014-02-18 18:03:25,699 - __main__ - INFO - Meter list network.outgoing.bytes
+2014-02-18 18:03:25,699 - __main__ - INFO - Meter list network.outgoing.packets
+2014-02-18 18:03:30,775 - __main__ - INFO - In pricing: Getting meter samples
+2014-02-18 18:03:30,775 - __main__ - WARNING - Not properly defined pricing function
+2014-02-18 18:03:30,775 - __main__ - INFO - Defining pricing function. ['7090000000.0', '+', 'image']
+2014-02-18 18:03:30,903 - __main__ - INFO - Insert pricing function in database

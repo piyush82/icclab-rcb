@@ -4,6 +4,7 @@ Created on Feb 18, 2014
 @author:  Tea Kolevska
 @contact: tea.kolevska@zhaw.ch
 @organization: ICCLab, Zurich University of Applied Sciences
+@summary: Unittesting
 
 '''
 import sys
@@ -31,15 +32,18 @@ class ApiTest(unittest.TestCase):
 
 
 class MeterTest(unittest.TestCase):  
-    metering="http://160.85.4.10:8777"                     
-    def test_sample(self): 
-        pom=ApiTest("test_api")
-        status, meter_list = ceilometer_api.get_meter_list(pom.token_id, self.metering)
-        status,sample_list=ceilometer_api.get_meter_samples("network",self.metering,pom.token_id,False,meter_list)       
+    metering="http://160.85.4.10:8777"      
+    pom=ApiTest("test_api")  
+    status, meter_list = ceilometer_api.get_meter_list(pom.token_id,metering)             
+    def test_sample(self):              
+        status,sample_list=ceilometer_api.get_meter_samples("network",self.metering,self.pom.token_id,False,self.meter_list)       
         for i in range(len(sample_list)):
             self.assertEqual(str(sample_list[i]["counter-unit"]),"network")
             self.assertEqual(str(sample_list[i]["counter-type"]),"gauge")
-                                                                       
+    def test_resource(self):
+        status,resources_list=ceilometer_api.get_resources(self.metering,self.pom.token_id,False)       
+        for i in range(len(resources_list)):
+            self.assertEqual(str(resources_list[i]["project-id"]),"323936522894416b903d3528fa971537")
         
                     
         
