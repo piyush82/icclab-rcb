@@ -49,7 +49,7 @@ def is_number(s):
     except ValueError:
         return False
   
-path=(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'logs'))) 
+path=os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'logs'))
 path2=os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'database'))
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -84,7 +84,8 @@ def periodic_counter(meters_used,metering,pom,periodic_counts,reden_br,time,mete
 
     global conn    
     conn = sqlite3.connect(path2+'/meters.db',check_same_thread=False)
-    
+    delta_list={}
+    delta_list[reden_br]=[None]*5
     for i in range(len(meters_used)):
         
 
@@ -103,7 +104,11 @@ def periodic_counter(meters_used,metering,pom,periodic_counts,reden_br,time,mete
                 periodic_counts[i].append(sample_list[j]["counter-volume"])
 
                 #calculate the difference between the metered data from each count for every meter used in the pricing function
-                print "Delta: " +str(periodic_counts[i][reden_br]-periodic_counts[i][reden_br-1])
+                delta=periodic_counts[i][reden_br]-periodic_counts[i][reden_br-1]
+                print "Delta: " +str(delta)
+                
+                delta_list[reden_br][i]=delta
+                user=sample_list[j]["user-id"]
                 
                 #get the row count; if its first entry-id=0; else get the last id and increment it by one
                 cursor = conn.execute("SELECT max(ID)  from METERS_COUNTER")
@@ -126,6 +131,10 @@ def periodic_counter(meters_used,metering,pom,periodic_counts,reden_br,time,mete
 
                 conn.commit()
                 logger.info('Insert data in meters_counter ')
+    
+    date_time=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    conn.execute("INSERT INTO UDR(USER_ID,TIMESTAMP,PARAM1,PARAM2,PARAM3,PARAM4,PARAM5) \
+           VALUES ( '"+ str(user) +"', '"+str(date_time)+"', '"+ str(delta_list[reden_br][0]) +"','" +str(delta_list[reden_br][1]) +"','" +str(delta_list[reden_br][2]) +"','" + str(delta_list[reden_br][3]) +" ','"+ str(delta_list[reden_br][4]) +" ')")
     reden_br+=1
     
     status2,meters_used2,meters_ids2,func,price=pricing(metering,meter_list,pom,input)
@@ -149,6 +158,67 @@ def periodic_counter(meters_used,metering,pom,periodic_counts,reden_br,time,mete
     t = Timer(float(time),periodic_counter,args=[meters_used,metering,pom,periodic_counts,reden_br,time,meters_ids,input,meter_list])
     t.start()
     return status
+
+def pricing_udr(metering,pom,input,delta_list,meter_list):
+    price=0
+    if input==None:
+        print "No pricing function defined."
+        logger.warn('No pricing function defined.')
+    else:
+        price_def=input
+        
+    for i in range(len(price_def)):
+        j=0
+        while j<len(meter_list):
+            if price_def[i]==meter_list[j]["meter-name"]:
+                price_def[i]=str(delta_list) 
+            else:
+                j=j+1    
+    for i in range(len(delta_list)):
+         if i==0:   
+             if is_number(price_def[i]):    
+                 price=price+float(price_def[i]) 
+                                  
+             else:
+                 status_ret=False  
+         if i%2!=0:
+              if price_def[i] in ["+","-","*","/","%"]:
+                  if is_number(price_def[i+1]):
+                      x=float(price_def[i+1])
+                                
+                  else:
+                       status_ret=False
+                       break
+                            
+                  if price_def[i]=="+":
+                       price=price+x
+                  if price_def[i]=="-": 
+                       price=price-x
+                  if price_def[i]=="*":
+                       price=price*x
+                  if price_def[i]=="/":
+                       if x!=0:
+                           price=price/x
+                       else:
+                           print "Division by zero."
+                           logger.warn('Division by zero')
+                           status_ret=False
+                  if price_def[i]=="%":
+                       price=price*x/100.0
+                            
+                  else:
+                       status_ret=False
+         else:
+              continue
+         if status_ret==True:
+                print "The price value is: " + str(price)
+                logger.info('Price is %s', price)
+        else:
+                print "Error. Poorly defined pricing function."
+                logger.warn('Not properly defined pricing function')
+                
+            return status_ret,meters_used,meters_ids,input,price
+
 
 def pricing(metering,meter_list,pom,input):     
             """
@@ -242,7 +312,7 @@ def pricing(metering,meter_list,pom,input):
                                     status_ret=False
                             if price_def[i]=="%":
                                 price=price*x/100.0
-                                print price
+                            
                     else:
                         status_ret=False
                 else:

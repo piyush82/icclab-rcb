@@ -8,14 +8,14 @@ Created on Feb 5, 2014
 
 '''
 import sys
-sys.path.append('/home/kolv/workspace/icc-lab-master/os_api')
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'os_api')))
 import ceilometer_api
 import compute_api
 import keystone_api
 import textwrap
 import sqlite3
 import json
-import os
 import logging
 
 
@@ -44,7 +44,7 @@ def main(argv):
         logger.info('The database exists')
 
         all=[]
-        default=["meters_counter","pricing_func","users","units","price_loop"]
+        default=["meters_counter","pricing_func","users","units","price_loop","udr"]
         logger.info('Opened database successfully')
 
         count=conn.execute("SELECT count(*) FROM sqlite_master WHERE type = 'table' AND name != 'android_metadata' AND name != 'sqlite_sequence'")
@@ -71,7 +71,7 @@ def main(argv):
         if x!=y:
             for i in range(len(all)):
                 conn.execute("DROP TABLE "+str(all[i])) 
-                create_tables(conn)
+            create_tables(conn)
             logger.info('Drop all tables')
             
             logger.info('Records created  successfully')
@@ -126,6 +126,17 @@ def create_tables(conn):
            USER_ID TEXT NOT NULL,
            TENANT_ID TEXT NOT NULL);''')
         logger.info('Table created successfully')
+        
+        conn.execute('''CREATE TABLE UDR
+           (ID INTEGER PRIMARY KEY AUTOINCREMENT,
+           USER_ID TEXT NOT NULL,
+           TIMESTAMP DATETIME NOT NULL,
+           PARAM1 TEXT,
+           PARAM2 TEXT,
+           PARAM3 TEXT,
+           PARAM4 TEXT,
+           PARAM5 TEXT);''')
+        logger.info('Table created successfully')        
 
         conn.commit()
         return True
