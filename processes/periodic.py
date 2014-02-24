@@ -49,7 +49,8 @@ def is_number(s):
     except ValueError:
         return False
   
-path=(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'logs')))  
+path=(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'logs'))) 
+path2=os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'database'))
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 handler = logging.FileHandler(path+'/periodic.log')
@@ -82,7 +83,7 @@ def periodic_counter(meters_used,metering,pom,periodic_counts,reden_br,time,mete
     """    
 
     global conn    
-    conn = sqlite3.connect('meters.db',check_same_thread=False)
+    conn = sqlite3.connect(path2+'/meters.db',check_same_thread=False)
     
     for i in range(len(meters_used)):
         
@@ -255,7 +256,7 @@ def pricing(metering,meter_list,pom,input):
                 
             return status_ret,meters_used,meters_ids,input,price
          
-conn = sqlite3.connect('meters.db',check_same_thread=False)
+conn = sqlite3.connect(path2+'/meters.db',check_same_thread=False)
 print "Opened database successfully"           
 
           
@@ -294,7 +295,7 @@ def main(argv):
             status,meters_used,meters_ids,input,price=pricing(token_data["metering"],meter_list,pom,None)
             logger.info('Defining pricing function. %s', input)
             global conn    
-            conn = sqlite3.connect('meters.db',check_same_thread=False)
+            conn = sqlite3.connect(path2+'/meters.db',check_same_thread=False)
             func=[None]*9
             for i in range(len(input)):
                 func[i]=input[i]
