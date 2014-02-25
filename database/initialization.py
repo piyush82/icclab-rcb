@@ -131,11 +131,13 @@ def create_tables(conn):
            (ID INTEGER PRIMARY KEY AUTOINCREMENT,
            USER_ID TEXT NOT NULL,
            TIMESTAMP DATETIME NOT NULL,
+           PRICING_FUNC_ID INT NOT NULL,
            PARAM1 TEXT,
            PARAM2 TEXT,
            PARAM3 TEXT,
            PARAM4 TEXT,
-           PARAM5 TEXT);''')
+           PARAM5 TEXT,
+           FOREIGN KEY(PRICING_FUNC_ID) REFERENCES PRICING_FUNC(ID));''')
         logger.info('Table created successfully')        
 
         conn.commit()

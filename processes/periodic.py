@@ -121,21 +121,16 @@ def periodic_counter(meters_used,metering,pom,periodic_counts,reden_br,time,mete
                         tenant=meter_list[k]["tenant-id"]
 
                 if number_of_rows==0:
+                    id_last=1
                     conn.execute("INSERT INTO METERS_COUNTER (ID,METER_ID,METER_NAME,USER_ID,RESOURCE_ID,COUNTER_VOLUME,UNIT,TIMESTAMP,TENANT_ID) \
-                          VALUES (1, '"+ str(meters_ids[i]) +"', '"+ str(meters_used[i]) +"','" + str(sample_list[j]["user-id"]) +" ','"+ str(sample_list[j]["resource-id"]) +"' ,' "+ str(sample_list[j]["counter-volume"])+"' ,' "+ str(sample_list[j]["counter-unit"]) +"' ,' "+ str(datetime1[0])+" "+str(datetime1[1])+"' ,' "+tenant+" ')")
+                          VALUES ("+str(id_last)+", '"+ str(meters_ids[i]) +"', '"+ str(meters_used[i]) +"','" + str(sample_list[j]["user-id"]) +" ','"+ str(sample_list[j]["resource-id"]) +"' ,' "+ str(sample_list[j]["counter-volume"])+"' ,' "+ str(sample_list[j]["counter-unit"]) +"' ,' "+ str(datetime1[0])+" "+str(datetime1[1])+"' ,' "+tenant+" ')")
                 else:
                     id_last = cursor.fetchone()[0]+1
                     conn.execute("INSERT INTO METERS_COUNTER (ID,METER_ID,METER_NAME,USER_ID,RESOURCE_ID,COUNTER_VOLUME,UNIT,TIMESTAMP,TENANT_ID) \
-                            VALUES ("+str(id_last)+",' "+ str(meters_ids[i]) +"', '"+ str(meters_used[i]) +"','" + str(sample_list[j]["user-id"]) +" ','"+ str(sample_list[j]["resource-id"]) +"' ,' "+ str(sample_list[j]["counter-volume"])+"' ,' "+ str(sample_list[j]["counter-unit"]) +"' ,' "+ str(datetime1[0])+" "+str(datetime1[1])+"' ,' "+tenant+" ')")    
-               
+                            VALUES ("+str(id_last)+",' "+ str(meters_ids[i]) +"', '"+ str(meters_used[i]) +"','" + str(sample_list[j]["user-id"]) +" ','"+ str(sample_list[j]["resource-id"]) +"' ,' "+ str(sample_list[j]["counter-volume"])+"' ,' "+ str(sample_list[j]["counter-unit"]) +"' ,' "+ str(datetime1[0])+" "+str(datetime1[1])+"' ,' "+tenant+" ')")                   
 
                 conn.commit()
                 logger.info('Insert data in meters_counter ')
-    
-    date_time=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    conn.execute("INSERT INTO UDR(USER_ID,TIMESTAMP,PARAM1,PARAM2,PARAM3,PARAM4,PARAM5) \
-           VALUES ( '"+ str(user) +"', '"+str(date_time)+"', '"+ str(delta_list[reden_br][0]) +"','" +str(delta_list[reden_br][1]) +"','" +str(delta_list[reden_br][2]) +"','" + str(delta_list[reden_br][3]) +" ','"+ str(delta_list[reden_br][4]) +" ')")
-    reden_br+=1
     
     status2,meters_used2,meters_ids2,func,price=pricing(metering,meter_list,pom,input)
     if status2:
@@ -145,186 +140,196 @@ def periodic_counter(meters_used,metering,pom,periodic_counts,reden_br,time,mete
         number_of_rows2=result2[0]
         datetime2=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         if number_of_rows2==0:
+            id_last2=1
             conn.execute("INSERT INTO PRICE_LOOP(ID,PRICE,TIMESTAMP,TENANT_ID) \
-                    VALUES (1, '"+ str(price) +"' ,' "+ str(datetime2)+"' ,' "+tenant+" ')")
+                    VALUES ("+str(id_last2)+", '"+ str(price) +"' ,' "+ str(datetime2)+"' ,' "+tenant+" ')")
         else:
             id_last2 = cursor2.fetchone()[0]+1
             conn.execute("INSERT INTO PRICE_LOOP (ID,PRICE,TIMESTAMP,TENANT_ID) \
                     VALUES ("+str(id_last2)+",' "+ str(price)  +"' ,' "+ str(datetime2)+"' ,' "+tenant+" ')")    
-               
-
-        conn.commit()
+        
         logger.info('Insert data in price_loop ')
+        
+    date_time=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    conn.execute("INSERT INTO UDR(USER_ID,TIMESTAMP,PRICING_FUNC_ID,PARAM1,PARAM2,PARAM3,PARAM4,PARAM5) \
+           VALUES ( '"+ str(user) +"', '"+str(date_time)+"', '"+str(id_last2)+"', '"+ str(delta_list[reden_br][0]) +"','" +str(delta_list[reden_br][1]) +"','" +str(delta_list[reden_br][2]) +"','" + str(delta_list[reden_br][3]) +" ','"+ str(delta_list[reden_br][4]) +" ')")        
+    reden_br+=1   
+    conn.commit() 
+    s,p=pricing_udr(metering,1,meter_list)
+    print p    
     t = Timer(float(time),periodic_counter,args=[meters_used,metering,pom,periodic_counts,reden_br,time,meters_ids,input,meter_list])
     t.start()
     return status
 
-def pricing_udr(metering,pom,input,delta_list,meter_list):
+def pricing_udr(metering,id_price,meter_list):
     price=0
-    if input==None:
-        print "No pricing function defined."
-        logger.warn('No pricing function defined.')
-    else:
-        price_def=input
-        
+    price_def=[]
+    udr_list=[]
+    cursor=conn.execute("SELECT PARAM1,SIGN1,PARAM2,SIGN2,PARAM3,SIGN3,PARAM4,SIGN4,PARAM5 FROM PRICING_FUNC WHERE ID="+str(id_price))
+    cursor2=conn.execute("SELECT PARAM1,PARAM2,PARAM3,PARAM4,PARAM5 FROM UDR WHERE PRICING_FUNC_ID="+str(id_price))   
+    k=0 
+    for i in cursor:
+        for j in range(0,9):
+            price_def.append(i[j])
+    for m in cursor2:
+        for j in range(0,5):
+            if m[j]!=None:
+                udr_list.append(m[j])
+            else:
+                udr_list[j].append(0)        
     for i in range(len(price_def)):
         j=0
         while j<len(meter_list):
             if price_def[i]==meter_list[j]["meter-name"]:
-                price_def[i]=str(delta_list) 
+                price_def[i]=udr_list[k]
+                k+=1
             else:
-                j=j+1    
-    for i in range(len(delta_list)):
-         if i==0:   
-             if is_number(price_def[i]):    
-                 price=price+float(price_def[i]) 
+                j=j+1 
+    status_ret=True          
+    for i in range(len(price_def)):
+        if i==0:   
+            if is_number(price_def[i]):    
+                price=price+float(price_def[i]) 
                                   
-             else:
-                 status_ret=False  
-         if i%2!=0:
-              if price_def[i] in ["+","-","*","/","%"]:
-                  if is_number(price_def[i+1]):
-                      x=float(price_def[i+1])
+            else:
+                status_ret=False  
+        if i%2!=0:
+            if price_def[i] in ["+","-","*","/","%"]:
+                if is_number(price_def[i+1]):
+                    x=float(price_def[i+1])
                                 
-                  else:
-                       status_ret=False
-                       break
+                else:
+                    status_ret=False
+                    break
                             
-                  if price_def[i]=="+":
-                       price=price+x
-                  if price_def[i]=="-": 
-                       price=price-x
-                  if price_def[i]=="*":
-                       price=price*x
-                  if price_def[i]=="/":
-                       if x!=0:
-                           price=price/x
-                       else:
-                           print "Division by zero."
-                           logger.warn('Division by zero')
-                           status_ret=False
-                  if price_def[i]=="%":
-                       price=price*x/100.0
+                if price_def[i]=="+":
+                    price=price+x
+                if price_def[i]=="-": 
+                    price=price-x
+                if price_def[i]=="*":
+                    price=price*x
+                if price_def[i]=="/":
+                    if x!=0:
+                        price=price/x
+                    else:
+                        print "Division by zero."
+                        logger.warn('Division by zero')
+                        status_ret=False
+                if price_def[i]=="%":
+                    price=price*x/100.0
                             
-                  else:
-                       status_ret=False
-         else:
-              continue
-         if status_ret==True:
+                else:
+                    status_ret=False
+        else:
+            continue
+        if status_ret==True:
                 print "The price value is: " + str(price)
                 logger.info('Price is %s', price)
         else:
                 print "Error. Poorly defined pricing function."
                 logger.warn('Not properly defined pricing function')
                 
-            return status_ret,meters_used,meters_ids,input,price
+        return status_ret,price
 
 
-def pricing(metering,meter_list,pom,input):     
-            """
+def pricing(metering,meter_list,pom,input_p):     
+    """
 
-            Method for defining the pricing function.
+    Method for defining the pricing function.
     
-            Args:
-              metering(string): The api endpoint for the ceilometer service.
-              pom(string): X-Auth-token.
-              meter_list: List with the available meters.              
-              input: Flag indicating whether we want to define the pricing function or use the previous one already defined.
+    Args:
+        metering(string): The api endpoint for the ceilometer service.
+        pom(string): X-Auth-token.
+        meter_list: List with the available meters.              
+        input_p: Flag indicating whether we want to define the pricing function or use the previous one already defined.
       
-            Returns:
-              bool: True if successful, False otherwise.
-              list: List of the meters used in the pricing function.
-              list: List of the meter's ids.
-              string: The user input for the pricing function.
-              float: The price.
+    Returns:
+        bool: True if successful, False otherwise.
+        list: List of the meters used in the pricing function.
+        list: List of the meter's ids.
+        string: The user input_p for the pricing function.
+        float: The price.
       
-            """                         
-            price=0
-            if input==None:
-                price_def=raw_input("Define the pricing function. Use only the meters from above and numbers as arguments. Use the following signs: '+' for sum, '-' for substraction, '*' for multiplying, '/' for division or '%' for percentage. Use whitespace in between. ")
-                price_def=price_def.split(" ")
-                if len(price_def)>9:
-                    print "You can use only 5 parameters"
-                    logger.warn('More than 5 parameters used')
-                    price_def=raw_input("Define the pricing function. Use only the meters from above and numbers as arguments. Use the following signs: '+' for sum, '-' for substraction, '*' for multiplying, '/' for division or '%' for percentage. Use whitespace in between. ")
-                input=price_def
-            else:
-                price_def=input
-            meters_used=[]
-            meters_ids=[]
+    """                         
+    price=0
+    if input_p==None:
+        price_def=raw_input("Define the pricing function. Use only the meters from above and numbers as arguments. Use the following signs: '+' for sum, '-' for substraction, '*' for multiplying, '/' for division or '%' for percentage. Use whitespace in between. ")
+        price_def=price_def.split(" ")
+        if len(price_def)>9:
+            print "You can use only 5 parameters"
+            logger.warn('More than 5 parameters used')
+            price_def=raw_input("Define the pricing function. Use only the meters from above and numbers as arguments. Use the following signs: '+' for sum, '-' for substraction, '*' for multiplying, '/' for division or '%' for percentage. Use whitespace in between. ")
+        input_p=price_def[:]
+    else:
+        price_def=input_p
+    meters_used=[]
+    meters_ids=[]
             
-            for i in range(len(price_def)):
-                j=0
-                while j<len(meter_list):
-                    if price_def[i]==meter_list[j]["meter-name"]:
-                        meters_used.append(price_def[i])
-                        meters_ids.append(meter_list[j]["meter-id"])
-
-                        status,sample_list=ceilometer_api.get_meter_samples(price_def[i],metering,pom,False,meter_list)
-                        logger.info('In pricing: Getting meter samples')
-                        if sample_list==[]:
-                            price_def[i]=str(0)
+    for i in range(len(price_def)):
+        j=0
+        while j<len(meter_list):
+            if price_def[i]==meter_list[j]["meter-name"]:
+                meters_used.append(price_def[i])
+                meters_ids.append(meter_list[j]["meter-id"])
+                status,sample_list=ceilometer_api.get_meter_samples(price_def[i],metering,pom,False,meter_list)
+                logger.info('In pricing: Getting meter samples')
+                if sample_list==[]:
+                    price_def[i]=str(0)
 
                         
-                        for n,m in enumerate(price_def):
-                            if m==price_def[i]:
-                                for k in range(len(sample_list)):
-                                    price_def[n]=str(sample_list[k]["counter-volume"]) 
+                for n,m in enumerate(price_def):
+                    if m==price_def[i]:
+                        for k in range(len(sample_list)):
+                            price_def[n]=str(sample_list[k]["counter-volume"]) 
                                                                   
-                        break
-                    else:
-                        j=j+1
-                       
-            
-            status_ret=True 
-            
-            for i in range(len(price_def)):
-                if i==0:   
-                     if is_number(price_def[i]):    
-                         price=price+float(price_def[i]) 
-                                  
-                     else:
-                         status_ret=False  
-                if i%2!=0:
-                    if price_def[i] in ["+","-","*","/","%"]:
-   
-                       
-                            if is_number(price_def[i+1]):
-                                 x=float(price_def[i+1])
-                                
-                            else:
-                                status_ret=False
-                                break
-                            
-                            if price_def[i]=="+":
-                                price=price+x
-                            if price_def[i]=="-": 
-                                price=price-x
-                            if price_def[i]=="*":
-                                price=price*x
-                            if price_def[i]=="/":
-                                if x!=0:
-                                    price=price/x
-                                else:
-                                    print "Division by zero."
-                                    logger.warn('Division by zero')
-                                    
-                                    status_ret=False
-                            if price_def[i]=="%":
-                                price=price*x/100.0
-                            
-                    else:
-                        status_ret=False
-                else:
-                    continue
-            if status_ret==True:
-                print "The price value is: " + str(price)
-                logger.info('Price is %s', price)
+                break
             else:
-                print "Error. Poorly defined pricing function."
-                logger.warn('Not properly defined pricing function')
+                j=j+1
+                       
+            
+    status_ret=True 
+            
+    for i in range(len(price_def)):
+        if i==0:   
+            if is_number(price_def[i]):    
+                price=price+float(price_def[i]) 
+                                  
+            else:
+                status_ret=False  
+        if i%2!=0:
+            if price_def[i] in ["+","-","*","/","%"]:
+                if is_number(price_def[i+1]):
+                    x=float(price_def[i+1])
+                else:
+                    status_ret=False
+                    break
+                if price_def[i]=="+":
+                    price=price+x
+                if price_def[i]=="-": 
+                    price=price-x
+                if price_def[i]=="*":
+                    price=price*x
+                if price_def[i]=="/":
+                    if x!=0:
+                        price=price/x
+                    else:
+                        print "Division by zero."
+                        logger.warn('Division by zero')
+                        status_ret=False
+                if price_def[i]=="%":
+                    price=price*x/100.0
+            else:
+                status_ret=False
+        else:
+            continue
+    if status_ret==True:
+        print "The price value is: " + str(price)
+        logger.info('Price is %s', price)
+    else:
+        print "Error. Poorly defined pricing function."
+        logger.warn('Not properly defined pricing function')
                 
-            return status_ret,meters_used,meters_ids,input,price
+    return status_ret,meters_used,meters_ids,input_p,price
          
 conn = sqlite3.connect(path2+'/meters.db',check_same_thread=False)
 print "Opened database successfully"           
