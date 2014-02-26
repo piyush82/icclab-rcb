@@ -13,7 +13,8 @@
 #--------------------------------------------------------------
 
 import sys
-sys.path.append('/home/kolv/workspace/icc-lab-master/os_api')
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'os_api')))
 import ceilometer_api
 import compute_api
 import keystone_api

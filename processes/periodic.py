@@ -14,6 +14,7 @@ import sys, re
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'os_api')))
 #sys.path.append('/home/kolv/workspace/icc-lab-master/os_api')
+
 import ceilometer_api
 import compute_api
 import keystone_api
@@ -61,7 +62,7 @@ logger.addHandler(handler)
 logger.propagate = False
 
 
-def periodic_counter(meters_used,metering,pom,periodic_counts,reden_br,time,meters_ids,input,meter_list):
+def periodic_counter(meters_used,metering,pom,periodic_counts,reden_br,time,meters_ids,input,meter_list,id_price):
     """
 
     Counter thats called periodically and inserts the metered data in one table and the calculated price in another.
@@ -84,11 +85,40 @@ def periodic_counter(meters_used,metering,pom,periodic_counts,reden_br,time,mete
 
     global conn    
     conn = sqlite3.connect(path2+'/meters.db',check_same_thread=False)
+    for i in range(len(meters_used)):
+        for k in range(len(meter_list)):
+            if meter_list[k]["meter-name"]==meters_used[i]:
+                tenant=meter_list[k]["tenant-id"]
+    status2,meters_used2,meters_ids2,func,price=pricing(metering,meter_list,pom,input)
+    if status2:
+        cursor2 = conn.execute("SELECT max(ID)  from PRICE_LOOP")
+        row2_count=conn.execute("SELECT COUNT(*) from PRICE_LOOP ")
+        result2=row2_count.fetchone()
+        number_of_rows2=result2[0]
+        datetime2=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        if number_of_rows2==0:
+            id_last2=1
+            conn.execute("INSERT INTO PRICE_LOOP(ID,PRICE,TIMESTAMP,TENANT_ID) \
+                    VALUES ("+str(id_last2)+", '"+ str(price) +"' ,' "+ str(datetime2)+"' ,' "+tenant+" ')")
+        else:
+            id_last2 = cursor2.fetchone()[0]+1
+            conn.execute("INSERT INTO PRICE_LOOP (ID,PRICE,TIMESTAMP,TENANT_ID) \
+                    VALUES ("+str(id_last2)+",' "+ str(price)  +"' ,' "+ str(datetime2)+"' ,' "+tenant+" ')")    
+        
+        logger.info('Insert data in price_loop ')
+        
+    status=get_delta_samples(metering,pom,meter_list,meters_used,periodic_counts,meters_ids,reden_br,id_price,tenant)
+    s,p=pricing_udr(metering,id_price,meter_list,tenant)  
+    #total_price=daily_count("2014-02-26",1,tenant)
+    conn.commit() 
+    t = Timer(float(time),periodic_counter,args=[meters_used,metering,pom,periodic_counts,reden_br,time,meters_ids,input,meter_list,id_price])
+    t.start()
+    return status
+
+def get_delta_samples(metering,pom,meter_list,meters_used,periodic_counts,meters_ids,reden_br,id_price,tenant):
     delta_list={}
     delta_list[reden_br]=[None]*5
     for i in range(len(meters_used)):
-        
-
         status,sample_list=ceilometer_api.get_meter_samples(str(meters_used[i]),metering,pom,False,meter_list)
         logger.info('In periodic: Getting meter samples')
         if status:
@@ -115,10 +145,6 @@ def periodic_counter(meters_used,metering,pom,periodic_counts,reden_br,time,mete
                 row_count=conn.execute("SELECT COUNT(*) from METERS_COUNTER ")
                 result=row_count.fetchone()
                 number_of_rows=result[0]
-                
-                for k in range(len(meter_list)):
-                    if meter_list[k]["meter-name"]==meters_used[i]:
-                        tenant=meter_list[k]["tenant-id"]
 
                 if number_of_rows==0:
                     id_last=1
@@ -130,38 +156,16 @@ def periodic_counter(meters_used,metering,pom,periodic_counts,reden_br,time,mete
                             VALUES ("+str(id_last)+",' "+ str(meters_ids[i]) +"', '"+ str(meters_used[i]) +"','" + str(sample_list[j]["user-id"]) +" ','"+ str(sample_list[j]["resource-id"]) +"' ,' "+ str(sample_list[j]["counter-volume"])+"' ,' "+ str(sample_list[j]["counter-unit"]) +"' ,' "+ str(datetime1[0])+" "+str(datetime1[1])+"' ,' "+tenant+" ')")                   
 
                 conn.commit()
-                logger.info('Insert data in meters_counter ')
-    
-    status2,meters_used2,meters_ids2,func,price=pricing(metering,meter_list,pom,input)
-    if status2:
-        cursor2 = conn.execute("SELECT max(ID)  from PRICE_LOOP")
-        row2_count=conn.execute("SELECT COUNT(*) from PRICE_LOOP ")
-        result2=row2_count.fetchone()
-        number_of_rows2=result2[0]
-        datetime2=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        if number_of_rows2==0:
-            id_last2=1
-            conn.execute("INSERT INTO PRICE_LOOP(ID,PRICE,TIMESTAMP,TENANT_ID) \
-                    VALUES ("+str(id_last2)+", '"+ str(price) +"' ,' "+ str(datetime2)+"' ,' "+tenant+" ')")
-        else:
-            id_last2 = cursor2.fetchone()[0]+1
-            conn.execute("INSERT INTO PRICE_LOOP (ID,PRICE,TIMESTAMP,TENANT_ID) \
-                    VALUES ("+str(id_last2)+",' "+ str(price)  +"' ,' "+ str(datetime2)+"' ,' "+tenant+" ')")    
-        
-        logger.info('Insert data in price_loop ')
+                logger.info('Insert data in meters_counter ')     
         
     date_time=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     conn.execute("INSERT INTO UDR(USER_ID,TIMESTAMP,PRICING_FUNC_ID,PARAM1,PARAM2,PARAM3,PARAM4,PARAM5) \
-           VALUES ( '"+ str(user) +"', '"+str(date_time)+"', '"+str(id_last2)+"', '"+ str(delta_list[reden_br][0]) +"','" +str(delta_list[reden_br][1]) +"','" +str(delta_list[reden_br][2]) +"','" + str(delta_list[reden_br][3]) +" ','"+ str(delta_list[reden_br][4]) +" ')")        
-    reden_br+=1   
+           VALUES ( '"+ str(user) +"', '"+str(date_time)+"', '"+str(id_price)+"', '"+ str(delta_list[reden_br][0]) +"','" +str(delta_list[reden_br][1]) +"','" +str(delta_list[reden_br][2]) +"','" + str(delta_list[reden_br][3]) +" ','"+ str(delta_list[reden_br][4]) +" ')")        
+    reden_br+=1      
     conn.commit() 
-    s,p=pricing_udr(metering,1,meter_list)
-    print p    
-    t = Timer(float(time),periodic_counter,args=[meters_used,metering,pom,periodic_counts,reden_br,time,meters_ids,input,meter_list])
-    t.start()
-    return status
+    return status                 
 
-def pricing_udr(metering,id_price,meter_list):
+def pricing_udr(metering,id_price,meter_list,tenant):
     price=0
     price_def=[]
     udr_list=[]
@@ -222,15 +226,41 @@ def pricing_udr(metering,id_price,meter_list):
                     status_ret=False
         else:
             continue
-        if status_ret==True:
-                print "The price value is: " + str(price)
-                logger.info('Price is %s', price)
-        else:
-                print "Error. Poorly defined pricing function."
-                logger.warn('Not properly defined pricing function')
+    if status_ret==True:
+        print "The price value is: " + str(price)
+        logger.info('Price is %s', price)
+        date_time=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        conn.execute("INSERT INTO PRICE_CDR(PRICE,TIMESTAMP,TENANT_ID,PRICING_FUNC_ID) \
+            VALUES ('"+ str(price) +"' ,' "+ str(date_time)+"' ,' "+str(tenant)+"' ,' "+str(id_price)+" ')")
+    else:
+        print "Error. Poorly defined pricing function."
+        logger.warn('Not properly defined pricing function')
                 
-        return status_ret,price
+    return status_ret,price
 
+def daily_count(day,id_price,tenant):
+    global conn    
+    conn = sqlite3.connect(path2+'/meters.db',check_same_thread=False)
+    day=day.split("-")
+    day=datetime.date(int(day[0]),int(day[1]),int(day[2]))
+    next_day=day + datetime.timedelta(days=1)
+    print next_day
+    prices_daily=[]
+    price_total=0
+    cursor=conn.execute("SELECT PRICE FROM PRICE_CDR WHERE ID="+str(id_price)+" AND TIMESTAMP BETWEEN "+str(day)+ " AND "+ str(next_day))
+    row_count=conn.execute("SELECT COUNT(PRICE) FROM PRICE_CDR WHERE ID="+str(id_price)+" AND TIMESTAMP BETWEEN "+str(day)+ " AND "+ str(next_day))
+    result=row_count.fetchone()
+    number_of_rows=result[0]
+    for i in cursor:
+        for j in range(0,number_of_rows):
+            prices_daily.append(i[j])   
+    for i in range(len(prices_daily)):
+        price_total+=prices_daily[i]   
+    conn.execute("INSERT INTO PRICE_DAILY(PRICE,TIMESTAMP,TENANT_ID,PRICING_FUNC_ID) \
+            VALUES ('"+ str(price_total) +"' ,' "+ str(day)+"' ,' "+str(tenant)+"' ,' "+str(id_price)+" ')") 
+    print "Daily total price: "+str(price_total)  
+    conn.commit() 
+    return price_total
 
 def pricing(metering,meter_list,pom,input_p):     
     """
@@ -378,6 +408,8 @@ def main(argv):
                        VALUES ( '"+ str(user) +"', '"+ str(func[0]) +"','" +str(func[1]) +"','" +str(func[2]) +"','" + str(func[3]) +" ','"+ str(func[4]) +"' ,' "+ str(func[5])+"' ,' "+ str(func[6]) +"' ,' "+ str(func[7])+"' ,' "+str(func[8])+" ')")
             conn.commit()
             logger.info('Insert pricing function in database')
+            cursor = conn.execute("SELECT max(ID)  from PRICING_FUNC")
+            id_price = cursor.fetchone()[0]
             if status:
                 time=raw_input("Enter the desired time interval in seconds. ")
                 if time=="":
@@ -385,7 +417,7 @@ def main(argv):
                 periodic_counts = [None]*len(meters_used)
                 for i in range(len(meters_used)):
                     periodic_counts[i]=[]
-                periodic_counter(meters_used,token_data["metering"],pom,periodic_counts,0,time,meters_ids,input,meter_list) 
+                periodic_counter(meters_used,token_data["metering"],pom,periodic_counts,0,time,meters_ids,input,meter_list,id_price) 
                 logger.info('Starting counter. Time interval is %s ', time)
                 conn.close()
                

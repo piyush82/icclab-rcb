@@ -44,14 +44,14 @@ def main(argv):
         logger.info('The database exists')
 
         all=[]
-        default=["meters_counter","pricing_func","users","units","price_loop","udr"]
+        default=["meters_counter","pricing_func","users","units","price_loop","udr","price_cdr","price_daily"]
         logger.info('Opened database successfully')
 
-        count=conn.execute("SELECT count(*) FROM sqlite_master WHERE type = 'table' AND name != 'android_metadata' AND name != 'sqlite_sequence'")
+        count=conn.execute("SELECT count(*) FROM sqlite_master WHERE type = 'table'  AND name != 'sqlite_sequence'")
         for i in count:
             total=i[0]
 
-        tables=conn.execute("SELECT * FROM sqlite_master WHERE type = 'table' AND name != 'android_metadata' AND name != 'sqlite_sequence'")
+        tables=conn.execute("SELECT * FROM sqlite_master WHERE type = 'table'  AND name != 'sqlite_sequence'")
         for i in tables:        
             all.append(i[2])
 
@@ -138,7 +138,25 @@ def create_tables(conn):
            PARAM4 TEXT,
            PARAM5 TEXT,
            FOREIGN KEY(PRICING_FUNC_ID) REFERENCES PRICING_FUNC(ID));''')
-        logger.info('Table created successfully')        
+        logger.info('Table created successfully')      
+        
+        conn.execute('''CREATE TABLE PRICE_CDR
+           (ID INTEGER PRIMARY KEY AUTOINCREMENT,
+           PRICE REAL,
+           TIMESTAMP DATETIME NOT NULL,
+           TENANT_ID TEXT NOT NULL,
+           PRICING_FUNC_ID INT NOT NULL,
+           FOREIGN KEY(PRICING_FUNC_ID) REFERENCES PRICING_FUNC(ID));''')
+        logger.info('Table created successfully')     
+        
+        conn.execute('''CREATE TABLE PRICE_DAILY
+           (ID INTEGER PRIMARY KEY AUTOINCREMENT,
+           PRICE REAL,
+           TIMESTAMP DATETIME NOT NULL,
+           TENANT_ID TEXT NOT NULL,
+           PRICING_FUNC_ID INT NOT NULL,
+           FOREIGN KEY(PRICING_FUNC_ID) REFERENCES PRICING_FUNC(ID));''')
+        logger.info('Table created successfully')               
 
         conn.commit()
         return True

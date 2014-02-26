@@ -10,10 +10,13 @@ Created on Jan 3, 2014
 
 import textwrap
 import sys
-sys.path.append('/home/kolv/workspace/icc-lab-master/os_api')
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'os_api')))
 import ceilometer_api
 import compute_api
 import keystone_api
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'processes')))
+import periodic
 
 def main(argv):
     print "Hello There. This is a simple test application making a test API call to OpenStack"
@@ -40,7 +43,7 @@ def main(argv):
          #   print "The list of servers are printed next."
          #   print server_list
         status, meter_list = ceilometer_api.get_meter_list(pom, token_data["metering"])
-
+        total_price=periodic.daily_count("2014-02-26",1, "323936522894416b903d3528fa971537")
         if status:
             print "The list of available meters are printed next."
             print '--------------------------------------------------------------------------------------------------------------------------'
