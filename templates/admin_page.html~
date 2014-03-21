@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+{% extends "base.html" %}
+<html>
+<head>
+    <title>{% block title %}Admin{% endblock %}</title>
+</head>
+<body>
+
+<div id="content">
+    {% block content %}
+    <div id="home_admin">
+	<h3>Users</h3>
+	{% if users_list %}
+		<table>
+  			<tr>
+    				<th>User ID</th>
+    				<th>Tenant ID</th>
+  			</tr>
+			{% for item in users_list %}
+  			<tr>
+    				<td>{{item.user_id}}</td>
+    				<td>{{item.tenant_id}}</td>
+				<td><a href="/pricing_function/">Define a pricing function.</a></td>
+				<td><a href="/calculate_price/">Calculate price.</a></td>
+  			</tr>
+			{% endfor %}
+		</table>
+	{% else %}
+		<p> There are not any users yet.</p>
+	{% endif %}s
+    {% endblock %}
+
+</div>
+
+</body>
+</html>

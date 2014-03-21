@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+{% extends "base.html" %}
+<html>
+<head>
+    <title>{% block title %}Home{% endblock %}</title>
+</head>
+<body>
+
+<div id="content">
+    {% block content %}
+    <a href="/admin_page/">Admin page</a>
+	
+    <a href="/user_page/">User page</a>
+    {% endblock %}
+
+</div>
+
+</body>
+</html>

@@ -8,7 +8,8 @@ Created on Jan 14, 2014
 
 '''
 import sys
-sys.path.append('/home/kolv/workspace/icc-lab-master/os_api')
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'os_api')))
 import ceilometer_api
 import compute_api
 import keystone_api
@@ -134,7 +135,7 @@ def main(argv):
             else:
                 print "Error. Poorly defined pricing function."
                 logger.warn('Pricing function not properly defined')
-    return status_ret,meters_used
+        return status_ret,meters_used
 
 
     

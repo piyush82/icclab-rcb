@@ -1,0 +1,45 @@
+2014-02-24 15:00:36,315 - __main__ - INFO - Authentication was successful
+2014-02-24 15:01:02,333 - __main__ - INFO - Getting meter samples
+2014-02-24 15:01:05,640 - __main__ - INFO - Getting meter samples
+2014-02-24 15:01:05,641 - __main__ - INFO - Calculated price is: 709.01
+2014-02-24 15:01:52,236 - __main__ - INFO - Authentication was successful
+2014-02-24 15:02:38,543 - __main__ - INFO - Getting meter samples
+2014-02-24 15:03:05,367 - __main__ - INFO - Getting meter samples
+2014-02-24 15:03:05,368 - __main__ - INFO - Calculated price is: 7097442.0
+2014-02-24 15:06:38,337 - __main__ - INFO - Authentication was not successful
+2014-02-24 15:08:02,393 - __main__ - INFO - Authentication was not successful
+2014-02-24 15:08:25,441 - __main__ - INFO - Authentication was successful
+2014-02-24 15:09:08,674 - __main__ - INFO - Getting meter samples
+2014-02-24 15:09:08,685 - __main__ - INFO - Calculated price is: 16.03
+2014-02-24 15:09:33,161 - __main__ - INFO - Authentication was successful
+2014-02-24 15:09:43,610 - __main__ - INFO - Getting meter samples
+2014-02-24 15:09:43,610 - __main__ - INFO - Calculated price is: 1.0
+2014-02-24 15:09:59,756 - __main__ - INFO - Authentication was successful
+2014-02-24 15:10:41,917 - __main__ - INFO - Getting meter samples
+2014-02-24 15:10:41,918 - __main__ - WARNING - Pricing function not properly defined
+2014-02-24 15:11:01,736 - __main__ - INFO - Authentication was successful
+2014-02-24 15:11:24,734 - __main__ - INFO - Getting meter samples
+2014-02-24 15:11:24,735 - __main__ - INFO - Calculated price is: 0.0
+2014-02-24 15:11:54,234 - __main__ - INFO - Authentication was successful
+2014-02-24 15:12:07,438 - __main__ - INFO - Getting meter samples
+2014-02-24 15:12:07,439 - __main__ - INFO - Calculated price is: 5.0
+2014-02-24 15:12:27,259 - __main__ - INFO - Authentication was successful
+2014-02-24 15:13:07,030 - __main__ - INFO - Getting meter samples
+2014-02-24 15:13:07,031 - __main__ - INFO - Calculated price is: 0.0
+2014-02-24 15:32:44,141 - __main__ - INFO - Authentication was successful
+2014-02-24 15:40:19,434 - __main__ - INFO - Authentication was successful
+2014-02-24 15:41:17,073 - __main__ - INFO - Getting meter samples
+2014-02-24 15:41:17,074 - __main__ - INFO - Calculated price is: 7556.097
+2014-02-24 15:43:40,150 - __main__ - INFO - Authentication was successful
+2014-02-24 15:44:32,702 - __main__ - INFO - Getting meter samples
+2014-02-24 15:44:32,703 - __main__ - INFO - Calculated price is: 7556.097
+2014-02-24 15:46:38,753 - __main__ - INFO - Authentication was successful
+2014-02-24 15:47:13,016 - __main__ - INFO - Getting meter samples
+2014-02-24 15:47:13,032 - __main__ - INFO - Calculated price is: 0.709
+2014-02-24 15:48:05,024 - __main__ - INFO - Authentication was successful
+2014-02-24 15:48:26,441 - __main__ - INFO - Getting meter samples
+2014-02-24 15:48:26,456 - __main__ - INFO - Calculated price is: 7.09
+2014-02-24 15:55:24,798 - __main__ - INFO - Authentication was successful
+2014-02-24 15:55:56,302 - __main__ - INFO - Getting meter samples
+2014-02-24 15:55:56,304 - __main__ - INFO - Calculated price is: 7097.442
+2014-03-07 15:34:10,548 - __main__ - INFO - Authentication was not successful

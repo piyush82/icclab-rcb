@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    {% if errors %}
+        <ul>
+            {% for error in errors %}
+            <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <form action="somepage.php" method="post">
+	<p> Define the pricing function. </p>
+	<select name="Parameter 1" size="5">
+		<option value="cocacola"> Coca Cola </option>
+		<option value="pepsi"> Pepsi </option>
+		<option value="cockta"> Cockta </option>
+		<option selected="selected" value="sevenup">7 up </option>
+	</select>
+	<select name="Sign 1" >
+		<option selected="+" value="+"> + </option>
+		<option value="-"> - </option>
+		<option value="*"> * </option>
+		<option value="/"> / </option>
+		<option value="%"> % </option>
+	</select>
+	<select name="Parameter 2" size="5">
+		<option value="cocacola"> Coca Cola </option>
+		<option value="pepsi"> Pepsi </option>
+		<option value="cockta"> Cockta </option>
+		<option selected="selected" value="sevenup">7 up </option>
+	</select>
+	<select name="Sign 2" >
+		<option value="+"> + </option>
+		<option value="-"> - </option>
+		<option value="*"> * </option>
+		<option value="/"> / </option>
+		<option value="%"> % </option>
+	</select>
+	<select name="Parameter 3" size="5">
+		<option value="cocacola"> Coca Cola </option>
+		<option value="pepsi"> Pepsi </option>
+		<option value="cockta"> Cockta </option>
+		<option selected="selected" value="sevenup">7 up </option>
+	</select>
+	<select name="Sign 3" >
+		<option value="+"> + </option>
+		<option value="-"> - </option>
+		<option value="*"> * </option>
+		<option value="/"> / </option>
+		<option value="%"> % </option>
+	</select>
+	<select name="Parameter 4" size="5">
+		<option value="cocacola"> Coca Cola </option>
+		<option value="pepsi"> Pepsi </option>
+		<option value="cockta"> Cockta </option>
+		<option selected="selected" value="sevenup">7 up </option>
+	</select>
+	<select name="Sign 4" >
+		<option value="+"> + </option>
+		<option value="-"> - </option>
+		<option value="*"> * </option>
+		<option value="/"> / </option>
+		<option value="%"> % </option>
+	</select>
+	<select name="Parameter 5" size="5">
+		<option value="cocacola"> Coca Cola </option>
+		<option value="pepsi"> Pepsi </option>
+		<option value="cockta"> Cockta </option>
+		<option selected="selected" value="sevenup">7 up </option>
+	</select>
+	<input type="submit" value="Submit">
+    </form>
+
+{% endblock %}
