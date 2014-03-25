@@ -1,19 +1,23 @@
-<!DOCTYPE html>
 {% extends "base.html" %}
-<html>
-<head>
-    <title>{% block title %}Home{% endblock %}</title>
-</head>
-<body>
+{% block title %}Home{% endblock %}
+{% block sidebar %}
+    <ul>
+        <li><a href="/">Home</a></li>
 
+        {% if user.is_authenticated %}
+            <li><a href="/accounts/logout">Logout</a></li>
+        {% else %}
+            <li><a href="/accounts/login">Login</a></li>
+        {% endif %}{% endblock %}
+{% block content %}
 <div id="content">
-    {% block content %}
-    <a href="/admin_page/">Admin page</a>
-	
+    
+    {% if user.is_active and user.is_staff %}
+    	<a href="/auth_token/">Authenticicate</a>
+    {% endif %}
     <a href="/user_page/">User page</a>
-    {% endblock %}
+    
 
 </div>
 
-</body>
-</html>
+{% endblock %}

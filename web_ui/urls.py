@@ -16,5 +16,8 @@ urlpatterns = patterns('',
     (r'^index/$', 'main_menu.views.index'),
     (r'^admin_page/$', 'main_menu.views.admin_page'),
     (r'^user_page/$', 'main_menu.views.user_page'),
-
+    (r'^auth_token/$', 'main_menu.views.auth_token'),
+    (r'^token_data/$', 'main_menu.views.token_data'),
+    #(r'^/define_pricing/?ct=(?P<ct>\d+)/$', 'main_menu.views.define_pricing'),
+    (r'^define_pricing/(?P<ct>\d+)/$', 'main_menu.views.define_pricing'),
 )

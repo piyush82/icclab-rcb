@@ -96,7 +96,7 @@ def get_endpoints(tokenId, uri):
     response, content = h.request(target.geturl(),method,body,headers)
     print "Endpoints:\n" + content
    
-def get_token_v3(uri):
+def get_token_v3(uri,username, password, domain,project):
     ''' 
     Returns the authentication token for v3 keystone.
     
@@ -116,7 +116,7 @@ def get_token_v3(uri):
     path = '/v3/auth/tokens'
     target = urlparse(uri+path)
     method = 'POST'
-    username, password, domain,project = login_v3()
+    #username, password, domain,project = login_v3()
     #defining the request body here
     body = '{"auth": {"identity": {"methods": ["password"],"password": {"user": {"domain":{"name":"' + domain + '"},"name": "' + username + '","password": "' + password + '"}}},"scope": {"project": {"domain": {"name": "' + domain + '"},"name": "' + project + '"}}}}'
     
@@ -135,7 +135,7 @@ def get_token_v3(uri):
         data = json.loads(content)
         auth_data["token-issued-at"] = data["token"]["issued_at"]
         auth_data["token-expires-at"] = data["token"]["expires_at"]
-        auth_data["token-id"] = json_header["x-subject-token"]
+        auth_data["token_id"] = json_header["x-subject-token"]
         auth_data["user-name"] = data["token"]["user"]["name"]
         auth_data["user-id"] = data["token"]["user"]["id"]
         for i in range(len(data["token"]["catalog"])):

@@ -29,7 +29,7 @@ TEMPLATE_DEBUG = True
 ALLOWED_HOSTS = []
 
 TEMPLATE_DIRS = (
-    '/home/kolv/workspace/icclab-rcb-master/templates',
+    BASE_DIR +'/templates',
 )
 
 # Application definition

@@ -1,23 +1,28 @@
 {% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block sidebar %}
+    <ul>
+        <li><a href="/">Home</a></li>
 
-{% block content %}
+        {% if user.is_authenticated %}
+            <li><a href="/accounts/logout">Logout</a></li>
+        {% else %}
+            <li><a href="/accounts/login">Login</a></li>
+        {% endif %}{% endblock %}
 
-    {% if errors %}
-        <ul>
-            {% for error in errors %}
-            <li>{{ error }}</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
 
-    <form action="somepage.php" method="post">
-	<p> Define the pricing function. </p>
-	<select name="Parameter 1" size="5">
-		<option value="cocacola"> Coca Cola </option>
-		<option value="pepsi"> Pepsi </option>
-		<option value="cockta"> Cockta </option>
-		<option selected="selected" value="sevenup">7 up </option>
-	</select>
+
+<div id="content">
+{% block content %}    
+	{% if status == True %}
+		{% if meter_list %}
+    			<form action="" method="post">
+			<p> Define the pricing function. </p>
+			<select name="Parameter 1" size="5">
+			{% for item in meter_list.forloop.counter %}
+				<option value=item.meter-id> item.meter_name </option>
+			{ % endfor %}
+			</select>
 	<select name="Sign 1" >
 		<option selected="+" value="+"> + </option>
 		<option value="-"> - </option>
@@ -26,10 +31,10 @@
 		<option value="%"> % </option>
 	</select>
 	<select name="Parameter 2" size="5">
-		<option value="cocacola"> Coca Cola </option>
-		<option value="pepsi"> Pepsi </option>
-		<option value="cockta"> Cockta </option>
-		<option selected="selected" value="sevenup">7 up </option>
+		<option value="">  </option>
+		<option value="">  </option>
+		<option value="">  </option>
+		<option selected="selected" value=""> </option>
 	</select>
 	<select name="Sign 2" >
 		<option value="+"> + </option>
@@ -39,10 +44,10 @@
 		<option value="%"> % </option>
 	</select>
 	<select name="Parameter 3" size="5">
-		<option value="cocacola"> Coca Cola </option>
-		<option value="pepsi"> Pepsi </option>
-		<option value="cockta"> Cockta </option>
-		<option selected="selected" value="sevenup">7 up </option>
+		<option value="">  </option>
+		<option value="">  </option>
+		<option value="">  </option>
+		<option selected="selected" value=""> </option>
 	</select>
 	<select name="Sign 3" >
 		<option value="+"> + </option>
@@ -52,10 +57,10 @@
 		<option value="%"> % </option>
 	</select>
 	<select name="Parameter 4" size="5">
-		<option value="cocacola"> Coca Cola </option>
-		<option value="pepsi"> Pepsi </option>
-		<option value="cockta"> Cockta </option>
-		<option selected="selected" value="sevenup">7 up </option>
+		<option value="">  </option>
+		<option value="">  </option>
+		<option value="">  </option>
+		<option selected="selected" value=""> </option>
 	</select>
 	<select name="Sign 4" >
 		<option value="+"> + </option>
@@ -65,20 +70,12 @@
 		<option value="%"> % </option>
 	</select>
 	<select name="Parameter 5" size="5">
-		<option value="cocacola"> Coca Cola </option>
-		<option value="pepsi"> Pepsi </option>
-		<option value="cockta"> Cockta </option>
-		<option selected="selected" value="sevenup">7 up </option>
+		<option value="">  </option>
+		<option value="">  </option>
+		<option value="">  </option>
+		<option selected="selected" value=""> </option>
 	</select>
 	<input type="submit" value="Submit">
-    </form>
-
-
-    <form action="/pricing/" method="post">
-        <p>Subject: <input type="text" name="subject"></p>
-        <p>Your e-mail (optional): <input type="text" name="email"></p>
-        <p>Message: <textarea name="message" rows="10" cols="50"></textarea></p>
-        <input type="submit" value="Submit">
     </form>
 
 {% endblock %}

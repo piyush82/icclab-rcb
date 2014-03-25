@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block sidebar %}
+    <ul>
+        <li><a href="/">Home</a></li>
+
+        {% if user.is_authenticated %}
+            <li><a href="/accounts/logout">Logout</a></li>
+        {% else %}
+            <li><a href="/accounts/login">Login</a></li>
+        {% endif %}{% endblock %}
+
+
+
+<div id="content">
+{% block content %}    
+	{% if status == True %}
+		<p>The authentication was successful, below are the data we got.</p>
+		{% if token_data %}
+			<table>
+			{% for key, value in token_data.iteritems %}
+         			{% if key != 'token_id' %}
+					<tr>
+    						<td>{{key}}</td>
+    						<td>{{value}}</td>
+  					</tr>
+
+	    			{% endif %}
+
+			{% endfor %}
+			</table>
+
+			<p>The authentication token is</p>
+			<label for="token">{{token_data.token_id}}</label>
+
+
+		{% endif %}
+		<p></p>
+    		<a href="/admin/">Admin page</a>
+	{% else %}
+		<p>The authentication was not successful. </p>
+		<a href="/auth_token/">Authenticicate</a>
+	
+	{% endif %}
+{% endblock %}
+</div>
+
+
