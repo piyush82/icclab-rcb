@@ -1,0 +1,18 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+
+
+    
+<p>Price: </p>
+    {{ price }}
+
+<p>The pricing function will be applied to the user with id:</p>
+
+    <ul>{{ user|unordered_list }}</ul>
+
+
+
+
+{% endblock %}
+

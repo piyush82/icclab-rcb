@@ -1,0 +1,65 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+
+<p> Define the pricing function. </p>
+
+<form action="" method="post">
+{% csrf_token %}
+    
+        <label for="meter1">Meter:</label>
+        {{ pricing_func_form.meter1 }}
+	
+	<p></p>
+
+        <label for="sign1">Sign:</label>
+        {{ pricing_func_form.sign1 }}
+
+	<p></p>
+
+        <label for="meter2">Meter:</label>
+        {{ pricing_func_form.meter2 }}
+
+	<p></p>
+
+        <label for="sign2">Sign:</label>
+        {{ pricing_func_form.sign2 }}
+
+	<p></p>
+
+        <label for="meter3">Meter:</label>
+        {{ pricing_func_form.meter3 }}
+
+	<p></p>
+
+        <label for="sign3">Sign:</label>
+        {{ pricing_func_form.sign3 }}
+
+	<p></p>
+
+        <label for="meter4">Meter:</label>
+        {{ pricing_func_form.meter4 }}
+
+	<p></p>
+
+        <label for="sign4">Sign:</label>
+        {{ pricing_func_form.sign }}
+
+	<p></p>
+
+        <label for="meter5">Meter:</label>
+        {{ pricing_func_form.meter5 }}
+
+	<p></p>
+
+
+    <p>The pricing function will be applied to the user with id:</p>
+
+    <ul>{{ user|unordered_list }}</ul>
+
+    <input type="hidden" name="action" value="add_pricing_func" />
+    <input type="submit" name="add_pricing" value="Add pricing function" />
+</form>
+
+{% endblock %}
+
