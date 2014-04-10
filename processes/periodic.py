@@ -374,12 +374,12 @@ def main(argv):
     auth_uri = 'http://160.85.4.10:5000' #internal test-setup, replace it with your own value
     #auth_uri = 'http://160.85.231.233:5000' #internal test-setup, replace it with your own value
                     
-    status, token_data = keystone_api.get_token_v3(auth_uri)
+    status, token_data = keystone_api.get_token_v3(auth_uri,False)
     if status:
         print 'The authentication was successful.'
         print '--------------------------------------------------------------------------------------------------------'
-        print 'The authentication token is: ', token_data["token-id"]
-        pom=token_data["token-id"]
+        print 'The authentication token is: ', token_data["token_id"]
+        pom=token_data["token_id"]
         user=token_data["user-id"]
         logger.info('Successful authentication for user %s', user)
     else:

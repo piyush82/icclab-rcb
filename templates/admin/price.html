@@ -1,12 +1,48 @@
 {% extends "admin/base_site.html" %}
-
+{% block head %}
+<script type="text/javascript" src="/site_media/prototype.js"></script>
+<script type="text/javascript" src="/site_media/my_ajax_function.js"></script>
+{% endblock %}
 {% block content %}
 
 <p> Define the pricing function. </p>
 
 <form action="" method="post">
 {% csrf_token %}
-    
+	{% if form.errors %}
+		{% for field in form %}
+			{% for error in field.errors %}
+            			<div class="alert alert-error">
+                			<strong>{{ error|escape }}</strong>
+            			</div>
+        		{% endfor %}
+    		{% endfor %}
+    		{% for error in form.non_field_errors %}
+        		<div class="alert alert-error">
+            			<strong>{{ error|escape }}</strong>
+        		</div>
+    		{% endfor %}
+	{% endif %}
+
+
+	{% for i in resources %}
+ 		<ul>	
+   		<li><b>{{i}}</b></li>
+ 				
+		
+		{% for j in meter_list %}
+			{% if forloop.counter == forloop.parentloop.counter %}
+				{% for k in j %}
+ 					<ul>
+  			 		<li>{{k}}</li>
+ 					</ul>
+				{% endfor %}
+			{% endif %}
+		{% endfor %}
+		</ul>
+	{% endfor %}
+
+
     {{ pricing_func_form.as_p }}
 
     <p>The pricing function will be applied to the user with id:</p>

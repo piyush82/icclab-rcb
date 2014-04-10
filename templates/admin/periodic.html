@@ -25,32 +25,17 @@
 	{% endif %}
 
 
-	{% for i in resources %}
- 		<ul>	
-   		<li><b>{{i}}</b></li>
- 				
-		
-		{% for j in meter_list %}
-			{% if forloop.counter==forloop.parentloop.counter %}
-				{% for k in j %}
- 					<ul>
-  			 		<li>{{k}}</li>
- 					</ul>
-				{% endfor %}
-			{% endif %}
-		{% endfor %}
-		</ul>
-	{% endfor %}
+    <p>Entered the desired amount of seconds</p>
 
 
-    {{ pricing_func_form.as_p }}
+    {{ periodic_form.as_p }}
 
-    <p>The pricing function will be applied to the user with id:</p>
+    <p>The periodic pricing will be applied to the user with id:</p>
 
     <ul>{{ user|unordered_list }}</ul>
 
     <input type="hidden" name="action" value="add_pricing_func" />
-    <input type="submit" name="add_pricing" value="Add pricing function" />
+    <input type="submit" name="start_periodic" value="Start the loop." />
 </form>
 
 {% endblock %}

@@ -21,18 +21,18 @@ import periodic
 def main(argv):
     print "Hello There. This is a simple test application making a test API call to OpenStack"
     auth_uri = 'http://160.85.4.10:5000' #internal test-setup, replace it with your own value
-    status, token_data = keystone_api.get_token_v3(auth_uri)
+    status, token_data = keystone_api.get_token_v3(auth_uri,False)
     if status:
         print 'The authentication was successful, below are the data we got:'
         print '--------------------------------------------------------------------------------------------------------'
         print '%1s %32s %2s %64s %1s' % ('|', 'key', '|', 'value', '|')
         print '--------------------------------------------------------------------------------------------------------'
         for key, value in token_data.iteritems():
-            if key not in {'token-id'}:
+            if key not in {'token_id'}:
                 print '%1s %32s %2s %64s %1s' % ('|', key, '|', value, '|')
         print '--------------------------------------------------------------------------------------------------------'
-        print 'The authentication token is: ', token_data["token-id"]
-        pom=token_data["token-id"]
+        print 'The authentication token is: ', token_data["token_id"]
+        pom=token_data["token_id"]
 
     else:
         print "Authentication was not successful."
@@ -47,10 +47,10 @@ def main(argv):
         if status:
             print "The list of available meters are printed next."
             print '--------------------------------------------------------------------------------------------------------------------------'
-            print '%1s %16s %2s %10s %2s %10s %2s %70s %1s' % ('|','meter-name', '|', 'meter-type', '|', 'meter-unit', '|', 'meter-id', '|')
+            print '%1s %16s %2s %10s %2s %10s %2s %40s %1s %70s' % ('|','meter-name', '|', 'meter-type', '|', 'meter-unit', '|', 'meter-id', '|','resource-id')
             print '--------------------------------------------------------------------------------------------------------------------------'
             for i in range(len(meter_list)):
-                print '%1s %16s %2s %10s %2s %10s %2s %70s %1s' % ('|', meter_list[i]["meter-name"], '|', meter_list[i]["meter-type"], '|', meter_list[i]["meter-unit"], '|', meter_list[i]["meter-id"].strip(), '|')
+                print '%1s %16s %2s %10s %2s %10s %2s %40s %1s %70s' % ('|', meter_list[i]["meter-name"], '|', meter_list[i]["meter-type"], '|', meter_list[i]["meter-unit"], '|', meter_list[i]["meter-id"].strip(), '|',meter_list[i]["resource-id"])
             print '--------------------------------------------------------------------------------------------------------------------------'
  
         meter_name=raw_input("Enter meter name: ")

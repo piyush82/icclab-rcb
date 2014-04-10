@@ -39,19 +39,12 @@ def user_page(request):
 @login_required
 def auth_token(request):
     if request.method == 'POST':
-        #username=None
-        #password=None
-
-        #if request.user.is_authenticated():
-            #username = request.user.username   
-        #if request.user.is_authenticated():
-            #password = request.user.password
         username=request.POST['user']
         password=request.POST['pass']
         domain=request.POST['domain']
         project=request.POST['project']
         auth_uri = 'http://160.85.4.10:5000'
-        status, token_data = keystone_api.get_token_v3(auth_uri,username, password, domain,project)
+        status, token_data = keystone_api.get_token_v3(auth_uri,True,username=username, password=password, domain=domain,project=project)
         request.session["status"] = status
         request.session["token_data"] = token_data
         return HttpResponseRedirect('/token_data/')
@@ -75,3 +68,11 @@ def define_pricing(request,ct):
     request.session["meter_list"] = meter_list
     context={'status':status_pricing,'meter_list':meter_list}
     return render(request,'define_pricing.html',context)   
+
+@login_required
+def is_auth(request):
+    if 'status' not in request.session:
+        return False
+    else:
+        return True
+

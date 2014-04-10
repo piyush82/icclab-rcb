@@ -96,7 +96,7 @@ def get_endpoints(tokenId, uri):
     response, content = h.request(target.geturl(),method,body,headers)
     print "Endpoints:\n" + content
    
-def get_token_v3(uri,username, password, domain,project):
+def get_token_v3(uri,web,**kwargs):
     ''' 
     Returns the authentication token for v3 keystone.
     
@@ -116,7 +116,16 @@ def get_token_v3(uri,username, password, domain,project):
     path = '/v3/auth/tokens'
     target = urlparse(uri+path)
     method = 'POST'
-    #username, password, domain,project = login_v3()
+    if web==False:
+        username, password, domain,project = login_v3()
+    else:
+        if kwargs:
+            username=kwargs.pop("username")
+            password=kwargs.pop("password")
+            project=kwargs.pop("project")
+            domain=kwargs.pop("domain")
+        else:
+            return False
     #defining the request body here
     body = '{"auth": {"identity": {"methods": ["password"],"password": {"user": {"domain":{"name":"' + domain + '"},"name": "' + username + '","password": "' + password + '"}}},"scope": {"project": {"domain": {"name": "' + domain + '"},"name": "' + project + '"}}}}'
     
