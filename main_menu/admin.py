@@ -10,7 +10,6 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 
 import ceilometer_api
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'processes')))
 import periodic
-import periodic_web
 from django.contrib.contenttypes.models import ContentType
 from django.core.urlresolvers import reverse
 from django.conf.urls import patterns
@@ -196,17 +195,84 @@ class stackUserAdmin(admin.ModelAdmin):
     class StartPeriodicForm(forms.Form):
         time=forms.CharField(required=True)
         _selected_action = forms.CharField(widget=forms.MultipleHiddenInput)
+
+    
+    def start_periodic(self, request, queryset):
+        form2 = None
+        token_data=request.session["token_data"] 
+        token_id=token_data["token_id"]
+        status_meter_list, meter_list = ceilometer_api.get_meter_list(token_id, token_data["metering"])      
+       
+        user=queryset[0]
         
+                    
+        if 'start_counter' in request.POST:
+            form2 = self.StartPeriodicForm(request.POST)
+            if form2.is_valid():
+                time=str(form2.cleaned_data["time"])
+                if periodic.is_number(time):
+                    if  time>0:
+                        try:
+                            func=PricingFunc.objects.get(user_id=user) 
+                            pricing_list=[]
+                            meters_used=[]
+                            pricing_list.append(func.param1)
+                            pricing_list.append(func.sign1)
+                            pricing_list.append(func.param2)
+                            pricing_list.append(func.sign2)
+                            pricing_list.append(func.param3)
+                            pricing_list.append(func.sign3)
+                            pricing_list.append(func.param4)
+                            pricing_list.append(func.sign4)
+                            pricing_list.append(func.param5)     
+            
+                            for i in range(len(pricing_list)):
+                                j=0
+                                while j<len(meter_list):
+                                    if pricing_list[i]==meter_list[j]["meter-name"]:
+                                        if pricing_list[i] in meters_used:
+                                            continue
+                                        else:
+                                            meters_used.append(pricing_list[i])                                                                
+                                        break
+                                    else:
+                                        j=j+1
+                            periodic_counter(self,token_data,token_id,meters_used,meter_list,func,user,time)
+                                
+                        except PricingFunc.DoesNotExist:
+                                messages.warning(request, 'You have to define the pricing function first.')   
+
+
+        if not form2:
+                form2=self.StartPeriodicForm(initial={'_selected_action': request.POST.getlist(admin.ACTION_CHECKBOX_NAME)})
+                context={'user': queryset,'periodic_form': form2}
+                return render(request,'admin/periodic.html',context)       
+                
+
+    start_periodic.short_description = "Start the periodic counter for the selected user"
+  
+        
+
+class pricingFuncAdmin(admin.ModelAdmin):
+    fields = ['user_id', 'param1','sign1', 'param2','sign2', 'param3','sign3', 'param4','sign4', 'param5']
+    list_display = ('user_id', 'param1','sign1', 'param2','sign2', 'param3','sign3', 'param4','sign4', 'param5')
+    actions = ['change_pricing_func']
+
+
+admin.site.register(StackUser,stackUserAdmin)
+admin.site.register(PricingFunc,pricingFuncAdmin)
+
+
 def get_delta_samples(self,token_data,token_id,user,meter):
     delta=0.0
-    meter=str(meter)
-    samples = MetersCounter.objects.filter(user_id=user).filter(meter_name=meter)
+    meter2=str(meter)
+    samples =list( MetersCounter.objects.filter(user_id=user,meter_name = meter))
     if len(samples)==1:
         delta=0.0
     else:
-        last=samples[-1]
-        second_to_last=samples[-2]
-        delta=last-second_to_last
+        last=str(samples[-1])
+        second_to_last=str(samples[-2])
+        delta=float(last)-float(second_to_last)
     return delta
         
 def get_udr(self,token_data,token_id,user,meters_used,meter_list,func):
@@ -221,22 +287,22 @@ def get_udr(self,token_data,token_id,user,meters_used,meter_list,func):
             meters_counter.save() 
         delta=get_delta_samples(self,token_data,token_id,user,meters_used[i])
         delta_list[i]=delta
-    udr=Udr(user_id=user,timestamp=date_time,pricing_func_id=func, param1=delta_list[0], param2=delta_list[1], param3=delta_list[2], param4=delta_list[3], param5=delta_list[4])
-    udr.save()        
+        udr=Udr(user_id=user,timestamp=date_time,pricing_func_id=func, param1=delta_list[0], param2=delta_list[1], param3=delta_list[2], param4=delta_list[3], param5=delta_list[4])
+        udr.save()        
     return udr
         
 
-def periodic(self,token_data,token_id,meters_used,meter_list,func,user,time):
-    udr=self.get_udr(token_data,token_id,user,meters_used,meter_list,func)
-    price=self.pricing(user)
-    t = Timer(float(time),periodic,args=[token_data,token_id,meters_used,meter_list,func,user,time])
+def periodic_counter(self,token_data,token_id,meters_used,meter_list,func,user,time):
+    udr=get_udr(self,token_data,token_id,user,meters_used,meter_list,func)
+    price=pricing(self,user)
+    t = Timer(float(time),periodic_counter,args=[token_data,token_id,meters_used,meter_list,func,user,time])
     t.start()
     
     
 def pricing(self,user):
     func=PricingFunc.objects.get(user_id=user)
-    udr=Udr.objects.get(user_id=user,pricing_func_id=func)
-    udr.reverse()[0]
+    udr=Udr.objects.filter(user_id=user,pricing_func_id=func).order_by('-id')[0]
+    #udr.reverse()[:1]
     pricing_list=[]
     pricing_list.append(udr.param1)
     pricing_list.append(func.sign1)
@@ -252,13 +318,13 @@ def pricing(self,user):
             
     for i in range(len(pricing_list)):
         if i==0:   
-            if periodic.is_number(pricing_list[i]):    
-                price=price+float(pricing_list[i]) 
+            if periodic.is_number(str(pricing_list[i])):    
+                price=price+float(str(pricing_list[i]))
  
         if i%2!=0:
             if pricing_list[i] in ["+","-","*","/","%"]:
-                if periodic.is_number(pricing_list[i+1]):
-                    x=float(pricing_list[i+1])                             
+                if periodic.is_number(str(pricing_list[i+1])):
+                    x=float(str(pricing_list[i+1]))                             
                 else:
                     break                          
                 if pricing_list[i]=="+":
@@ -277,57 +343,4 @@ def pricing(self,user):
     cdr.save()
     return price
 
-    
-    def start_periodic(self, request, queryset):
-        form = None
-        token_data=request.session["token_data"] 
-        token_id=token_data["token_id"]
-        status_meter_list, meter_list = ceilometer_api.get_meter_list(token_id, token_data["metering"])      
-       
-        user=queryset[0]
-        try:
-            func=PricingFunc.objects.get(user_id=user) 
-            pricing_list=[]
-            meters_used=[]
-            pricing_list.append(func.param1)
-            pricing_list.append(func.sign1)
-            pricing_list.append(func.param2)
-            pricing_list.append(func.sign2)
-            pricing_list.append(func.param3)
-            pricing_list.append(func.sign3)
-            pricing_list.append(func.param4)
-            pricing_list.append(func.sign4)
-            pricing_list.append(func.param5)     
-            
-            for i in range(len(pricing_list)):
-                j=0
-                while j<len(meter_list):
-                    if pricing_list[i]==meter_list[j]["meter-name"]:
-                        meters_used.append(pricing_list[i])
-            
-            if 'start_periodic' in request.POST:
-                form = self.StartPeriodicFuncForm(request.POST)
-                if form.is_valid():
-                    if periodic.is_number(form.time) and form.time!=0:
-                        self.periodic(token_data,token_id,meters_used,meter_list,func,user,form["time"])
-
-            if not form:
-                form=self.StartPeriodicForm(initial={'_selected_action': request.POST.getlist(admin.ACTION_CHECKBOX_NAME)})
-                context={'user': queryset,'periodic_form': form}
-                return render(request,'admin/periodic.html',context)       
-        except PricingFunc.DoesNotExist:
-            messages.warning(request, 'You have to define the pricing function first.')                   
-
-    start_periodic.short_description = "Start the periodic counter for the selected user"
-  
-        
-
-class pricingFuncAdmin(admin.ModelAdmin):
-    fields = ['user_id', 'param1','sign1', 'param2','sign2', 'param3','sign3', 'param4','sign4', 'param5']
-    list_display = ('user_id', 'param1','sign1', 'param2','sign2', 'param3','sign3', 'param4','sign4', 'param5')
-    actions = ['change_pricing_func']
-
-
-admin.site.register(StackUser,stackUserAdmin)
-admin.site.register(PricingFunc,pricingFuncAdmin)
 

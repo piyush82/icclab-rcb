@@ -10,14 +10,14 @@ class StackUser(models.Model):
 
 class MetersCounter(models.Model):
     meter_name = models.CharField(max_length=200)
-    user_id = models.ForeignKey(StackUser,related_name='+')
-    counter_volume = models.TextField()
+    user_id = models.ForeignKey(StackUser)
+    counter_volume = models.TextField(blank=True,null=True)
     unit = models.CharField(max_length=100)
     timestamp = models.DateTimeField()
 
     
     def __unicode__(self):  
-        return u'%s %s %s' % (self.meter_name, self.counter_volume)
+        return u' %s' % (self.counter_volume)
 
 
 class PriceLoop(models.Model):
@@ -58,8 +58,8 @@ class Udr(models.Model):
     param4 = models.CharField(max_length=200,blank=True, null=True)
     param5 = models.CharField(max_length=200,blank=True, null=True)  
     
-    def __unicode__(self):  
-        return u'%s %s %s %s %s %s ' % (self.user_id, self.param1, self.param2, self.param3, self.param4, self.param5)        
+    #def __unicode__(self):  
+     #   return u'%s %s %s %s %s %s ' % (self.user_id, self.param1, self.param2, self.param3, self.param4, self.param5)        
     
 class PriceCdr(models.Model):
     price = models.FloatField(blank=True, null=True)
