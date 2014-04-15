@@ -19,7 +19,9 @@ urlpatterns = patterns('',
     (r'^auth_token/$', 'main_menu.views.auth_token'),
     (r'^token_data/$', 'main_menu.views.token_data'),
     (r'^admin/$', 'main_menu.views.auth_token'),
-#    (r'^define_pricing/(?P<ct>\d+)/$', 'main_menu.views.define_pricing', "define_pricing"),
+    #(r'^js/jquery-1.11.0.min.js/$', include("static/js/jquery-1.11.0.min.js")),
+    #(r'^js/jquery-ui-1.10.4.min.js/$', include("static/js/jquery-ui-1.10.4.min.js")),
+    #(r'^js/ui.js/$', include("static/js/ui.js")),
     #(r'^/define_pricing/?ct=(?P<ct>\d+)/$', 'main_menu.views.define_pricing'),
     
 )

@@ -1,0 +1,38 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+
+<script type="text/javascript" src="{{ STATIC_URL }}js/jquery-1.11.0.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/jquery-ui-1.10.4.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/ui.js"></script>
+<link type="text/css" href="{{ STATIC_URL }}admin/css/bootstrap-timepicker.css" />
+<link type="text/css" href="{{ STATIC_URL }}admin/css/bootstrap-timepicker.min.css" />
+<script type="text/javascript" src="{{ STATIC_URL }}js/bootstrap-timepicker.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/bootstrap-timepicker.min.js"></script>
+
+<p>Do you wish to define a query?</p>
+{{ query_form.radio }}
+
+<div id="queryForm" >
+	<p><label for="dateStart">Start date:</label>{{ query_form.dateStart }}
+        <label for="id_timeStart">Start time:</label>{{ query_form.timeStart }}
+	</p>
+	<p></p>
+        <p><label for="dateEnd">End date:</label> {{ query_form.dateEnd }}
+	<label for="id_timeEnd">End time:</label>{{ query_form.timeEnd }}
+	</p>
+
+</div>
+
+
+
+<input type="hidden" name="action" value="calculate_price" />
+<p></p>
+<input type="submit" name="calculate" value="Calculate price" />
+
+
+
+
+
+{% endblock %}
+
