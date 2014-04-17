@@ -1,27 +1,42 @@
-{% load admin_static %}{% load firstof from future %}<!DOCTYPE html>
-<html lang="{{ LANGUAGE_CODE|default:"en-us" }}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
 <head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>
 {% block title %}
 	ICCLab RCB Demo Site
 {% endblock %}
 </title>
-<link rel="stylesheet" type="text/css" href="{% block stylesheet %}{% static "admin/css/base.css" %}{% endblock %}" />
-{% block extrastyle %}{% endblock %}
-<!--[if lte IE 7]><link rel="stylesheet" type="text/css" href="{% block stylesheet_ie %}{% static "admin/css/ie.css" %}{% endblock %}" /><![endif]-->
-{% if LANGUAGE_BIDI %}<link rel="stylesheet" type="text/css" href="{% block stylesheet_rtl %}{% static "admin/css/rtl.css" %}{% endblock %}" />{% endif %}
-<script type="text/javascript">window.__admin_media_prefix__ = "{% filter escapejs %}{% static "admin/" %}{% endfilter %}";</script>
-{% block extrahead %}{% endblock %}
-{% block blockbots %}<meta name="robots" content="NONE,NOARCHIVE" />{% endblock %}
+
+<!-- SET: FAVICON -->
+<link rel="shortcut icon" type="image/x-icon" href="{{STATIC_URL}}favicon.ico" />
+<!-- END: FAVICON -->
+
+<!-- SET: STYLESHEET -->
+<link href="{{STATIC_URL}}style.css" rel="stylesheet" type="text/css" media="all" />
+<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}admin/css/dashboard.css" />
+<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}admin/css/base.css" />
+<!-- END: STYLESHEET -->
+
+<!-- SET: SCRIPTS -->
+<script type="text/javascript"></script>
+<!-- END: SCRIPTS -->
+<!--[if lt IE 7]>
+<style type="text/css">
+.lorem p{ line-height:18px; }
+</style>
+<![endif]-->
 </head>
 {% load i18n %}
+<body>
 
-<body class="{% if is_popup %}popup {% endif %}{% block bodyclass %}{% endblock %}">
 <!-- wrapper starts -->
 <div class="wrapper"> 
   
   <!-- container starts -->
   <div class="container"> 
-    
+    {% if not is_popup %}
     <!-- Header Starts -->
     <div class="header">
       <div class="logo">
@@ -38,19 +53,7 @@
         <div class="clear"></div>
       </div>
       <div class="clear"></div>
-    </div>
-    <div class="banner"><img src="{{STATIC_URL}}banner.jpg" width="980" height="332" alt="banner" /></div>
-    <!-- Header ends --> 
-    
-<!-- Container -->
-<div id="container">
 
-    {% if not is_popup %}
-    <!-- Header -->
-    <div id="header">
-        <div id="branding">
-        {% block branding %}{% endblock %}
-        </div>
         {% if user.is_active and user.is_staff %}
         <div id="user-tools">
             {% trans 'Welcome,' %}
@@ -67,9 +70,10 @@
             {% endblock %}
         </div>
         {% endif %}
-        {% block nav-global %}{% endblock %}
     </div>
-    <!-- END Header -->
+    <div class="banner"><img src="{{STATIC_URL}}banner.jpg" width="980" height="332" alt="banner" /></div>
+    <!-- Header ends --> 
+    
     {% block breadcrumbs %}
     <div class="breadcrumbs">
     <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
@@ -85,9 +89,11 @@
         {% endfor %}</ul>
         {% endif %}
     {% endblock messages %}
-
-    <!-- Content -->
-    <div id="content" class="{% block coltype %}colM{% endblock %}">
+    <!-- maincontent Starts -->
+    <div class="main_content">
+      <div class="left_cont">
+      {% block my_content %}
+        <div id="content" class="{% block coltype %}colM{% endblock %}">
         {% block pretitle %}{% endblock %}
         {% block content_title %}{% if title %}<h1>{{ title }}</h1>{% endif %}{% endblock %}
         {% block content %}
@@ -97,11 +103,59 @@
         {% block sidebar %}{% endblock %}
         <br class="clear" />
     </div>
-    <!-- END Content -->
-
-    {% block footer %}<div id="footer"></div>{% endblock %}
+      {% endblock %}
+      </div>
+      
+      
+      <div class="right_cont">
+        <h2>Featured services</h2>
+        <div class="lorem lorem1">
+          <h3><a href="#">General Consultancy for Cloud</a></h3>
+          <img src="{{STATIC_URL}}loram_img1.jpg" width="66" height="54" alt="img" align="left" />
+          <p class="loreml">We are experts in the cloud domain. Use our in-depth expertise to fine tune your business offerings in the cloud ... <a  href="#">Read More</a></p>
+        </div>
+        <div class="lorem">
+          <h3><a href="#">High Availability</a></h3>
+          <img src="{{STATIC_URL}}loram_img2.jpg" width="66" height="54" alt="img" align="left" />
+          <p class="loreml">Build your solutions using our best practices on highly available service setup. A resilient service is what consumers demands ... <a  href="#">Read More</a></p>
+        </div>
+        <div class="lorem">
+          <h3><a href="#">Datacenter Automation</a></h3>
+          <img src="{{STATIC_URL}}loram_img3.jpg" width="66" height="54" alt="img" align="left" />
+          <p class="loreml">Me manage our cloud using automation tools such as Foreman and Puppet, starting from bare-metal provisioning ... <a  href="#">Read More</a></p>
+        </div>
+        <div class="lorem">
+          <h3><a href="#">Online Billing for Clouds</a></h3>
+          <img src="{{STATIC_URL}}loram_img4.jpg" width="66" height="54" alt="img" align="left" />
+          <p class="loreml">Our Rating-Charging-Billing platform gives you total freedom in defining your own models and billing strategies ... <a  href="#">Read More</a></p>
+        </div>
+      </div>
+      <div class="clear"></div>
+      
+      <!-- maincontent ends --> 
+      
+      <!-- footer starts -->
+      <div class="footer">
+        <div class="copy"> Copyright © 2013 - 2014 ICCLab - ZHAW. All rights reserved. Design by <a href="#" target="_blank" rel="nofollow">FreeCSSTemplates.com</a></div>
+        <div class="social_icons flt_rt">
+          <ul>
+            <li><a href="#"><img src="{{STATIC_URL}}fb_icon.png" width="24" height="24" alt="img" /> </a></li>
+            <li><a href="#"> <img src="{{STATIC_URL}}twiter_icon.png" width="24" height="24" alt="img" /></a></li>
+            <li><a href="#"><img src="{{STATIC_URL}}google_icon.png" width="26" height="26" alt="img" /></a></li>
+          </ul>
+          <div class="clear"></div>
+        </div>
+        <div class="clear"></div>
+      </div>
+      <div class="clear"></div>
+      <!-- footer ends --> 
+    </div>
+  </div>
+  <!-- container ends --> 
+  
 </div>
-<!-- END Container -->
+<!-- wrapper ends -->
 
 </body>
 </html>
+      

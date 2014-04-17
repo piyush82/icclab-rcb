@@ -8,28 +8,35 @@ from main_menu.models import StackUser
 import sys
 import os
 from django.http.response import HttpResponseRedirect
+from django.contrib import messages
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'os_api')))
 import ceilometer_api
 import compute_api
 import keystone_api
 
-@login_required
+
+
 def index(request):
     return render_to_response('index.html',{},
+            context_instance=RequestContext(request))
+    
+@login_required    
+def demo(request):
+    #return HttpResponseRedirect('//')
+    return render_to_response('demo.html',{},
             context_instance=RequestContext(request))
 
 @login_required
 def admin_page(request):
-    users_list=StackUser.objects.all()
-    #return render_to_response('admin_page.html',
-    #    {'is_auth':request.user.is_authenticated()},
-    #    context_instance=RequestContext(request))
-    context={'users_list':users_list}
-    return render(request,'admin_page.html',
-         # {'is_auth':request.user.is_authenticated()},
-          context)
-    #    context_instance=RequestContext(request))
-
+    try:
+        status=request.session["status"]
+        token_data=request.session["token_data"] 
+        return render_to_response('admin/index.html',{},
+            context_instance=RequestContext(request))
+    except KeyError:
+        messages.warning(request, "You have to authenticate first!")
+        return HttpResponseRedirect('/auth_token/')
+    
 @login_required
 def user_page(request):
     return render_to_response('user_page.html',
@@ -38,25 +45,33 @@ def user_page(request):
     
 @login_required
 def auth_token(request):
-    if request.method == 'POST':
-        username=request.POST['user']
-        password=request.POST['pass']
-        domain=request.POST['domain']
-        project=request.POST['project']
-        auth_uri = 'http://160.85.4.10:5000'
-        status, token_data = keystone_api.get_token_v3(auth_uri,True,username=username, password=password, domain=domain,project=project)
-        request.session["status"] = status
-        request.session["token_data"] = token_data
-        return HttpResponseRedirect('/token_data/')
-    return render(request,'auth_token.html')
+    try:
+        status=request.session["status"]
+        token_data=request.session["token_data"] 
+        return HttpResponseRedirect('/admin/')
+    except KeyError:
+        if request.method == 'POST':
+            username=request.POST['user']
+            password=request.POST['pass']
+            domain=request.POST['domain']
+            project=request.POST['project']
+            auth_uri = 'http://160.85.4.10:5000'
+            status, token_data = keystone_api.get_token_v3(auth_uri,True,username=username, password=password, domain=domain,project=project)
+            request.session["status"] = status
+            request.session["token_data"] = token_data
+            return HttpResponseRedirect('/token_data/')
+        return render(request,'auth_token.html')
 
 @login_required
 def token_data(request):
-
-    status=request.session["status"]
-    token_data=request.session["token_data"] 
-    context={'status':status,'token_data':token_data}
-    return render(request,'token_data.html',context)
+    try:
+        status=request.session["status"]
+        token_data=request.session["token_data"] 
+        context={'status':status,'token_data':token_data}
+        return render(request,'token_data.html',context)
+    except KeyError:
+        messages.warning(request, "You have to authenticate first!")
+        return HttpResponseRedirect('/auth_token/')
     
     
 @login_required
@@ -68,6 +83,9 @@ def define_pricing(request,ct):
     request.session["meter_list"] = meter_list
     context={'status':status_pricing,'meter_list':meter_list}
     return render(request,'define_pricing.html',context)   
+
+
+
 
 @login_required
 def is_auth(request):

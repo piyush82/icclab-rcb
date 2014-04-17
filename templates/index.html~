@@ -1,23 +1,46 @@
 {% extends "base.html" %}
-{% block title %}Home{% endblock %}
-{% block sidebar %}
-    <ul>
-        <li><a href="/">Home</a></li>
 
-        {% if user.is_authenticated %}
-            <li><a href="/accounts/logout">Logout</a></li>
-        {% else %}
-            <li><a href="/accounts/login">Login</a></li>
-        {% endif %}{% endblock %}
-{% block content %}
-<div id="content">
-    
-    {% if user.is_active and user.is_staff %}
-    	<a href="/auth_token/">Admin page</a>
-    {% endif %}
-    <a href="/user_page/">User page</a>
-    
+{% block title %}
+	{{ data.title|default:'ICCLab RCB Demo Site' }}
+{% endblock %}
 
-</div>
+{% block my_content %}
+	<div class="content1">     
+    	<h2>Rating, Charging, Billing solutions for tomorrow!</h2>
+    	<br>
+    	<p>
+    		This is a service demonstrator. You will be able to manage the full spectrum of the billing process from this interface. System has been configured to work with OpenStack Ceilometer project.
+    	</p>
+    	<p>
+    		The main features of our solution are: Complete control on rating methodology, Support for flexible pricing models, Customized billing support, discounts, and all of this keeping cloud platforms in mind. 
+    		This demonstrator will allow you to get the list of available meters from Ceilometer, and shows you can custom set your rating parameters, charging models and billing strategies. 
+    		<a  href="#">Read More</a>
+    	</p>
+	</div>
 
+	<div class="content1">
+		<h4><a href="demo">Enter our DEMO site.</a></h4>
+	</div>
+
+	<div class="content2">
+		<div class="reel">
+			<h2>What we do</h2>
+            <a href="#"><img src="{{STATIC_URL}}img1.jpg" width="278" height="108" alt="img1" /></a>
+            <p>
+            	We are a group of highly motivated researchers coming from academia and industry dedicated to furthering the sphere of innovation in all things cloud. 
+            	We have experts dealing in storage, high-availability, performance, automation challenges, and other cloud related topics.
+            </p>
+            <a href="#">Read More</a>
+        </div>
+        <div class="reel">
+            <h2>How it works</h2>
+            <a href="#"><img src="{{STATIC_URL}}img2.jpg" width="278" height="110" alt="img" /></a>
+            <p>
+            	We have developed a very generic rating-charging-billing engine that allows anyone to offer rating-charging-billing as a service for their clients. 
+            	This demonstration has been tuned to work with ICCLab's OpenStack testbeds, but you can deploy the solution in any business scenarios.
+            </p>
+            <a href="#">Read More</a> 
+        </div>
+        <div class="clear"></div>
+	</div>
 {% endblock %}

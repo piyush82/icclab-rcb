@@ -1,4 +1,5 @@
-from django.contrib import admin
+#from django.contrib import admin
+from main_menu import admin_custom as admin
 from main_menu.models import StackUser,PricingFunc, PriceLoop, MetersCounter,\
     Udr, PriceCdr
 from django.http import HttpResponseRedirect
@@ -28,16 +29,10 @@ from threading import Timer
 class stackUserAdmin(admin.ModelAdmin):
     fields = ['user_id', 'user_name','tenant_id']
     list_display = ('user_id', 'user_name','tenant_id')
-    actions = ['add_pricing_func','calculate_price','start_periodic']
+    actions = ['add_pricing_func','calculate_price','start_periodic','soberi_func']
     
 
-    
-    class Media:
-        js = (
-            '/media/js/jquery-1.11.0.min.js',
-            '/media/js/jquery-ui-1.10.4.min.js',
-            '/media/js/ui.js',
-        )    
+
     
     
     class AddPricingFuncForm(forms.Form):
@@ -153,7 +148,76 @@ class stackUserAdmin(admin.ModelAdmin):
             else:
                 messages.warning(request, "Pricing function already defined for selected user. You can change it in main_menu->pricing func!") 
     add_pricing_func.short_description = "Specify a pricing function for the selected user."
-  
+
+
+
+    class SoberiForm(forms.Form):
+        dateStart=forms.DateField( input_formats=['%d-%m-%Y'], initial=date.today)
+        timeStart=forms.TimeField(input_formats=['%H:%M:%S'])
+        dateEnd=forms.DateField( input_formats=['%d-%m-%Y'], initial=date.today)
+        timeEnd=forms.TimeField(input_formats=['%H:%M:%S'])
+        _selected_action = forms.CharField(widget=forms.MultipleHiddenInput)    
+        
+    def soberi_func(self, request, queryset):
+        forma = None
+        token_data=request.session["token_data"] 
+        token_id=token_data["token_id"]
+        status_meter_list, meter_list = ceilometer_api.get_meter_list(token_id, token_data["metering"])      
+       
+        user=queryset[0]
+        
+                    
+        if 'soberi' in request.POST:
+            forma = self.SoberiForm(request.POST)
+            if forma.is_valid():
+                        try:
+                            func=PricingFunc.objects.get(user_id=user) 
+                            pricing_list=[]
+                            meters_used=[]
+                            pricing_list.append(func.param1)
+                            pricing_list.append(func.sign1)
+                            pricing_list.append(func.param2)
+                            pricing_list.append(func.sign2)
+                            pricing_list.append(func.param3)
+                            pricing_list.append(func.sign3)
+                            pricing_list.append(func.param4)
+                            pricing_list.append(func.sign4)
+                            pricing_list.append(func.param5)     
+            
+                            for i in range(len(pricing_list)):
+                                j=0
+                                while j<len(meter_list):
+                                    if pricing_list[i]==meter_list[j]["meter-name"]:
+                                        if pricing_list[i] in meters_used:
+                                            continue
+                                        else:
+                                            meters_used.append(pricing_list[i])                                                                
+                                        break
+                                    else:
+                                        j=j+1
+                            from_date=str(forma.cleaned_data["dateStart"])
+                            from_time=str(forma.cleaned_data["timeStart"])
+                            to_date=str(forma.cleaned_data["dateEnd"])
+                            to_time=str(forma.cleaned_data["timeEnd"])
+                            #ceilometer_api.set_query(from_date,to_date,from_time,to_time,"/","/",True)            
+                            udr=get_udr(self,token_data,token_id,user,meters_used,meter_list,func,False)
+                            price=pricing(self,user)
+                            self.message_user(request, "Successfully calculated price.")
+                            context={'user': queryset,'price':price}
+                            return render(request,'admin/show_price.html',context)    
+                        except PricingFunc.DoesNotExist:
+                                messages.warning(request, 'You have to define the pricing function first.')   
+
+
+        if not forma:
+                for i in request.POST.getlist(admin.ACTION_CHECKBOX_NAME):
+                        selected=int(str(i))
+                forma=self.SoberiForm(initial={'_selected_action': request.POST.getlist(admin.ACTION_CHECKBOX_NAME)})
+                context={'user': queryset,'soberi_form': forma, 'selected':selected}
+                return render(request,'admin/soberi.html',context)       
+                
+
+    soberi_func.short_description = "Get price."
   
     class AddQueryForm(forms.Form):
         query_choice = (('yes', 'Yes',), ('no', 'No',))
@@ -162,14 +226,14 @@ class stackUserAdmin(admin.ModelAdmin):
         timeStart=forms.TimeField(input_formats=['%H:%M:%S'])
         dateEnd=forms.DateField( input_formats=['%d-%m-%Y'], initial=date.today)
         timeEnd=forms.TimeField(input_formats=['%H:%M:%S'])
-        _selected_action = forms.CharField(widget=forms.MultipleHiddenInput)   
+        _selected_action = forms.CharField(widget=forms.MultipleHiddenInput)  
         
     def calculate_price(self, request, queryset):
         token_data=request.session["token_data"] 
         token_id=token_data["token_id"]
         form3=None
         status_meter_list, meter_list = ceilometer_api.get_meter_list(token_id, token_data["metering"])
-        
+        flag=True
         user=queryset[0]
         try:
             func=PricingFunc.objects.get(user_id=user)
@@ -196,31 +260,34 @@ class stackUserAdmin(admin.ModelAdmin):
                         break
                     else:
                         j=j+1
-            
+        except PricingFunc.DoesNotExist:
+            messages.warning(request, 'You have to define the pricing function first.')
+            flag=False
+        if flag==True:  
             if 'calculate' in request.POST:
-                if request.POST["query"]=="yes":
-                    form3 = self.AddQueryForm(request.POST)
-                    if form3.is_valid():
+                form3 = self.AddQueryForm(request.POST)
+                if form3.is_valid():
+                    if request.POST["radio"]=="yes":                      
                         from_date=str(form3.cleaned_data["dateStart"])
                         from_time=str(form3.cleaned_data["timeStart"])
                         to_date=str(form3.cleaned_data["dateEnd"])
                         to_time=str(form3.cleaned_data["timeEnd"])
-                        ceilometer_api.set_query(from_date,to_date,from_time,to_time,"/","/",True)
-                        udr=get_udr(self,token_data,token_id,user,meters_used,meter_list,func,True)
-                        price=pricing(self,user)
-                        self.message_user(request, "Successfully calculated price.")
-                        context={'user': queryset,'price':price}
-                        return render(request,'admin/calculate_price.html',context) 
+                        q=ceilometer_api.set_query(from_date,to_date,from_time,to_time,"/","/",True)            
+                        udr=get_udr(self,token_data,token_id,user,meters_used,meter_list,func,True,q)
+                    else:
+                        udr=get_udr(self,token_data,token_id,user,meters_used,meter_list,func,False,"")
+                    price=pricing(self,user)
+                    self.message_user(request, "Successfully calculated price.")
+                    context={'user': queryset,'price':price}
+                    return render(request,'admin/show_price.html',context) 
+                return HttpResponseRedirect(request.get_full_path())
             if not form3:
+                for i in request.POST.getlist(admin.ACTION_CHECKBOX_NAME):
+                        selected=int(str(i))
                 form3=self.AddQueryForm(initial={'_selected_action': request.POST.getlist(admin.ACTION_CHECKBOX_NAME)})
-                context={'user': queryset,'query_form': form3}
-                return render(request,'admin/query.html',context) 
-                
-        except PricingFunc.DoesNotExist:
-            messages.warning(request, 'You have to define the pricing function first.')
-            return HttpResponseRedirect(request.get_full_path())
-    
-
+                context={'user': queryset,'query_form': form3, 'selected':selected}
+                return render(request,'admin/query.html',context)   
+            
         
     calculate_price.short_description = "Calculate the price for the specific user."
     
@@ -310,12 +377,12 @@ def get_delta_samples(self,token_data,token_id,user,meter):
         delta=float(last)-float(second_to_last)
     return delta
         
-def get_udr(self,token_data,token_id,user,meters_used,meter_list,func,web_bool):
+def get_udr(self,token_data,token_id,user,meters_used,meter_list,func,web_bool,q):
     date_time=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     delta_list=[None]*5
     for i in range(len(meters_used)):
         rez=0.0
-        status,sample_list=ceilometer_api.get_meter_samples(meters_used[i],token_data["metering"],token_id,False,meter_list,web_bool)
+        status,sample_list=ceilometer_api.get_meter_samples(meters_used[i],token_data["metering"],token_id,False,meter_list,web_bool,q)
         for k in range(len(sample_list)):
             rez+=sample_list[k]["counter-volume"]
             meters_counter=MetersCounter(meter_name=meters_used[i],user_id=user,counter_volume=rez,unit=sample_list[k]["counter-unit"],timestamp=date_time)

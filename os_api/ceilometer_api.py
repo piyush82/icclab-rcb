@@ -336,7 +336,7 @@ def meter_statistics(meter_id,api_endpoint,token,meter_list):
         return False,meter_stat
       
 
-def get_meter_samples(meter_name,api_endpoint,token,bool_query,meter_list):
+def get_meter_samples(meter_name,api_endpoint,token,bool_query,meter_list,web,q):
     """
 
     Get the samples for the specified meter.
@@ -365,25 +365,29 @@ def get_meter_samples(meter_name,api_endpoint,token,bool_query,meter_list):
         target = urlparse(api_endpoint+path)
         logger.info('Inside get_meter_sample: Path is %s',target)
         method = 'GET'
-        if bool_query==True:
-            from_date,to_date,from_time,to_time,resource_id,project_id,status_q=query()
-            if(status_q==True):
-                q=set_query(from_date,to_date,from_time,to_time,resource_id,project_id,status_q)
-                body="{"+q
-                limit=raw_input("Do you want to set a limit to the number of samples that gets returned? Enter 'Y' if yes, 'N' if no.")
-                if(limit=="Y"):
-                    limit_def=raw_input("Enter the desired limit for the number of samples: ")
-                    body=body+',"limit":'+limit_def
-                body=body+"}"
+        if web==False:      
+            if bool_query==True:
+                from_date,to_date,from_time,to_time,resource_id,project_id,status_q=query()
+                if(status_q==True):
+                    q=set_query(from_date,to_date,from_time,to_time,resource_id,project_id,status_q)
+                    body="{"+q
+                    limit=raw_input("Do you want to set a limit to the number of samples that gets returned? Enter 'Y' if yes, 'N' if no.")
+                    if(limit=="Y"):
+                        limit_def=raw_input("Enter the desired limit for the number of samples: ")
+                        body=body+',"limit":'+limit_def
+                    body=body+"}"
+                else:
+                    body="{"
+                    limit=raw_input("Do you want to set a limit to the number of samples that gets returned? Enter 'Y' if yes, 'N' if no.")
+                    if(limit=="Y"):
+                        limit_def=raw_input("Enter the desired limit for the number of samples: ")
+                        body=body+'"limit":'+limit_def
+                    body=body+"}"
             else:
-                body="{"
-                limit=raw_input("Do you want to set a limit to the number of samples that gets returned? Enter 'Y' if yes, 'N' if no.")
-                if(limit=="Y"):
-                    limit_def=raw_input("Enter the desired limit for the number of samples: ")
-                    body=body+'"limit":'+limit_def
-                body=body+"}"
+                body='{"limit": 1 }'
         else:
-            body='{"limit": 1 }'
+            body="{"+q+"}"
+            
     
         logger.info('Inside get_meter_samples: Body is %s', body)
         h = http.Http()

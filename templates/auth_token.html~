@@ -1,40 +1,51 @@
 {% extends "base.html" %}
-{% block title %}Home{% endblock %}
-{% block sidebar %}
-    <ul>
-        <li><a href="/">Home</a></li>
 
-        {% if user.is_authenticated %}
-            <li><a href="/accounts/logout">Logout</a></li>
-        {% else %}
-            <li><a href="/accounts/login">Login</a></li>
-        {% endif %}{% endblock %}
-{% block content %}
-<div id="content">
+{% block title %}
+	{{ data.title|default:'ICCLab RCB Demo Site' }}
+{% endblock %}
+
+{% block my_content %}
+
+  {% if form.errors %}
+    <p class="error">Sorry, that's not a valid username or password</p>
+  {% endif %}
+
+
+<div class="content2">
+Please provide all the details requested below, all fields are mandatory.<br><br>
     
     {% if user.is_active and user.is_staff %}
 	{% if form.errors %}
     		<p class="error">Sorry, that are not valid creditentials. </p>
   	{% endif %}
-
-  	<form action="" method="post">
+	<form method="post" action="auth_token" style='background:#F2F2F2;padding:10px;'>
+	<table style="background:#F2F2F2;font-family:Verdana;text-align:left;">
     		{% csrf_token %}
-    		<label for="user">Username:</label>
-    		<input type="user" name="user" value="" id="user">
-    		<label for="pass">Password:</label>
-    		<input type="pass" name="pass" value="" id="pass">
-    		<label for="domain">Domain:</label>
-    		<input type="domain" name="domain" value="" id="domain">
-    		<label for="project">Project:</label>
-    		<input type="project" name="project" value="" id="project">
+		<tr>
+    		<td><label for="user">Username:</label></td>
+    		<td><input type="user" name="user" value="" id="user"></td>
+		</tr>
+		<tr>
+    		<td><label for="pass">Password:</label></td>
+    		<td><input type="password" name="pass" value="" id="pass"></td>
+		</tr>
+		<tr>
+    		<td><label for="domain">Domain:</label></td>
+    		<td><input type="domain" name="domain" value="" id="domain"></td>
+		</tr>
+		<tr>
+    		<td><label for="project">Project:</label></td>
+    		<td><input type="project" name="project" value="" id="project"></td>
+		</tr>
 
-   		 <input type="submit" value="login" />
+	</table>
+		<input type="submit" value="Login" />
     		<input type="hidden" name="next" value="{{ next|escape }}" />
-  	</form>
-    	
-    {% endif %}
-
-    
-
+	</form>
+     {% endif %}
 </div>
+
 {% endblock %}
+
+
+

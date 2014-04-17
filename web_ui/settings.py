@@ -32,9 +32,11 @@ TEMPLATE_DIRS = (
     BASE_DIR +'/templates',
 )
 
+
 # Application definition
 
 INSTALLED_APPS = (
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -43,6 +45,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'main_menu',
     'south',
+    
 )
 
 MIDDLEWARE_CLASSES = (
@@ -70,6 +73,9 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
+
+SESSION_SAVE_EVERY_REQUEST = True
+SESSION_COOKIE_AGE = 6400 #age is in seconds=>2hours
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.6/topics/i18n/

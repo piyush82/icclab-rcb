@@ -3,7 +3,7 @@ $(document).ready(function(){
 	$("#id_radio_0").click(function(){
     		$("#queryForm").show();
 });
-	$("#id_radio_0").click(function(){
+	$("#id_radio_1").click(function(){
     		$("#queryForm").hide();
 });
 });
@@ -17,5 +17,5 @@ $(function() {
 
 
 
-
+$("form").submit();
 

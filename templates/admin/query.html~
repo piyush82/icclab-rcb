@@ -1,5 +1,8 @@
 {% extends "admin/base_site.html" %}
-
+{% block head %}
+<script type="text/javascript" src="/site_media/prototype.js"></script>
+<script type="text/javascript" src="/site_media/my_ajax_function.js"></script>
+{% endblock %}
 {% block content %}
 
 <script type="text/javascript" src="{{ STATIC_URL }}js/jquery-1.11.0.min.js"></script>
@@ -10,28 +13,42 @@
 <script type="text/javascript" src="{{ STATIC_URL }}js/bootstrap-timepicker.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/bootstrap-timepicker.min.js"></script>
 
-<p>Do you wish to define a query?</p>
-{{ query_form.radio }}
+<form action="" method="post" >
+{% csrf_token %}
+	{% if form.errors %}
+		{% for field in form %}
+			{% for error in field.errors %}
+            			<div class="alert alert-error">
+                			<strong>{{ error|escape }}</strong>
+            			</div>
+        		{% endfor %}
+    		{% endfor %}
+    		{% for error in form.non_field_errors %}
+        		<div class="alert alert-error">
+            			<strong>{{ error|escape }}</strong>
+        		</div>
+    		{% endfor %}
+	{% endif %}
+	<input type="hidden" name="_selected_action" value={{ selected }} />
 
-<div id="queryForm" >
-	<p><label for="dateStart">Start date:</label>{{ query_form.dateStart }}
-        <label for="id_timeStart">Start time:</label>{{ query_form.timeStart }}
-	</p>
-	<p></p>
-        <p><label for="dateEnd">End date:</label> {{ query_form.dateEnd }}
-	<label for="id_timeEnd">End time:</label>{{ query_form.timeEnd }}
-	</p>
+	<div id="queryForm" >
+		<p><label for="dateStart">Start date:</label>{{ query_form.dateStart }}
+      	  	<label for="id_timeStart">Start time:</label>{{ query_form.timeStart }}
+		</p>
+		<p></p>
+     	  	 <p><label for="dateEnd">End date:</label> {{ query_form.dateEnd }}
+		<label for="id_timeEnd">End time:</label>{{ query_form.timeEnd }}
+		</p>
 
-</div>
-
-
-<input type="radio" name="query" value="no" id="query_no" checked="checked" >No
-<input type="hidden" name="action" value="calculate_price" />
-<p></p>
-<input type="submit" name="calculate" value="Calculate price" />
+	</div>
 
 
 
+	<input type="hidden" name="action" value="calculate_price" />
+	<input type="submit" name="calculate" value="Calculate price" />
+
+
+</form>
 
 
 {% endblock %}

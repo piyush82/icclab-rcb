@@ -23,34 +23,23 @@
         		</div>
     		{% endfor %}
 	{% endif %}
+	
+	<input type="hidden" name="_selected_action" value={{ selected }} />
 
-	<p>List of available meters per resource.'</p>
-	{% for i in resources %}
- 		<ul>	
-   		<li><b>{{i}}</b></li>
- 				
-		
-		{% for j in meter_list %}
-			{% if forloop.counter == forloop.parentloop.counter %}
-				{% for k in j %}
- 					<ul>
-  			 		<li>{{k}}</li>
- 					</ul>
-				{% endfor %}
-			{% endif %}
-		{% endfor %}
-		</ul>
-	{% endfor %}
-
-
-    {{ pricing_func_form.as_p }}
+		<p><label for="dateStart">Start date:</label>{{ soberi_form.dateStart }}
+      	  	<label for="id_timeStart">Start time:</label>{{ soberi_form.timeStart }}
+		</p>
+		<p></p>
+     	  	 <p><label for="dateEnd">End date:</label> {{ soberi_form.dateEnd }}
+		<label for="id_timeEnd">End time:</label>{{ soberi_form.timeEnd }}
+		</p>
 
     <p>The pricing function will be applied to the user with id:</p>
 
     <ul>{{ user|unordered_list }}</ul>
 
-    <input type="hidden" name="action" value="add_pricing_func" />
-    <input type="submit" name="add_pricing" value="Add pricing function" />
+    <input type="hidden" name="action" value="soberi_func" />
+    <input type="submit" name="soberi" value="Add pricing function" />
 </form>
 
 {% endblock %}

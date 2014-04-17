@@ -19,6 +19,10 @@ img {
 	border: none;
 }
 /**************************************************************************************/
+.breadcrumbs a:link, .breadcrumbs a:visited {
+    color: #5b80b2;
+    text-decoration: none;
+}
 
 
 a {

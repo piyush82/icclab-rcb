@@ -1,23 +1,21 @@
 {% extends "base.html" %}
-{% block title %}Home{% endblock %}
-{% block sidebar %}
-    <ul>
-        <li><a href="/">Home</a></li>
 
-        {% if user.is_authenticated %}
-            <li><a href="/accounts/logout">Logout</a></li>
-        {% else %}
-            <li><a href="/accounts/login">Login</a></li>
-        {% endif %}{% endblock %}
+{% block title %}
+	{{ data.title|default:'ICCLab RCB Demo Site' }}
+{% endblock %}
 
+{% block my_content %}
 
+  {% if form.errors %}
+    <p class="error">Sorry, that's not a valid username or password</p>
+  {% endif %}
 
-<div id="content">
+<div class="content1">
 {% block content %}    
 	{% if status == True %}
 		<p>The authentication was successful, below are the data we got.</p>
 		{% if token_data %}
-			<table>
+			<table style="background:#F2F2F2;font-family:Verdana;text-align:left;font-size:120%">
 			{% for key, value in token_data.iteritems %}
          			{% if key != 'token_id' %}
 					<tr>
@@ -31,18 +29,21 @@
 			</table>
 
 			<p>The authentication token is</p>
-			<label for="token">{{token_data.token_id}}</label>
-
-
+			<table style="background:#F2F2F2;font-family:Verdana;text-align:left;width:485px;table-layout:fixed">
+			<tr><td style="width:485px;table-layout:fixed; overflow:hidden;word-wrap:break-word;">
+			{{token_data.token_id}}
+			</tr></td>
+			</table>
+			<Button><a href= "/admin/" >Admin page</a></Button>
 		{% endif %}
-		<p></p>
-    		<a href="/admin/">Admin page</a>
+
 	{% else %}
 		<p>The authentication was not successful. </p>
 		<a href="/auth_token/">Authenticicate</a>
 	
 	{% endif %}
+	
 {% endblock %}
 </div>
-
+{% endblock %}
 
