@@ -20,7 +20,7 @@
 
 	<div class="content2">
 		<div class="reel">
-			<a href="admin">Admin page</a>
+			<a href="/admin/">Admin page</a>
         </div>
         <div class="reel">
 		<a href="#">User page</a>

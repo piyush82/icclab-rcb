@@ -386,7 +386,10 @@ def get_meter_samples(meter_name,api_endpoint,token,bool_query,meter_list,web,q)
             else:
                 body='{"limit": 1 }'
         else:
-            body="{"+q+"}"
+            if q=='':
+                body='{"limit": 1 }'
+            else:
+                body="{"+q+"}"
             
     
         logger.info('Inside get_meter_samples: Body is %s', body)

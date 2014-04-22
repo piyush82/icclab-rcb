@@ -150,81 +150,12 @@ class stackUserAdmin(admin.ModelAdmin):
     add_pricing_func.short_description = "Specify a pricing function for the selected user."
 
 
-
-    class SoberiForm(forms.Form):
-        dateStart=forms.DateField( input_formats=['%d-%m-%Y'], initial=date.today)
-        timeStart=forms.TimeField(input_formats=['%H:%M:%S'])
-        dateEnd=forms.DateField( input_formats=['%d-%m-%Y'], initial=date.today)
-        timeEnd=forms.TimeField(input_formats=['%H:%M:%S'])
-        _selected_action = forms.CharField(widget=forms.MultipleHiddenInput)    
-        
-    def soberi_func(self, request, queryset):
-        forma = None
-        token_data=request.session["token_data"] 
-        token_id=token_data["token_id"]
-        status_meter_list, meter_list = ceilometer_api.get_meter_list(token_id, token_data["metering"])      
-       
-        user=queryset[0]
-        
-                    
-        if 'soberi' in request.POST:
-            forma = self.SoberiForm(request.POST)
-            if forma.is_valid():
-                        try:
-                            func=PricingFunc.objects.get(user_id=user) 
-                            pricing_list=[]
-                            meters_used=[]
-                            pricing_list.append(func.param1)
-                            pricing_list.append(func.sign1)
-                            pricing_list.append(func.param2)
-                            pricing_list.append(func.sign2)
-                            pricing_list.append(func.param3)
-                            pricing_list.append(func.sign3)
-                            pricing_list.append(func.param4)
-                            pricing_list.append(func.sign4)
-                            pricing_list.append(func.param5)     
-            
-                            for i in range(len(pricing_list)):
-                                j=0
-                                while j<len(meter_list):
-                                    if pricing_list[i]==meter_list[j]["meter-name"]:
-                                        if pricing_list[i] in meters_used:
-                                            continue
-                                        else:
-                                            meters_used.append(pricing_list[i])                                                                
-                                        break
-                                    else:
-                                        j=j+1
-                            from_date=str(forma.cleaned_data["dateStart"])
-                            from_time=str(forma.cleaned_data["timeStart"])
-                            to_date=str(forma.cleaned_data["dateEnd"])
-                            to_time=str(forma.cleaned_data["timeEnd"])
-                            #ceilometer_api.set_query(from_date,to_date,from_time,to_time,"/","/",True)            
-                            udr=get_udr(self,token_data,token_id,user,meters_used,meter_list,func,False)
-                            price=pricing(self,user)
-                            self.message_user(request, "Successfully calculated price.")
-                            context={'user': queryset,'price':price}
-                            return render(request,'admin/show_price.html',context)    
-                        except PricingFunc.DoesNotExist:
-                                messages.warning(request, 'You have to define the pricing function first.')   
-
-
-        if not forma:
-                for i in request.POST.getlist(admin.ACTION_CHECKBOX_NAME):
-                        selected=int(str(i))
-                forma=self.SoberiForm(initial={'_selected_action': request.POST.getlist(admin.ACTION_CHECKBOX_NAME)})
-                context={'user': queryset,'soberi_form': forma, 'selected':selected}
-                return render(request,'admin/soberi.html',context)       
-                
-
-    soberi_func.short_description = "Get price."
-  
     class AddQueryForm(forms.Form):
         query_choice = (('yes', 'Yes',), ('no', 'No',))
         radio = forms.ChoiceField(required = True, widget=RadioSelect(), choices=query_choice)
-        dateStart=forms.DateField( input_formats=['%d-%m-%Y'], initial=date.today)
+        dateStart=forms.DateField( input_formats=['%d-%m-%Y'])
         timeStart=forms.TimeField(input_formats=['%H:%M:%S'])
-        dateEnd=forms.DateField( input_formats=['%d-%m-%Y'], initial=date.today)
+        dateEnd=forms.DateField( input_formats=['%d-%m-%Y'])
         timeEnd=forms.TimeField(input_formats=['%H:%M:%S'])
         _selected_action = forms.CharField(widget=forms.MultipleHiddenInput)  
         
@@ -266,21 +197,21 @@ class stackUserAdmin(admin.ModelAdmin):
         if flag==True:  
             if 'calculate' in request.POST:
                 form3 = self.AddQueryForm(request.POST)
-                if form3.is_valid():
-                    if request.POST["radio"]=="yes":                      
+                if request.POST["radio"]=="yes":
+                    if form3.is_valid():                                          
                         from_date=str(form3.cleaned_data["dateStart"])
                         from_time=str(form3.cleaned_data["timeStart"])
                         to_date=str(form3.cleaned_data["dateEnd"])
                         to_time=str(form3.cleaned_data["timeEnd"])
                         q=ceilometer_api.set_query(from_date,to_date,from_time,to_time,"/","/",True)            
                         udr=get_udr(self,token_data,token_id,user,meters_used,meter_list,func,True,q)
-                    else:
-                        udr=get_udr(self,token_data,token_id,user,meters_used,meter_list,func,False,"")
-                    price=pricing(self,user)
-                    self.message_user(request, "Successfully calculated price.")
-                    context={'user': queryset,'price':price}
-                    return render(request,'admin/show_price.html',context) 
-                return HttpResponseRedirect(request.get_full_path())
+                else:
+                    udr=get_udr(self,token_data,token_id,user,meters_used,meter_list,func,True,"")
+                price=pricing(self,user,meter_list)
+                self.message_user(request, "Successfully calculated price.")
+                context={'user': queryset,'price':price}
+                return render(request,'admin/show_price.html',context) 
+
             if not form3:
                 for i in request.POST.getlist(admin.ACTION_CHECKBOX_NAME):
                         selected=int(str(i))
@@ -396,25 +327,46 @@ def get_udr(self,token_data,token_id,user,meters_used,meter_list,func,web_bool,q
 
 def periodic_counter(self,token_data,token_id,meters_used,meter_list,func,user,time):
     udr=get_udr(self,token_data,token_id,user,meters_used,meter_list,func,False)
-    price=pricing(self,user)
+    price=pricing(self,user,meter_list)
     t = Timer(float(time),periodic_counter,args=[token_data,token_id,meters_used,meter_list,func,user,time])
     t.start()
     
     
-def pricing(self,user):
+def pricing(self,user,meter_list):
     func=PricingFunc.objects.get(user_id=user)
     udr=Udr.objects.filter(user_id=user,pricing_func_id=func).order_by('-id')[0]
     #udr.reverse()[:1]
     pricing_list=[]
-    pricing_list.append(udr.param1)
+    pricing_list.append(func.param1)
     pricing_list.append(func.sign1)
-    pricing_list.append(udr.param2)
+    pricing_list.append(func.param2)
     pricing_list.append(func.sign2)
-    pricing_list.append(udr.param3)
+    pricing_list.append(func.param3)
     pricing_list.append(func.sign3)
-    pricing_list.append(udr.param4)
+    pricing_list.append(func.param4)
     pricing_list.append(func.sign4)
-    pricing_list.append(udr.param5)
+    pricing_list.append(func.param5)
+    
+    
+    udr_list=[]
+    udr_list.append(udr.param1)
+    udr_list.append(udr.param2)
+    udr_list.append(udr.param3)
+    udr_list.append(udr.param4)
+    udr_list.append(udr.param5)
+    for i in udr_list:
+        if i==None:
+            i=0
+            
+    k=0
+    for i in range(len(pricing_list)):
+        j=0
+        while j<len(meter_list):
+            if pricing_list[i]==meter_list[j]["meter-name"]:
+                pricing_list[i]=udr_list[k]
+                k+=1
+            else:
+                j=j+1 
             
     price=0.0 
             
