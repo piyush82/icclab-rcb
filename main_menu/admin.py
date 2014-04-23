@@ -151,19 +151,19 @@ class stackUserAdmin(admin.ModelAdmin):
 
 
     class AddQueryForm(forms.Form):
-        query_choice = (('yes', 'Yes',), ('no', 'No',))
-        radio = forms.ChoiceField(required = True, widget=RadioSelect(), choices=query_choice)
-        dateStart=forms.DateField( input_formats=['%d-%m-%Y'])
-        timeStart=forms.TimeField(input_formats=['%H:%M:%S'])
-        dateEnd=forms.DateField( input_formats=['%d-%m-%Y'])
-        timeEnd=forms.TimeField(input_formats=['%H:%M:%S'])
+        dateStart=forms.DateField( input_formats=['%Y-%m-%d'])
+        dateEnd=forms.DateField( input_formats=['%Y-%m-%d'])
         _selected_action = forms.CharField(widget=forms.MultipleHiddenInput)  
         
     def calculate_price(self, request, queryset):
-        token_data=request.session["token_data"] 
-        token_id=token_data["token_id"]
+        try:
+            token_data=request.session["token_data"] 
+            token_id=token_data["token_id"]
+            status_meter_list, meter_list = ceilometer_api.get_meter_list(token_id, token_data["metering"])      
+        except KeyError:
+            messages.warning(request, "You have to authenticate first!")
+            return HttpResponseRedirect('/auth_token/')
         form3=None
-        status_meter_list, meter_list = ceilometer_api.get_meter_list(token_id, token_data["metering"])
         flag=True
         user=queryset[0]
         try:
@@ -197,17 +197,58 @@ class stackUserAdmin(admin.ModelAdmin):
         if flag==True:  
             if 'calculate' in request.POST:
                 form3 = self.AddQueryForm(request.POST)
-                if request.POST["radio"]=="yes":
-                    if form3.is_valid():                                          
-                        from_date=str(form3.cleaned_data["dateStart"])
-                        from_time=str(form3.cleaned_data["timeStart"])
-                        to_date=str(form3.cleaned_data["dateEnd"])
-                        to_time=str(form3.cleaned_data["timeEnd"])
-                        q=ceilometer_api.set_query(from_date,to_date,from_time,to_time,"/","/",True)            
-                        udr=get_udr(self,token_data,token_id,user,meters_used,meter_list,func,True,q)
-                else:
-                    udr=get_udr(self,token_data,token_id,user,meters_used,meter_list,func,True,"")
-                price=pricing(self,user,meter_list)
+                if form3.is_valid():                                          
+                    from_date=str(form3.cleaned_data["dateStart"])
+                    from_time="00:00:00"
+                    to_date=str(form3.cleaned_data["dateEnd"])
+                    to_time="23:59:59"
+                    q=ceilometer_api.set_query(from_date,to_date,from_time,to_time,"/","/",True) 
+                    all_stats=[]           
+                    for i in meters_used:
+                        status,stat_list=ceilometer_api.meter_statistics(i, token_data["metering"],token_id,meter_list,True,q=q)
+                        all_stats.append(stat_list)
+                        
+                    k=0
+                    for i in range(len(pricing_list)):
+                        j=0
+                        while j<len(meter_list):
+                            if pricing_list[i]==meter_list[j]["meter-name"]:
+                                if all_stats[k]==[]:
+                                    pricing_list[i]=0
+                                else:
+                                    pricing_list[i]=all_stats[k][0]['sum']
+                                k+=1
+                            else:
+                                j=j+1 
+                for i in range(len(pricing_list)):
+                    if pricing_list[i]==None:
+                        pricing_list[i]=0
+                price=0.0    
+                for i in range(len(pricing_list)):
+                    if i==0:   
+                        if periodic.is_number(str(pricing_list[i])):    
+                            price=price+float(str(pricing_list[i]))
+ 
+                    if i%2!=0:
+                        if pricing_list[i] in ["+","-","*","/","%"]:
+                            if periodic.is_number(str(pricing_list[i+1])):
+                                x=float(str(pricing_list[i+1]))                             
+                            else:
+                                break                          
+                            if pricing_list[i]=="+":
+                                price=price+x
+                            if pricing_list[i]=="-": 
+                                price=price-x
+                            if pricing_list[i]=="*":
+                                price=price*x
+                            if pricing_list[i]=="/":
+                                if x!=0:
+                                    price=price/x
+                            if pricing_list[i]=="%":
+                                price=price*x/100.0
+                date_time=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                cdr=PriceCdr(user_id=user,timestamp=date_time,pricing_func_id=func, price=price)
+                cdr.save()
                 self.message_user(request, "Successfully calculated price.")
                 context={'user': queryset,'price':price}
                 return render(request,'admin/show_price.html',context) 
@@ -232,10 +273,13 @@ class stackUserAdmin(admin.ModelAdmin):
     
     def start_periodic(self, request, queryset):
         form2 = None
-        token_data=request.session["token_data"] 
-        token_id=token_data["token_id"]
-        status_meter_list, meter_list = ceilometer_api.get_meter_list(token_id, token_data["metering"])      
-       
+        try:
+            token_data=request.session["token_data"] 
+            token_id=token_data["token_id"]
+            status_meter_list, meter_list = ceilometer_api.get_meter_list(token_id, token_data["metering"])      
+        except KeyError:
+            messages.warning(request, "You have to authenticate first!")
+            return HttpResponseRedirect('/auth_token/')
         user=queryset[0]
         
                     
@@ -284,7 +328,6 @@ class stackUserAdmin(admin.ModelAdmin):
 
     start_periodic.short_description = "Start the periodic counter for the selected user"
   
-        
 
 class pricingFuncAdmin(admin.ModelAdmin):
     fields = ['user_id', 'param1','sign1', 'param2','sign2', 'param3','sign3', 'param4','sign4', 'param5']
@@ -311,13 +354,21 @@ def get_delta_samples(self,token_data,token_id,user,meter):
 def get_udr(self,token_data,token_id,user,meters_used,meter_list,func,web_bool,q):
     date_time=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     delta_list=[None]*5
+    all_stats=[] 
     for i in range(len(meters_used)):
-        rez=0.0
-        status,sample_list=ceilometer_api.get_meter_samples(meters_used[i],token_data["metering"],token_id,False,meter_list,web_bool,q)
-        for k in range(len(sample_list)):
-            rez+=sample_list[k]["counter-volume"]
-            meters_counter=MetersCounter(meter_name=meters_used[i],user_id=user,counter_volume=rez,unit=sample_list[k]["counter-unit"],timestamp=date_time)
-            meters_counter.save() 
+        #rez=0.0
+        #status,sample_list=ceilometer_api.get_meter_samples(meters_used[i],token_data["metering"],token_id,False,meter_list,web_bool,q=q)
+        #for k in range(len(sample_list)):
+        #    rez+=sample_list[k]["counter-volume"]
+        #    meters_counter=MetersCounter(meter_name=meters_used[i],user_id=user,counter_volume=rez,unit=sample_list[k]["counter-unit"],timestamp=date_time)
+        #    meters_counter.save() 
+        status,stat_list=ceilometer_api.meter_statistics(meters_used[i], token_data["metering"],token_id,meter_list,True,q=q)
+        all_stats.append(stat_list)
+        if stat_list==[]:
+            meters_counter=MetersCounter(meter_name=meters_used[i],user_id=user,counter_volume=0.0,unit="/" ,timestamp=date_time)
+        else:
+            meters_counter=MetersCounter(meter_name=meters_used[i],user_id=user,counter_volume=stat_list[0]["sum"],unit=stat_list[0]["unit"] ,timestamp=date_time)
+        meters_counter.save() 
         delta=get_delta_samples(self,token_data,token_id,user,meters_used[i])
         delta_list[i]=delta
         udr=Udr(user_id=user,timestamp=date_time,pricing_func_id=func, param1=delta_list[0], param2=delta_list[1], param3=delta_list[2], param4=delta_list[3], param5=delta_list[4])
@@ -326,7 +377,13 @@ def get_udr(self,token_data,token_id,user,meters_used,meter_list,func,web_bool,q
         
 
 def periodic_counter(self,token_data,token_id,meters_used,meter_list,func,user,time):
-    udr=get_udr(self,token_data,token_id,user,meters_used,meter_list,func,False)
+    today=datetime.date.today().strftime("%Y-%m-%d")
+    from_date=today
+    from_time="00:00:00"
+    to_date=today
+    to_time="23:59:59"
+    q=ceilometer_api.set_query(from_date,to_date,from_time,to_time,"/","/",True) 
+    udr=get_udr(self,token_data,token_id,user,meters_used,meter_list,func,False,q)
     price=pricing(self,user,meter_list)
     t = Timer(float(time),periodic_counter,args=[token_data,token_id,meters_used,meter_list,func,user,time])
     t.start()
