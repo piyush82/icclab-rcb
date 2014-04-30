@@ -8,19 +8,35 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
+        # Adding field 'PricingFunc.currency'
+        db.add_column(u'main_menu_pricingfunc', 'currency',
+                      self.gf('django.db.models.fields.CharField')(default='CHF', max_length=200),
+                      keep_default=False)
+
+        # Adding field 'PricingFunc.unit'
+        db.add_column(u'main_menu_pricingfunc', 'unit',
+                      self.gf('django.db.models.fields.CharField')(default='0.01', max_length=200, null=True, blank=True),
+                      keep_default=False)
+
 
         # Changing field 'MetersCounter.counter_volume'
         db.alter_column(u'main_menu_meterscounter', 'counter_volume', self.gf('django.db.models.fields.TextField')(null=True))
 
     def backwards(self, orm):
+        # Deleting field 'PricingFunc.currency'
+        db.delete_column(u'main_menu_pricingfunc', 'currency')
+
+        # Deleting field 'PricingFunc.unit'
+        db.delete_column(u'main_menu_pricingfunc', 'unit')
+
 
         # Changing field 'MetersCounter.counter_volume'
-        db.alter_column(u'main_menu_meterscounter', 'counter_volume', self.gf('django.db.models.fields.TextField')(default=0))
+        db.alter_column(u'main_menu_meterscounter', 'counter_volume', self.gf('django.db.models.fields.TextField')(default=0.0))
 
     models = {
         u'main_menu.meterscounter': {
             'Meta': {'object_name': 'MetersCounter'},
-            'counter_volume': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
+            'counter_volume': ('django.db.models.fields.TextField', [], {'default': "'0.0'", 'null': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'meter_name': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
             'timestamp': ('django.db.models.fields.DateTimeField', [], {}),
@@ -52,7 +68,8 @@ class Migration(SchemaMigration):
         },
         'main_menu.pricingfunc': {
             'Meta': {'object_name': 'PricingFunc'},
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'currency': ('django.db.models.fields.CharField', [], {'default': "'CHF'", 'max_length': '200'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'param1': ('django.db.models.fields.CharField', [], {'max_length': '200', 'null': 'True', 'blank': 'True'}),
             'param2': ('django.db.models.fields.CharField', [], {'max_length': '200', 'null': 'True', 'blank': 'True'}),
             'param3': ('django.db.models.fields.CharField', [], {'max_length': '200', 'null': 'True', 'blank': 'True'}),
@@ -62,6 +79,7 @@ class Migration(SchemaMigration):
             'sign2': ('django.db.models.fields.CharField', [], {'max_length': '5', 'null': 'True', 'blank': 'True'}),
             'sign3': ('django.db.models.fields.CharField', [], {'max_length': '5', 'null': 'True', 'blank': 'True'}),
             'sign4': ('django.db.models.fields.CharField', [], {'max_length': '5', 'null': 'True', 'blank': 'True'}),
+            'unit': ('django.db.models.fields.CharField', [], {'default': "'0.01'", 'max_length': '200', 'null': 'True', 'blank': 'True'}),
             'user_id': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['main_menu.StackUser']"})
         },
         u'main_menu.stackuser': {

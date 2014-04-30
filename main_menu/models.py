@@ -11,7 +11,7 @@ class StackUser(models.Model):
 class MetersCounter(models.Model):
     meter_name = models.CharField(max_length=200)
     user_id = models.ForeignKey(StackUser)
-    counter_volume = models.TextField(blank=True,null=True)
+    counter_volume = models.TextField(blank=True,null=True,default='0.0')
     unit = models.CharField(max_length=100)
     timestamp = models.DateTimeField()
 
@@ -29,6 +29,7 @@ class PriceLoop(models.Model):
         return u'%s %s %s' % (self.tenant_id, self.price, self.timestamp)
     
 class PricingFunc(models.Model):
+    id = models.AutoField(primary_key=True)
     user_id = models.ForeignKey(StackUser)
     param1 = models.CharField(max_length=200, blank=True, null=True)
     sign1 = models.CharField(max_length=5,blank=True, null=True)
@@ -39,12 +40,14 @@ class PricingFunc(models.Model):
     param4 = models.CharField(max_length=200,blank=True, null=True)
     sign4 = models.CharField(max_length=5,blank=True, null=True)
     param5 = models.CharField(max_length=200,blank=True, null=True)
+    currency=models.CharField(max_length=200,default='CHF')
+    unit=models.CharField(max_length=200,default='0.01', null=True,blank=True)
     
     class Meta:  
         app_label = 'main_menu'
     
     def __unicode__(self):  
-        return u'%s %s %s %s %s %s %s %s %s %s' % (self.user_id, self.param1, self.sign1, self.param2, self.sign2, self.param3, self.sign3, self.param4, self.sign4, self.param5)    
+        return u'%s %s %s %s %s %s %s %s %s %s %s %s' % (self.user_id, self.param1, self.sign1, self.param2, self.sign2, self.param3, self.sign3, self.param4, self.sign4, self.param5,self.currency,self.unit)    
     
 
     

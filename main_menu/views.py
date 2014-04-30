@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
@@ -59,7 +59,10 @@ def auth_token(request):
             status, token_data = keystone_api.get_token_v3(auth_uri,True,username=username, password=password, domain=domain,project=project)
             request.session["status"] = status
             request.session["token_data"] = token_data
-            return HttpResponseRedirect('/token_data/')
+            if 'next' in request.GET:
+                return redirect(request.GET['next'])
+            else:
+                return HttpResponseRedirect('/token_data/')
         return render(request,'auth_token.html')
 
 @login_required

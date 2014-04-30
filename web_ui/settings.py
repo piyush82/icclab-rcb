@@ -12,6 +12,10 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 import os
 import sys
 
+from datetime import timedelta
+
+
+
 #BASE_DIR = os.path.dirname(os.path.dirname(__file__))+'/database'
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
@@ -45,6 +49,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'main_menu',
     'south',
+
     
 )
 
@@ -82,7 +87,7 @@ SESSION_COOKIE_AGE = 6400 #age is in seconds=>2hours
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Zurich'
 
 USE_I18N = True
 
@@ -98,3 +103,9 @@ STATICFILES_DIRS = (
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 
 STATIC_URL = '/static/'
+
+CELERY_TIMEZONE = 'Europe/Zurich'
+
+CELERY_RESULT_BACKEND = "amqp"
+
+

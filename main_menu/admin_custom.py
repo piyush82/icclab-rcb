@@ -23,6 +23,7 @@ site = AdminSite()
 site.index_template=BASE_DIR+"/templates/admin/index.html"
 
 
+
 def autodiscover():
     """
     Autodiscover function from django.contrib.admin
