@@ -3,7 +3,8 @@ Created on Apr 16, 2014
 
 @author: kolv
 '''
-
+from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.models import User
 from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
 from django.contrib.admin.options import ModelAdmin, HORIZONTAL, VERTICAL
 from django.contrib.admin.options import StackedInline, TabularInline
@@ -16,11 +17,15 @@ import copy
 from django.conf import settings
 from django.utils.importlib import import_module
 from django.utils.module_loading import module_has_submodule 
+
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 site = AdminSite()
 
 site.index_template=BASE_DIR+"/templates/admin/index.html"
+
+
+site.register(User, UserAdmin)
 
 
 

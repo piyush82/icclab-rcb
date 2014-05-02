@@ -29,7 +29,6 @@ class PriceLoop(models.Model):
         return u'%s %s %s' % (self.tenant_id, self.price, self.timestamp)
     
 class PricingFunc(models.Model):
-    id = models.AutoField(primary_key=True)
     user_id = models.ForeignKey(StackUser)
     param1 = models.CharField(max_length=200, blank=True, null=True)
     sign1 = models.CharField(max_length=5,blank=True, null=True)

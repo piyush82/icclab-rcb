@@ -1,46 +1,34 @@
 '''
-Created on Apr 9, 2014
+Created on Apr 30, 2014
 
 @author: kolv
 '''
 
-from django.contrib import admin
-from main_menu.models import StackUser,PricingFunc, PriceLoop, MetersCounter,\
-    Udr, PriceCdr
-from django.http import HttpResponseRedirect
-import sys,os
-from django.core import urlresolvers
-from django.forms import widgets
+
+from main_menu.models import StackUser,PricingFunc, PriceLoop, MetersCounter,Udr, PriceCdr
 import datetime
+import sys,os
+from datetime import date
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'os_api')))
 import ceilometer_api
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'processes')))
 import periodic
-from django.contrib.contenttypes.models import ContentType
-from django.core.urlresolvers import reverse
-from django.conf.urls import patterns
-from django.shortcuts import render
-import django.forms as forms
-from django.shortcuts import render_to_response
-from django.contrib import messages
-from django.core import serializers
-from django.core.exceptions import ObjectDoesNotExist
-from main_menu.views import auth_token,is_auth
-from time import gmtime, strftime
-from threading import Timer
 
+
+def run(self,token_data,token_id,meters_used,meter_list,func,user,time):
+    periodic_counter(self,token_data,token_id,meters_used,meter_list,func,user,time)
 
 def periodic_counter(self,token_data,token_id,meters_used,meter_list,func,user,time):
     
     from_date="2014-04-20"
     from_time="00:00:00"
-    to_date="2014-04-21"
+    to_date="2014-04-20"
     to_time="23:59:59"
     q=ceilometer_api.set_query(from_date,to_date,from_time,to_time,"/","/",True) 
     udr=get_udr(self,token_data,token_id,user,meters_used,meter_list,func,False,q)
     price=pricing(self,user,meter_list)
-    t = Timer(10,periodic_counter,args=[self,token_data,token_id,meters_used,meter_list,func,user,time])
-    t.start()
+
+
 
 def get_delta_samples(self,token_data,token_id,user,meter):
     delta=0.0
@@ -143,5 +131,3 @@ def pricing(self,user,meter_list):
     cdr=PriceCdr(user_id=user,timestamp=date_time,pricing_func_id=func, price=price)
     cdr.save()
     return price
-
-

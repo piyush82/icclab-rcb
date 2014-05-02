@@ -3,6 +3,7 @@ from django.contrib.auth.views import login, logout
 from main_menu import admin_custom as admin
 #from django.contrib import admin
 
+
 admin.autodiscover()
 
 urlpatterns = patterns('',

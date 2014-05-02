@@ -29,15 +29,17 @@ app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 
 app.conf.update(
     CELERY_RESULT_BACKEND='djcelery.backends.database:DatabaseBackend',
-)
-
-app.conf.update(
-    CELERY_RESULT_BACKEND='djcelery.backends.cache:CacheBackend',
     
-    CELERY_IMPORTS=("tasks",),
+    CELERY_IMPORTS=("main_menu.tasks",),
 
-    CELERYBEAT_SCHEDULER = "djcelery.schedulers.DatabaseScheduler",
+    #CELERYBEAT_SCHEDULER = "djcelery.schedulers.DatabaseScheduler",
+    
+    CELERY_TIMEZONE = 'Europe/Zurich'
+    
+   
 )
+
+
 
 
 

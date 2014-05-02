@@ -14,8 +14,12 @@ import sys
 
 from datetime import timedelta
 
+import djcelery
+djcelery.setup_loader()
+#CELERYD_CONCURRENCY = 1
 
-
+CELERY_IMPORTS = ('main_menu.tasks', )
+#BROKER_HOST = "localhost"
 #BASE_DIR = os.path.dirname(os.path.dirname(__file__))+'/database'
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
@@ -49,6 +53,9 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'main_menu',
     'south',
+    'celery',
+    'djcelery',
+
 
     
 )
@@ -103,9 +110,5 @@ STATICFILES_DIRS = (
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 
 STATIC_URL = '/static/'
-
-CELERY_TIMEZONE = 'Europe/Zurich'
-
-CELERY_RESULT_BACKEND = "amqp"
 
 

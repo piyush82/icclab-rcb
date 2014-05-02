@@ -119,7 +119,7 @@ def get_delta_samples(metering,pom,meter_list,meters_used,periodic_counts,meters
     delta_list={}
     delta_list[reden_br]=[None]*5
     for i in range(len(meters_used)):
-        status,sample_list=ceilometer_api.get_meter_samples(str(meters_used[i]),metering,pom,False,meter_list)
+        status,sample_list=ceilometer_api.get_meter_samples(str(meters_used[i]),metering,pom,False,meter_list,False,"")
         logger.info('In periodic: Getting meter samples')
         if status:
             print '--------------------------------------------------------------------------------------------------------------------------' 
@@ -301,7 +301,7 @@ def pricing(metering,meter_list,pom,input_p):
             if price_def[i]==meter_list[j]["meter-name"]:
                 meters_used.append(price_def[i])
                 meters_ids.append(meter_list[j]["meter-id"])
-                status,sample_list=ceilometer_api.get_meter_samples(price_def[i],metering,pom,False,meter_list)
+                status,sample_list=ceilometer_api.get_meter_samples(price_def[i],metering,pom,False,meter_list,False,"")
                 logger.info('In pricing: Getting meter samples')
                 if sample_list==[]:
                     price_def[i]=str(0)

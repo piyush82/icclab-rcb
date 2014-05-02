@@ -22,30 +22,42 @@ from main_menu import admin_custom as admin
 app = Celery()
 from celery.task import PeriodicTask
 from datetime import timedelta
-from datetime import datetime
+
 from celery.task import Task
 
 
 #class MyTask(PeriodicTask):
-    #run_every = timedelta(seconds=10)
+    #run_every = timedelta(seconds=30)
 
-    #def run(self,token_data,token_id,meters_used,meter_list,func,user,time):
-        #periodic_counter(self,token_data,token_id,meters_used,meter_list,func,user,time)
-        #from_date="2014-04-20"
-        #from_time="00:00:00"
-        #to_date="2014-04-20"
-        #to_time="23:59:59"
-        #q=ceilometer_api.set_query(from_date,to_date,from_time,to_time,"/","/",True) 
-        #udr=get_udr(self,token_data,token_id,user,meters_used,meter_list,func,False,q)
-        #price=pricing(self,user,meter_list)
-        #return price
+    #def run(self,**kwargs):
+        #k_self = kwargs.pop('k_self')
+        #token_data=kwargs.pop('token_data')
+        #token_id=kwargs.pop('token_id')
+        #meters_used=kwargs.pop('meters_used')
+        #meter_list=kwargs.pop('meter_list')
+        #func=kwargs.pop('func')
+        #user=kwargs.pop('user')
+        #time=kwargs.pop('time')
+        #periodic_counter(k_self,token_data,token_id,meters_used,meter_list,func,user,time)
 
-@periodic_task(run_every=timedelta(seconds=10))
+@periodic_task(run_every=timedelta(seconds=30))
+def my_task(**kwargs):
+        k_self = kwargs.pop('k_self')
+        token_data=kwargs.pop('token_data')
+        token_id=kwargs.pop('token_id')
+        meters_used=kwargs.pop('meters_used')
+        meter_list=kwargs.pop('meter_list')
+        func=kwargs.pop('func')
+        user=kwargs.pop('user')
+        time=kwargs.pop('time')
+        periodic_counter(k_self,token_data,token_id,meters_used,meter_list,func,user,time)
+
+#@periodic_task(run_every=timedelta(seconds=30))
 def periodic_counter(self,token_data,token_id,meters_used,meter_list,func,user,time):
     
     from_date="2014-04-20"
     from_time="00:00:00"
-    to_date="2014-04-20"
+    to_date="2014-04-21"
     to_time="23:59:59"
     q=ceilometer_api.set_query(from_date,to_date,from_time,to_time,"/","/",True) 
     udr=get_udr(self,token_data,token_id,user,meters_used,meter_list,func,False,q)
@@ -65,7 +77,7 @@ def get_delta_samples(self,token_data,token_id,user,meter):
     return delta
         
 def get_udr(self,token_data,token_id,user,meters_used,meter_list,func,web_bool,q):
-    date_time="2014-04-28"
+    date_time=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     delta_list=[None]*5
     all_stats=[] 
     for i in range(len(meters_used)):
@@ -149,7 +161,7 @@ def pricing(self,user,meter_list):
                         price=price/x
                 if pricing_list[i]=="%":
                     price=price*x/100.0
-    date_time="2014-04-20"
+    date_time=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     cdr=PriceCdr(user_id=user,timestamp=date_time,pricing_func_id=func, price=price)
     cdr.save()
     return price

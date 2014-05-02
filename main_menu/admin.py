@@ -9,6 +9,8 @@ from django.forms import widgets
 import datetime
 from datetime import date
 from django.forms.widgets import RadioSelect
+from main_menu.tasks import  my_task
+from processes import periodic_web
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'os_api')))
 import ceilometer_api
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'processes')))
@@ -348,8 +350,11 @@ class stackUserAdmin(admin.ModelAdmin):
                                             break
                                         else:
                                             j=j+1
-                                    tasks.periodic_counter(self,token_data,token_id,meters_used,meter_list,func,user,time)
-                                
+                                k_self=self
+                                #task=MyTask()
+                                #kwargs={"k_self"=self,"token_data"=token_data,"token_id"=token_id,"meters_used"=meters_used,"meter_list"=meter_list,"func"=func,"user"=user,"time"=time}
+                                #my_task(k_self=k_self,token_data=token_data,token_id=token_id,meters_used=meters_used,meter_list=meter_list,func=func,user=user,time=time)
+                                periodic_web.periodic_counter(self,token_data,token_id,meters_used,meter_list,func,user,time)
                             except PricingFunc.DoesNotExist:
                                     messages.warning(request, 'You have to define the pricing function first.')   
 
