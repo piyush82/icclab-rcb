@@ -31,14 +31,11 @@ from time import gmtime, strftime
 from threading import Timer
 
 
-def periodic_counter(self,token_data,token_id,meters_used,meter_list,func,user,time):
+def periodic_counter(self,token_data,token_id,meters_used,meter_list,func,user,time,from_date,from_time,end_date,end_time):
     
-    from_date="2014-04-20"
-    from_time="00:00:00"
-    to_date="2014-04-21"
-    to_time="23:59:59"
-    q=ceilometer_api.set_query(from_date,to_date,from_time,to_time,"/","/",True) 
-    udr=get_udr(self,token_data,token_id,user,meters_used,meter_list,func,False,q)
+
+    q=ceilometer_api.set_query(from_date,end_date,from_time,end_time,"/","/",True) 
+    udr=get_udr(self,token_data,token_id,user,meters_used,meter_list,func,True,q=q)
     price=pricing(self,user,meter_list)
     #t = Timer(10,periodic_counter,args=[self,token_data,token_id,meters_used,meter_list,func,user,time])
     #t.start()
@@ -47,13 +44,13 @@ def get_delta_samples(self,token_data,token_id,user,meter):
     delta=0.0
     meter2=str(meter)
     samples =list( MetersCounter.objects.filter(user_id=user,meter_name = meter))
-    if len(samples)==1:
-        delta=0.0
-    else:
-        last=str(samples[-1])
-        second_to_last=str(samples[-2])
-        delta=float(last)-float(second_to_last)
-    return delta
+    #if len(samples)==1:
+    #    delta=0.0
+    #else:
+    last=str(samples[-1])
+        #second_to_last=str(samples[-2])
+        #delta=float(last)-float(second_to_last)
+    return last
         
 def get_udr(self,token_data,token_id,user,meters_used,meter_list,func,web_bool,q):
     date_time=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -78,6 +75,8 @@ def get_udr(self,token_data,token_id,user,meters_used,meter_list,func,web_bool,q
         udr=Udr(user_id=user,timestamp=date_time,pricing_func_id=func, param1=delta_list[0], param2=delta_list[1], param3=delta_list[2], param4=delta_list[3], param5=delta_list[4])
         udr.save()        
     return udr
+
+
 
 
 def pricing(self,user,meter_list):
@@ -148,7 +147,7 @@ def pricing(self,user,meter_list):
 
 
 class MyThread(Thread):
-    def __init__(self, k_self,token_data,token_id,meters_used,meter_list,func,user,time):
+    def __init__(self, k_self,token_data,token_id,meters_used,meter_list,func,user,time_f,from_date,from_time,end_date,end_time):
         super(MyThread, self).__init__()
         self.daemon = True
         self.cancelled = False
@@ -159,15 +158,30 @@ class MyThread(Thread):
         self.meter_list=meter_list
         self.func=func
         self.user=user
-        self.time=time
+        self.time_f=time_f
+        self.from_date=from_date
+        self.from_time=from_time
+        self.func=func
+        self.end_date=end_date
+        self.end_time=end_time
 
     def run(self):
         """Overloaded Thread.run, runs the update 
         method once per every 10 milliseconds."""
 
         while not self.cancelled:
-            periodic_counter(self.k_self,self.token_data,self.token_id,self.meters_used,self.meter_list,self.func,self.user,self.time)
-            time.sleep(10)
+            periodic_counter(self.k_self,self.token_data,self.token_id,self.meters_used,self.meter_list,self.func,self.user,self.time_f,self.from_date,self.from_time,self.end_date,self.end_time)
+            self.from_time=self.end_time
+            self.from_date=self.end_date
+            today = datetime.date.today()
+            today.strftime("%Y-%m-%d")
+            now = datetime.datetime.now()
+            now=datetime.time(now.hour, now.minute, now.second)
+            now.strftime("%H:%M:%S")
+            self.end_date=str(today)
+            self.end_time=str(now)
+
+            time.sleep(self.time_f)
 
     def cancel(self):
         """End this timer thread"""

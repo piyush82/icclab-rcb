@@ -38,7 +38,7 @@ app = Celery()
 class stackUserAdmin(admin.ModelAdmin):
     fields = ['user_id', 'user_name','tenant_id']
     list_display = ('user_id', 'user_name','tenant_id')
-    actions = ['add_pricing_func','calculate_price','start_periodic','soberi_func']  
+    actions = ['add_pricing_func','calculate_price','start_periodic','soberi_func','stop_periodic']  
     
     class AddPricingFuncForm(forms.Form):
         CHOICES = (('EUR', 'EUR',), ('CHF', 'CHF',),('USD', 'USD',), ('GBP', 'GBP',))
@@ -298,7 +298,7 @@ class stackUserAdmin(admin.ModelAdmin):
 
 
     class StartPeriodicForm(forms.Form):
-        date_Start=forms.DateField( input_formats=['%Y-%m-%d'])
+        dateStart=forms.DateField( input_formats=['%Y-%m-%d'])
         time=forms.CharField(required=True)
         _selected_action = forms.CharField(widget=forms.MultipleHiddenInput)
 
@@ -323,10 +323,19 @@ class stackUserAdmin(admin.ModelAdmin):
             if 'start_counter' in request.POST:
                 form2 = self.StartPeriodicForm(request.POST)
                 if form2.is_valid():
-                    from_date=str(form2.cleaned_data["date_Start"])
-                    time=str(form2.cleaned_data["time"])
-                    if periodic.is_number(time):
-                        if  time>0:
+                    from_date=str(form2.cleaned_data["dateStart"])
+                    from_time='00:00:00'
+                    time_f=str(form2.cleaned_data["time"])
+                    today = datetime.date.today()
+                    today.strftime("%Y-%m-%d")
+                    now = datetime.datetime.now()
+                    now=datetime.time(now.hour, now.minute, now.second)
+                    now.strftime("%H:%M:%S")
+                    time_f=float(time_f)
+                    end_date=str(today)
+                    end_time=str(now)
+                    if periodic.is_number(time_f):
+                        if  time_f>0:
                             try:
                                 func=PricingFunc.objects.get(user_id=user) 
                                 pricing_list=[]
@@ -353,11 +362,13 @@ class stackUserAdmin(admin.ModelAdmin):
                                         else:
                                             j=j+1
                                 k_self=self
+                                request.session["thread_running"] = True
                                 #task=MyTask()
                                 #kwargs={"k_self"=self,"token_data"=token_data,"token_id"=token_id,"meters_used"=meters_used,"meter_list"=meter_list,"func"=func,"user"=user,"time"=time}
                                 #my_task(k_self=k_self,token_data=token_data,token_id=token_id,meters_used=meters_used,meter_list=meter_list,func=func,user=user,time=time)
                                 #periodic_web.periodic_counter(self,token_data,token_id,meters_used,meter_list,func,user,time)
-                                thread1=periodic_web.MyThread(self,token_data,token_id,meters_used,meter_list,func,user,time)
+                                global thread1
+                                thread1=periodic_web.MyThread(k_self,token_data,token_id,meters_used,meter_list,func,user,time_f,from_date,from_time,end_date,end_time)
                                 thread1.start()
                             except PricingFunc.DoesNotExist:
                                     messages.warning(request, 'You have to define the pricing function first.')   
@@ -370,6 +381,53 @@ class stackUserAdmin(admin.ModelAdmin):
                 
 
     start_periodic.short_description = "Start the periodic counter for the selected user"
+ 
+ 
+ 
+ 
+
+
+    class StopPeriodicThread(forms.Form):
+        _selected_action = forms.CharField(widget=forms.MultipleHiddenInput)
+
+    
+    def stop_periodic(self, request, queryset):
+        if len(queryset)>1:
+            messages.warning(request, "You can only select one user at a time!") 
+            return HttpResponseRedirect('/admin/main_menu/stackuser/')
+             
+        else:
+            form5 = None
+            try:
+                token_data=request.session["token_data"] 
+                token_id=token_data["token_id"]
+                status_meter_list, meter_list = ceilometer_api.get_meter_list(token_id, token_data["metering"])      
+            except KeyError:
+                messages.warning(request, "You have to authenticate first!")
+                return redirect('/auth_token/?next=%s' % request.path)
+            user=queryset[0]
+        
+                    
+            if 'stop_counter' in request.POST:
+                form5 = self.StopPeriodicThread(request.POST)
+                if form5.is_valid():
+                    try:
+                        thread_running=request.session["thread_running"] 
+                        global thread1
+                        if thread1.isAlive():
+                            thread1.cancel()
+                    except KeyError:
+                        messages.warning(request, "Counter hasn't been started!")
+                        return redirect('/auth_token/?next=%s' % request.path)
+
+
+            if not form5:
+                form5=self.StopPeriodicThread(initial={'_selected_action': request.POST.getlist(admin.ACTION_CHECKBOX_NAME)})
+                context={'user': queryset,'stop_form': form5}
+                return render(request,'admin/stop_periodic.html',context)       
+                
+
+    stop_periodic.short_description = "Stop the periodic counter for the selected user"
   
 
 class pricingFuncAdmin(admin.ModelAdmin):
