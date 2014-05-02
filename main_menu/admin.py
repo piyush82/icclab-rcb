@@ -9,7 +9,7 @@ from django.forms import widgets
 import datetime
 from datetime import date
 from django.forms.widgets import RadioSelect
-from main_menu.tasks import  my_task
+
 from processes import periodic_web
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'os_api')))
 import ceilometer_api
@@ -27,13 +27,11 @@ from django.core.exceptions import ObjectDoesNotExist
 from main_menu.views import auth_token,is_auth
 from time import gmtime, strftime
 from threading import Timer
-from main_menu import tasks
+
 
 #from main_menu.tasks import MyTask
 
-from celery import task
-from celery import Celery
-app = Celery()
+
 
 class stackUserAdmin(admin.ModelAdmin):
     fields = ['user_id', 'user_name','tenant_id']
