@@ -5,6 +5,9 @@
 {% endblock %}
 {% block content %}
 
+<script type="text/javascript" src="{{ STATIC_URL }}js/jquery-1.11.0.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/jquery-ui-1.10.4.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/ui.js"></script>
 <p> Define the pricing function. </p>
 
 <form action="" method="post">
@@ -36,7 +39,7 @@
 
     <ul>{{ user|unordered_list }}</ul>
 
-    <input type="hidden" name="action" value="add_pricing_func" />
+    <input type="hidden" name="action" value="start_periodic" />
     <input type="submit" name="start_counter" value="Start the loop." />
 </form>
 

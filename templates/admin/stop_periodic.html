@@ -31,16 +31,12 @@
     <p>Enter date and time.</p>
 
 
-    {{ periodic_form.as_p}}
+    {{ stop_form.as_p}}
 
 
 
-    <p>The periodic pricing will be applied to the user with id:</p>
-
-    <ul>{{ user|unordered_list }}</ul>
-
-    <input type="hidden" name="action" value="start_periodic" />
-    <input type="submit" name="start_counter" value="Start the loop." />
+    <input type="hidden" name="action" value="stop_periodic" />
+    <input type="submit" name="stop_counter" value="Stop the loop." />
 </form>
 
 {% endblock %}

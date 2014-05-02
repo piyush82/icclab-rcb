@@ -5,9 +5,9 @@
 
     
 <p>Price: </p>
-    {{ price }}&nbsp{{ currency }} 
+    {{ price }}&nbsp &nbsp{{ currency }} 
 
-<p></p>
+
     
 
 <p>The pricing function will be applied to the user with id:</p>
