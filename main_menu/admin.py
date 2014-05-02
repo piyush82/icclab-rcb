@@ -298,6 +298,7 @@ class stackUserAdmin(admin.ModelAdmin):
 
 
     class StartPeriodicForm(forms.Form):
+        date_Start=forms.DateField( input_formats=['%Y-%m-%d'])
         time=forms.CharField(required=True)
         _selected_action = forms.CharField(widget=forms.MultipleHiddenInput)
 
@@ -322,6 +323,7 @@ class stackUserAdmin(admin.ModelAdmin):
             if 'start_counter' in request.POST:
                 form2 = self.StartPeriodicForm(request.POST)
                 if form2.is_valid():
+                    from_date=str(form2.cleaned_data["date_Start"])
                     time=str(form2.cleaned_data["time"])
                     if periodic.is_number(time):
                         if  time>0:
@@ -354,7 +356,9 @@ class stackUserAdmin(admin.ModelAdmin):
                                 #task=MyTask()
                                 #kwargs={"k_self"=self,"token_data"=token_data,"token_id"=token_id,"meters_used"=meters_used,"meter_list"=meter_list,"func"=func,"user"=user,"time"=time}
                                 #my_task(k_self=k_self,token_data=token_data,token_id=token_id,meters_used=meters_used,meter_list=meter_list,func=func,user=user,time=time)
-                                periodic_web.periodic_counter(self,token_data,token_id,meters_used,meter_list,func,user,time)
+                                #periodic_web.periodic_counter(self,token_data,token_id,meters_used,meter_list,func,user,time)
+                                thread1=periodic_web.MyThread(self,token_data,token_id,meters_used,meter_list,func,user,time)
+                                thread1.start()
                             except PricingFunc.DoesNotExist:
                                     messages.warning(request, 'You have to define the pricing function first.')   
 

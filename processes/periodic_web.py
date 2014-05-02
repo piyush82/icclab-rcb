@@ -3,7 +3,7 @@ Created on Apr 9, 2014
 
 @author: kolv
 '''
-
+from threading import Thread
 from django.contrib import admin
 from main_menu.models import StackUser,PricingFunc, PriceLoop, MetersCounter,\
     Udr, PriceCdr
@@ -12,6 +12,7 @@ import sys,os
 from django.core import urlresolvers
 from django.forms import widgets
 import datetime
+import time
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'os_api')))
 import ceilometer_api
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'processes')))
@@ -39,8 +40,8 @@ def periodic_counter(self,token_data,token_id,meters_used,meter_list,func,user,t
     q=ceilometer_api.set_query(from_date,to_date,from_time,to_time,"/","/",True) 
     udr=get_udr(self,token_data,token_id,user,meters_used,meter_list,func,False,q)
     price=pricing(self,user,meter_list)
-    t = Timer(10,periodic_counter,args=[self,token_data,token_id,meters_used,meter_list,func,user,time])
-    t.start()
+    #t = Timer(10,periodic_counter,args=[self,token_data,token_id,meters_used,meter_list,func,user,time])
+    #t.start()
 
 def get_delta_samples(self,token_data,token_id,user,meter):
     delta=0.0
@@ -145,3 +146,29 @@ def pricing(self,user,meter_list):
     return price
 
 
+
+class MyThread(Thread):
+    def __init__(self, k_self,token_data,token_id,meters_used,meter_list,func,user,time):
+        super(MyThread, self).__init__()
+        self.daemon = True
+        self.cancelled = False
+        self.k_self=k_self
+        self.token_data=token_data
+        self.token_id=token_id
+        self.meters_used=meters_used
+        self.meter_list=meter_list
+        self.func=func
+        self.user=user
+        self.time=time
+
+    def run(self):
+        """Overloaded Thread.run, runs the update 
+        method once per every 10 milliseconds."""
+
+        while not self.cancelled:
+            periodic_counter(self.k_self,self.token_data,self.token_id,self.meters_used,self.meter_list,self.func,self.user,self.time)
+            time.sleep(10)
+
+    def cancel(self):
+        """End this timer thread"""
+        self.cancelled = True
