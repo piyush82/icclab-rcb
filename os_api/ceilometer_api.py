@@ -199,7 +199,7 @@ def set_query(from_date,to_date,from_time,to_time,resource_id,project_id,status_
 
 
 
-def meter_statistics(meter_id,api_endpoint,token,meter_list):
+def meter_statistics(meter_id,api_endpoint,token,meter_list,web,**kwargs):
     """
 
     Get the statistics for the specified meter.
@@ -222,54 +222,34 @@ def meter_statistics(meter_id,api_endpoint,token,meter_list):
                'X-Auth-Token': token
                
     }
-    from_date,to_date,from_time,to_time,resource_id,project_id,status_q=query()   
+
+
+
+        
     path = "/v2/meters/"+meter_id+"/statistics"
     target = urlparse(api_endpoint+path)
     method = 'GET'
     logger.info('Inside meter-statistics: Path is %s',target)
-        
-    if(status_q==True):
-        q=set_query(from_date,to_date,from_time,to_time,resource_id,project_id,status_q)
-        body="{"+q
-        period=raw_input("Do you want to define a time period? Enter 'Y' if yes, 'N' if no.")
-        if(period=="Y"):
-            period_def=raw_input("Enter the desired time period in seconds: ")
-            body=body+',"period":'+period_def
-        groupby=raw_input("Do you want to define a group by value? Enter 'Y' if yes, 'N' if no.")  
-        if (groupby=="Y") :
-            rid=raw_input("Do you want to group by the resource id? If yes, enter 'Y', else enter 'N'. ")
-            if(rid=="Y"):
-                    groupby_def=',"groupby":['
-                    groupby_def=groupby_def+'"resource_id"'
-                    pid=raw_input("Do you want to group by the project id? If yes, enter 'Y', else enter 'N'. ")
-                    if(pid=="Y"):
-                        groupby_def=groupby_def+',"project_id"'  
-                        groupby_def=groupby_def+']'
-                        body=body+groupby_def            
-            else:
-                pid=raw_input("Do you want to group by the project id? If yes, enter 'Y', else enter 'N'. ")
-                if(pid=="Y"):
-                    groupby_def=',"groupby":['
-                    groupby_def=groupby_def+'"project_id"'  
-                    groupby_def=groupby_def+']'
-                    body=body+groupby_def
-        body=body+"}"
-    else:
-        body="{"
-        period=raw_input("Do you want to define a time period? Enter 'Y' if yes, 'N' if no.")
-        if(period=="Y"):
-            period_def=raw_input("Enter the desired time period in seconds: ")
-            body=body+'"period":'+period_def
-
-            rid=raw_input("Do you want to group by the resource id? If yes, enter 'Y', else enter 'N'. ")
-            if(rid=="Y"):
-                groupby_def=',"groupby":['
-                groupby_def=groupby_def+'"resource_id"'
-                pid=raw_input("Do you want to group by the project id? If yes, enter 'Y', else enter 'N'. ")
-                if(pid=="Y"):
-                    groupby_def=groupby_def+',"project_id"'  
-                    groupby_def=groupby_def+']'
-                    body=body+groupby_def            
+    if(web==False):    
+        from_date,to_date,from_time,to_time,resource_id,project_id,status_q=query()   
+        if(status_q==True):
+            q=set_query(from_date,to_date,from_time,to_time,resource_id,project_id,status_q)
+            body="{"+q
+            period=raw_input("Do you want to define a time period? Enter 'Y' if yes, 'N' if no.")
+            if(period=="Y"):
+                period_def=raw_input("Enter the desired time period in seconds: ")
+                body=body+',"period":'+period_def
+            groupby=raw_input("Do you want to define a group by value? Enter 'Y' if yes, 'N' if no.")  
+            if (groupby=="Y") :
+                rid=raw_input("Do you want to group by the resource id? If yes, enter 'Y', else enter 'N'. ")
+                if(rid=="Y"):
+                        groupby_def=',"groupby":['
+                        groupby_def=groupby_def+'"resource_id"'
+                        pid=raw_input("Do you want to group by the project id? If yes, enter 'Y', else enter 'N'. ")
+                        if(pid=="Y"):
+                            groupby_def=groupby_def+',"project_id"'  
+                            groupby_def=groupby_def+']'
+                            body=body+groupby_def            
                 else:
                     pid=raw_input("Do you want to group by the project id? If yes, enter 'Y', else enter 'N'. ")
                     if(pid=="Y"):
@@ -278,25 +258,55 @@ def meter_statistics(meter_id,api_endpoint,token,meter_list):
                         groupby_def=groupby_def+']'
                         body=body+groupby_def
             body=body+"}"
-        else: 
-            rid=raw_input("Do you want to group by the resource id? If yes, enter 'Y', else enter 'N'. ")
-            if(rid=="Y"):
-                    groupby_def='"groupby":['
+        else:
+            body="{"
+            period=raw_input("Do you want to define a time period? Enter 'Y' if yes, 'N' if no.")
+            if(period=="Y"):
+                period_def=raw_input("Enter the desired time period in seconds: ")
+                body=body+'"period":'+period_def
+                rid=raw_input("Do you want to group by the resource id? If yes, enter 'Y', else enter 'N'. ")
+                if(rid=="Y"):
+                    groupby_def=',"groupby":['
                     groupby_def=groupby_def+'"resource_id"'
                     pid=raw_input("Do you want to group by the project id? If yes, enter 'Y', else enter 'N'. ")
                     if(pid=="Y"):
                         groupby_def=groupby_def+',"project_id"'  
-                    groupby_def=groupby_def+']'
-                    body=body+groupby_def            
-            else:
-                pid=raw_input("Do you want to group by the project id? If yes, enter 'Y', else enter 'N'. ")
-                if(pid=="Y"):
-                    groupby_def='"groupby":['
-                    groupby_def=groupby_def+'"project_id"'  
-                    groupby_def=groupby_def+']'
-                    body=body+groupby_def
-            body=body+"}"
-            
+                        groupby_def=groupby_def+']'
+                        body=body+groupby_def            
+                    else:
+                        pid=raw_input("Do you want to group by the project id? If yes, enter 'Y', else enter 'N'. ")
+                        if(pid=="Y"):
+                            groupby_def=',"groupby":['
+                            groupby_def=groupby_def+'"project_id"'  
+                            groupby_def=groupby_def+']'
+                            body=body+groupby_def
+                body=body+"}"
+            else: 
+                rid=raw_input("Do you want to group by the resource id? If yes, enter 'Y', else enter 'N'. ")
+                if(rid=="Y"):
+                        groupby_def='"groupby":['
+                        groupby_def=groupby_def+'"resource_id"'
+                        pid=raw_input("Do you want to group by the project id? If yes, enter 'Y', else enter 'N'. ")
+                        if(pid=="Y"):
+                            groupby_def=groupby_def+',"project_id"'  
+                        groupby_def=groupby_def+']'
+                        body=body+groupby_def            
+                else:
+                    pid=raw_input("Do you want to group by the project id? If yes, enter 'Y', else enter 'N'. ")
+                    if(pid=="Y"):
+                        groupby_def='"groupby":['
+                        groupby_def=groupby_def+'"project_id"'  
+                        groupby_def=groupby_def+']'
+                        body=body+groupby_def
+                body=body+"}"
+    else:       
+        q=kwargs.pop('q')
+        if 'period' in kwargs:
+            period=kwargs.pop('period')
+            body="{"+q
+            body=body+',"period":'+period+"}"
+        else:   
+            body="{"+q+"}"
         
     if is_in_mlist(meter_id,meter_list):        
         logger.info('Inside meter_statistics: body is  %s',body)        
