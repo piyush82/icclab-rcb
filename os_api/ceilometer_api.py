@@ -150,7 +150,7 @@ def query():
         resource_id="/"
     pid=raw_input("Do you want to define the project id? If yes, enter 'Y', else enter 'N'. ")
     if(pid=="Y"):
-        project_id=raw_input("Enter the project id: ")
+        project_id=raw_input("Enter the user id: ")
         status=True
     else:
         project_id="/"
