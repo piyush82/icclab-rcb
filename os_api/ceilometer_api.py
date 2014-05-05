@@ -182,18 +182,18 @@ def set_query(from_date,to_date,from_time,to_time,resource_id,project_id,status_
             if (resource_id != "/"):
                 q=q+',{"field": "resource_id","op": "eq","value": "'+resource_id+'"}'
                 if (project_id != "/"):
-                    q=q+',{"field": "project_id","op": "eq","value": "'+project_id+'"}'
+                    q=q+',{"field": "user_id","op": "eq","value": "'+project_id+'"}'
             else:
                 if (project_id != "/"):
-                    q=q+'{"field": "project_id","op": "eq","value": "'+project_id+'"}'
+                    q=q+'{"field": "user_id","op": "eq","value": "'+project_id+'"}'
         else:
             if (resource_id != "/"):
                 q=q+'{"field": "resource_id","op": "eq","value": "'+resource_id+'"}'
                 if (project_id != "/"):
-                    q=q+',{"field": "project_id","op": "eq","value": "'+project_id+'"}'
+                    q=q+',{"field": "user_id","op": "eq","value": "'+project_id+'"}'
             else:
                 if (project_id != "/"):
-                    q=q+'{"field": "project_id","op": "eq","value": "'+project_id+'"}'
+                    q=q+'{"field": "user_id","op": "eq","value": "'+project_id+'"}'
         q=q+']'
     return q
 
