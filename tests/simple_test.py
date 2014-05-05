@@ -77,7 +77,7 @@ def main(argv):
                     print "Group by: " + str(stat_list[i]["group-by"]) 
                 print '--------------------------------------------------------------------------------------------------------------------------'
         
-            status,sample_list=ceilometer_api.get_meter_samples(meter_name, token_data["ceilometer"],token_data["token-id"],True,meter_list)
+            status,sample_list=ceilometer_api.get_meter_samples(meter_name, token_data["ceilometer"],token_data["token-id"],True,meter_list,False)
             if status:
                 print '--------------------------------------------------------------------------------------------------------------------------'
                 print "The samples for your meter are printed next."

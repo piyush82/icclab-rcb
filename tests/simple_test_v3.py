@@ -55,7 +55,7 @@ def main(argv):
  
         meter_name=raw_input("Enter meter name: ")
 
-        st,stat_list=ceilometer_api.meter_statistics(meter_name, token_data["metering"],pom,meter_list)
+        st,stat_list=ceilometer_api.meter_statistics(meter_name, token_data["metering"],pom,meter_list,False)
         if st:
             print '--------------------------------------------------------------------------------------------------------------------------'
             print "The statistics for your meters is printed next."
@@ -79,7 +79,7 @@ def main(argv):
             print '--------------------------------------------------------------------------------------------------------------------------'
         
         print "Query initialization for meter samples function."
-        status,sample_list=ceilometer_api.get_meter_samples(meter_name,token_data["metering"],pom,True,meter_list)
+        status,sample_list=ceilometer_api.get_meter_samples(meter_name,token_data["metering"],pom,True,meter_list,False,"")
         if status:
             print '--------------------------------------------------------------------------------------------------------------------------'
             print "The samples for your meter are printed next."
