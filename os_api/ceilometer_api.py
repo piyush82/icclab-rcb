@@ -150,14 +150,14 @@ def query():
         resource_id="/"
     pid=raw_input("Do you want to define the user id? If yes, enter 'Y', else enter 'N'. ")
     if(pid=="Y"):
-        project_id=raw_input("Enter the user id: ")
+        user_id=raw_input("Enter the user id: ")
         status=True
     else:
-        project_id="/"
-    return from_date,to_date,from_time,to_time,resource_id,project_id,status
+        user_id="/"
+    return from_date,to_date,from_time,to_time,resource_id,user_id,status
 
 
-def set_query(from_date,to_date,from_time,to_time,resource_id,project_id,status_q):
+def set_query(from_date,to_date,from_time,to_time,resource_id,user_id,status_q):
     """
 
     Define the query.
@@ -168,7 +168,7 @@ def set_query(from_date,to_date,from_time,to_time,resource_id,project_id,status_
       string: Defined ending date.
       string: Defined ending time.
       string: Defined resource id.
-      string: Defined project id.
+      string: Defined user id.
       bool: True if successful, False otherwise.
       
     Returns:
@@ -181,19 +181,19 @@ def set_query(from_date,to_date,from_time,to_time,resource_id,project_id,status_
             q= q+'{"field": "timestamp","op": "ge","value": "'+from_date+'T'+from_time+'"},{"field": "timestamp","op": "lt","value": "'+to_date+'T'+to_time+'"}'
             if (resource_id != "/"):
                 q=q+',{"field": "resource_id","op": "eq","value": "'+resource_id+'"}'
-                if (project_id != "/"):
-                    q=q+',{"field": "user_id","op": "eq","value": "'+project_id+'"}'
+                if (user_id != "/"):
+                    q=q+',{"field": "user_id","op": "eq","value": "'+user_id+'"}'
             else:
-                if (project_id != "/"):
-                    q=q+'{"field": "user_id","op": "eq","value": "'+project_id+'"}'
+                if (user_id != "/"):
+                    q=q+',{"field": "user_id","op": "eq","value": "'+user_id+'"}'
         else:
             if (resource_id != "/"):
                 q=q+'{"field": "resource_id","op": "eq","value": "'+resource_id+'"}'
-                if (project_id != "/"):
-                    q=q+',{"field": "user_id","op": "eq","value": "'+project_id+'"}'
+                if (user_id != "/"):
+                    q=q+',{"field": "user_id","op": "eq","value": "'+user_id+'"}'
             else:
-                if (project_id != "/"):
-                    q=q+'{"field": "user_id","op": "eq","value": "'+project_id+'"}'
+                if (user_id != "/"):
+                    q=q+'{"field": "user_id","op": "eq","value": "'+user_id+'"}'
         q=q+']'
     return q
 
@@ -231,9 +231,9 @@ def meter_statistics(meter_id,api_endpoint,token,meter_list,web,**kwargs):
     method = 'GET'
     logger.info('Inside meter-statistics: Path is %s',target)
     if(web==False):    
-        from_date,to_date,from_time,to_time,resource_id,project_id,status_q=query()   
+        from_date,to_date,from_time,to_time,resource_id,user_id,status_q=query()   
         if(status_q==True):
-            q=set_query(from_date,to_date,from_time,to_time,resource_id,project_id,status_q)
+            q=set_query(from_date,to_date,from_time,to_time,resource_id,user_id,status_q)
             body="{"+q
             period=raw_input("Do you want to define a time period? Enter 'Y' if yes, 'N' if no.")
             if(period=="Y"):
@@ -377,9 +377,9 @@ def get_meter_samples(meter_name,api_endpoint,token,bool_query,meter_list,web,q)
         method = 'GET'
         if web==False:      
             if bool_query==True:
-                from_date,to_date,from_time,to_time,resource_id,project_id,status_q=query()
+                from_date,to_date,from_time,to_time,resource_id,user_id,status_q=query()
                 if(status_q==True):
-                    q=set_query(from_date,to_date,from_time,to_time,resource_id,project_id,status_q)
+                    q=set_query(from_date,to_date,from_time,to_time,resource_id,user_id,status_q)
                     body="{"+q
                     limit=raw_input("Do you want to set a limit to the number of samples that gets returned? Enter 'Y' if yes, 'N' if no.")
                     if(limit=="Y"):
@@ -436,7 +436,7 @@ def get_meter_samples(meter_name,api_endpoint,token,bool_query,meter_list,web,q)
                 meter_samples[i]["user-id"] = data[i]["user_id"]
             return True, meter_samples
     else:
-        logger.warn("Inside meter statistics: not an existing meter name")  
+        logger.warn("Inside meter samples: not an existing meter name")  
         print "Choose a meter from the meter list!"
         return False,meter_samples
         
@@ -469,10 +469,10 @@ def get_resources(api_endpoint,token,bool_query):
     method = 'GET'
     
     if bool_query:
-        from_date,to_date,from_time,to_time,resource_id,project_id,status_q=query()  
+        from_date,to_date,from_time,to_time,resource_id,user_id,status_q=query()  
         body="{"
         if(status_q==True):
-            q=set_query(from_date,to_date,from_time,to_time,resource_id,project_id,status_q)
+            q=set_query(from_date,to_date,from_time,to_time,resource_id,user_id,status_q)
             body=body+q
         body=body+"}"
     else:

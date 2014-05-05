@@ -31,8 +31,7 @@ def admin_page(request):
     try:
         status=request.session["status"]
         token_data=request.session["token_data"] 
-        return render_to_response('admin/index.html',{},
-            context_instance=RequestContext(request))
+        return HttpResponseRedirect('/admin/')
     except KeyError:
         messages.warning(request, "You have to authenticate first!")
         return HttpResponseRedirect('/auth_token/')

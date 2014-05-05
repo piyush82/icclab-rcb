@@ -31,10 +31,10 @@ from time import gmtime, strftime
 from threading import Timer
 
 
-def periodic_counter(self,token_data,token_id,meters_used,meter_list,func,user,time,from_date,from_time,end_date,end_time):
+def periodic_counter(self,token_data,token_id,meters_used,meter_list,func,user,time,from_date,from_time,end_date,end_time,user_id_stack):
     
 
-    q=ceilometer_api.set_query(from_date,end_date,from_time,end_time,"/","/",True) 
+    q=ceilometer_api.set_query(from_date,end_date,from_time,end_time,"/",user_id_stack,True) 
     udr=get_udr(self,token_data,token_id,user,meters_used,meter_list,func,True,q=q)
     price=pricing(self,user,meter_list)
     #t = Timer(10,periodic_counter,args=[self,token_data,token_id,meters_used,meter_list,func,user,time])
@@ -147,7 +147,7 @@ def pricing(self,user,meter_list):
 
 
 class MyThread(Thread):
-    def __init__(self, k_self,token_data,token_id,meters_used,meter_list,func,user,time_f,from_date,from_time,end_date,end_time):
+    def __init__(self, k_self,token_data,token_id,meters_used,meter_list,func,user,time_f,from_date,from_time,end_date,end_time,user_id_stack):
         super(MyThread, self).__init__()
         self.daemon = True
         self.cancelled = False
@@ -164,13 +164,14 @@ class MyThread(Thread):
         self.func=func
         self.end_date=end_date
         self.end_time=end_time
+        self.user_id_stack=user_id_stack
 
     def run(self):
         """Overloaded Thread.run, runs the update 
         method once per every 10 milliseconds."""
 
         while not self.cancelled:
-            periodic_counter(self.k_self,self.token_data,self.token_id,self.meters_used,self.meter_list,self.func,self.user,self.time_f,self.from_date,self.from_time,self.end_date,self.end_time)
+            periodic_counter(self.k_self,self.token_data,self.token_id,self.meters_used,self.meter_list,self.func,self.user,self.time_f,self.from_date,self.from_time,self.end_date,self.end_time,self.user_id_stack)
             self.from_time=self.end_time
             self.from_date=self.end_date
             today = datetime.date.today()

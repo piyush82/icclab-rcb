@@ -191,6 +191,7 @@ class stackUserAdmin(admin.ModelAdmin):
             user=queryset[0]
             try:
                 func=PricingFunc.objects.get(user_id=user)
+                usr=StackUser.objects.get(user_id=user)
                 pricing_list=[]
                 meters_used=[]
                 pricing_list.append(func.param1)
@@ -205,7 +206,9 @@ class stackUserAdmin(admin.ModelAdmin):
 
                 unit=float(func.unit)
                 currency=func.currency
-            
+                user_id_stack=usr.user_id
+                
+                
                 for i in range(len(pricing_list)):
                     j=0
                     while j<len(meter_list):
@@ -228,7 +231,7 @@ class stackUserAdmin(admin.ModelAdmin):
                         from_time="00:00:00"
                         to_date=str(form3.cleaned_data["dateEnd"])
                         to_time="23:59:59"
-                        q=ceilometer_api.set_query(from_date,to_date,from_time,to_time,"/","/",True) 
+                        q=ceilometer_api.set_query(from_date,to_date,from_time,to_time,"/",user_id_stack,True) 
                         all_stats=[]           
                         for i in meters_used:
                             status,stat_list=ceilometer_api.meter_statistics(i, token_data["metering"],token_id,meter_list,True,q=q)
@@ -336,6 +339,8 @@ class stackUserAdmin(admin.ModelAdmin):
                         if  time_f>0:
                             try:
                                 func=PricingFunc.objects.get(user_id=user) 
+                                usr=StackUser.objects.get(user_id=user)
+                                
                                 pricing_list=[]
                                 meters_used=[]
                                 pricing_list.append(func.param1)
@@ -347,6 +352,8 @@ class stackUserAdmin(admin.ModelAdmin):
                                 pricing_list.append(func.param4)
                                 pricing_list.append(func.sign4)
                                 pricing_list.append(func.param5)     
+            
+                                user_id_stack=usr.user_id
             
                                 for i in range(len(pricing_list)):
                                     j=0
@@ -366,7 +373,7 @@ class stackUserAdmin(admin.ModelAdmin):
                                 #my_task(k_self=k_self,token_data=token_data,token_id=token_id,meters_used=meters_used,meter_list=meter_list,func=func,user=user,time=time)
                                 #periodic_web.periodic_counter(self,token_data,token_id,meters_used,meter_list,func,user,time)
                                 global thread1
-                                thread1=periodic_web.MyThread(k_self,token_data,token_id,meters_used,meter_list,func,user,time_f,from_date,from_time,end_date,end_time)
+                                thread1=periodic_web.MyThread(k_self,token_data,token_id,meters_used,meter_list,func,user,time_f,from_date,from_time,end_date,end_time,user_id_stack)
                                 thread1.start()
                             except PricingFunc.DoesNotExist:
                                     messages.warning(request, 'You have to define the pricing function first.')   
