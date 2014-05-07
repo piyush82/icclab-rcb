@@ -23,22 +23,24 @@ from django.conf.urls import patterns
 from django.shortcuts import render
 import django.forms as forms
 from django.shortcuts import render_to_response
-from django.contrib import messagessp
+from django.contrib import messages
 from django.core import serializers
 from django.core.exceptions import ObjectDoesNotExist
 from main_menu.views import auth_token,is_auth
-from time import gmtime, strftime
+from time import gmtime, strftime, strptime
 from threading import Timer
 
 
 def periodic_counter(self,token_data,token_id,meters_used,meter_list,func,user,time,from_date,from_time,end_date,end_time,user_id_stack):
     
 
-    q=ceilometer_api.set_query(from_date,end_date,from_time,end_time,"/",user_id_stack,True) 
-    udr=get_udr(self,token_data,token_id,user,meters_used,meter_list,func,True,q=q)
+    #q=ceilometer_api.set_query(from_date,end_date,from_time,end_time,"/",user_id_stack,True) 
+    #udr=get_udr(self,token_data,token_id,user,meters_used,meter_list,func,True,q=q)
+    udr,new_time=get_udr(self,token_data,token_id,user,meters_used,meter_list,func,True,from_date,from_time,end_date,end_time,user_id_stack)
     price=pricing(self,user,meter_list)
     #t = Timer(10,periodic_counter,args=[self,token_data,token_id,meters_used,meter_list,func,user,time])
     #t.start()
+    return new_time
 
 def get_delta_samples(self,token_data,token_id,user,meter):
     delta=0.0
@@ -52,29 +54,53 @@ def get_delta_samples(self,token_data,token_id,user,meter):
         #delta=float(last)-float(second_to_last)
     return last
         
-def get_udr(self,token_data,token_id,user,meters_used,meter_list,func,web_bool,q):
+def get_udr(self,token_data,token_id,user,meters_used,meter_list,func,web_bool,from_date,from_time,end_date,end_time,user_id_stack):
     date_time=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     delta_list=[None]*5
     all_stats=[] 
+    total=[None]*len(meters_used)
+    new_time="/"
     for i in range(len(meters_used)):
-        #rez=0.0
+        total[i]=0
+        for j in range(len(meter_list)):
+            if meters_used[i]==meter_list[j]["meter-name"]:
+                resource_id=meter_list[j]["resource-id"]
+                q=ceilometer_api.set_query(from_date,end_date,from_time,end_time,resource_id,user_id_stack,True)
+                status,stat_list=ceilometer_api.meter_statistics(meters_used[i], token_data["metering"],token_id,meter_list,True,q=q)
+                unit=meter_list[j]["meter-unit"]
+                if stat_list==[]:
+                    total[i]+=0
+                else:
+                    if meter_list[j]["meter-type"]=="cumulative":
+                        total[i]+=stat_list[0]["max"]-stat_list[0]["min"]
+                    if meter_list[j]["meter-type"]=="gauge":
+                        t1=datetime.datetime.combine(datetime.datetime.strptime(from_date,"%Y-%m-%d").date(),datetime.datetime.strptime(from_time,"%H:%M:%S").time())
+                        t2=datetime.datetime.combine(datetime.datetime.strptime(end_date,"%Y-%m-%d").date(),datetime.datetime.strptime(end_time,"%H:%M:%S").time())
+                        t=t2-t1
+                        time_period=t.total_seconds()
+                        total[i]+=stat_list[0]["average"]*time_period
+                    if meter_list[j]["meter-type"]=="delta":
+                        total[i]+=stat_list[0]["sum"]
+                    new_time=stat_list[0]["duration-end"]
+        meters_counter=MetersCounter(meter_name=meters_used[i],user_id=user,counter_volume=total[i],unit=unit ,timestamp=date_time)
+        #rez=0.0    
         #status,sample_list=ceilometer_api.get_meter_samples(meters_used[i],token_data["metering"],token_id,False,meter_list,web_bool,q=q)
         #for k in range(len(sample_list)):
         #    rez+=sample_list[k]["counter-volume"]
         #    meters_counter=MetersCounter(meter_name=meters_used[i],user_id=user,counter_volume=rez,unit=sample_list[k]["counter-unit"],timestamp=date_time)
         #    meters_counter.save() 
-        status,stat_list=ceilometer_api.meter_statistics(meters_used[i], token_data["metering"],token_id,meter_list,True,q=q)
-        all_stats.append(stat_list)
-        if stat_list==[]:
-            meters_counter=MetersCounter(meter_name=meters_used[i],user_id=user,counter_volume=0.0,unit="/" ,timestamp=date_time)
-        else:
-            meters_counter=MetersCounter(meter_name=meters_used[i],user_id=user,counter_volume=stat_list[0]["sum"],unit=stat_list[0]["unit"] ,timestamp=date_time)
+        #status,stat_list=ceilometer_api.meter_statistics(meters_used[i], token_data["metering"],token_id,meter_list,True,q=q)
+        #all_stats.append(stat_list)
+        #if stat_list==[]:
+        #    meters_counter=MetersCounter(meter_name=meters_used[i],user_id=user,counter_volume=0.0,unit="/" ,timestamp=date_time)
+        #else:
+        #    meters_counter=MetersCounter(meter_name=meters_used[i],user_id=user,counter_volume=stat_list[0]["sum"],unit=stat_list[0]["unit"] ,timestamp=date_time)
         meters_counter.save() 
         delta=get_delta_samples(self,token_data,token_id,user,meters_used[i])
         delta_list[i]=delta
         udr=Udr(user_id=user,timestamp=date_time,pricing_func_id=func, param1=delta_list[0], param2=delta_list[1], param3=delta_list[2], param4=delta_list[3], param5=delta_list[4])
         udr.save()        
-    return udr
+    return udr,new_time
 
 
 
@@ -171,9 +197,14 @@ class MyThread(Thread):
         method once per every 10 milliseconds."""
 
         while not self.cancelled:
-            periodic_counter(self.k_self,self.token_data,self.token_id,self.meters_used,self.meter_list,self.func,self.user,self.time_f,self.from_date,self.from_time,self.end_date,self.end_time,self.user_id_stack)
-            self.from_time=self.end_time
-            self.from_date=self.end_date
+            new_time=periodic_counter(self.k_self,self.token_data,self.token_id,self.meters_used,self.meter_list,self.func,self.user,self.time_f,self.from_date,self.from_time,self.end_date,self.end_time,self.user_id_stack)
+            if new_time=="/":
+                self.from_time=self.end_time
+                self.from_date=self.end_date
+            else:
+                new_time=new_time.split("T")
+                self.from_date=new_time[0]    
+                self.from_time=new_time[1]
             today = datetime.date.today()
             today.strftime("%Y-%m-%d")
             now = datetime.datetime.now()
