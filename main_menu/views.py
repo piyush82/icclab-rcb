@@ -9,7 +9,7 @@ import sys
 import os
 from django.http.response import HttpResponseRedirect
 from django.contrib import messages
-import settings
+from web_ui import settings
 from processes import periodic
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'os_api')))
 import ceilometer_api
