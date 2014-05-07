@@ -9332,3 +9332,200 @@
 2014-05-05 16:43:39,897 - ceilometer_api - INFO - Inside meter_statistics: body is  {"q":[{"field": "timestamp","op": "ge","value": "2014-05-01T00:00:00"},{"field": "timestamp","op": "lt","value": "2014-05-05T23:59:59"},{"field": "user_id","op": "eq","value": "a9eeff23809e4b3ead1c98d550879c76"}]}
 2014-05-05 16:43:39,923 - ceilometer_api - INFO - Getting the meter statistics 
 
+2014-05-06 09:53:20,873 - ceilometer_api - INFO - Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters', params='', query='', fragment='')
+2014-05-06 09:53:28,238 - ceilometer_api - INFO - Return meter list 
+
+2014-05-06 14:23:29,905 - ceilometer_api - INFO - Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters', params='', query='', fragment='')
+2014-05-06 14:23:37,885 - ceilometer_api - INFO - Return meter list 
+
+2014-05-06 14:32:39,343 - ceilometer_api - INFO - Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters', params='', query='', fragment='')
+2014-05-06 14:32:46,819 - ceilometer_api - INFO - Return meter list 
+
+2014-05-06 14:35:53,347 - ceilometer_api - INFO - Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters', params='', query='', fragment='')
+2014-05-06 14:36:01,644 - ceilometer_api - INFO - Return meter list 
+
+2014-05-06 14:38:30,443 - ceilometer_api - INFO - Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters', params='', query='', fragment='')
+2014-05-06 14:38:38,022 - ceilometer_api - INFO - Return meter list 
+
+2014-05-06 14:46:35,148 - ceilometer_api - INFO - Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters', params='', query='', fragment='')
+2014-05-06 14:46:42,764 - ceilometer_api - INFO - Return meter list 
+
+2014-05-06 14:48:27,497 - ceilometer_api - INFO - Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters', params='', query='', fragment='')
+2014-05-06 14:48:35,059 - ceilometer_api - INFO - Return meter list 
+
+2014-05-06 14:55:28,272 - ceilometer_api - INFO - Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters', params='', query='', fragment='')
+2014-05-06 14:55:35,585 - ceilometer_api - INFO - Return meter list 
+
+2014-05-06 14:55:47,962 - ceilometer_api - INFO - Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters', params='', query='', fragment='')
+2014-05-06 14:55:56,649 - ceilometer_api - INFO - Return meter list 
+
+2014-05-06 14:56:04,284 - ceilometer_api - INFO - Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters', params='', query='', fragment='')
+2014-05-06 14:56:12,346 - ceilometer_api - INFO - Return meter list 
+
+2014-05-06 14:56:12,362 - ceilometer_api - INFO - Inside get_meter_sample: Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters/cpu', params='', query='', fragment='')
+2014-05-06 14:56:12,362 - ceilometer_api - INFO - Inside get_meter_samples: Body is {"limit": 1 }
+2014-05-06 14:56:12,395 - ceilometer_api - INFO - Fetching meter samples 
+
+2014-05-06 14:56:12,396 - ceilometer_api - INFO - Inside get_meter_sample: Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters/network', params='', query='', fragment='')
+2014-05-06 14:56:12,396 - ceilometer_api - INFO - Inside get_meter_samples: Body is {"limit": 1 }
+2014-05-06 14:56:12,430 - ceilometer_api - INFO - Fetching meter samples 
+
+2014-05-06 14:56:22,272 - ceilometer_api - INFO - Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters', params='', query='', fragment='')
+2014-05-06 14:56:31,251 - ceilometer_api - INFO - Return meter list 
+
+2014-05-06 14:56:41,325 - ceilometer_api - INFO - Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters', params='', query='', fragment='')
+2014-05-06 14:56:49,379 - ceilometer_api - INFO - Return meter list 
+
+2014-05-06 15:00:05,343 - ceilometer_api - INFO - Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters', params='', query='', fragment='')
+2014-05-06 15:00:13,591 - ceilometer_api - INFO - Return meter list 
+
+2014-05-06 15:00:25,474 - ceilometer_api - INFO - Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters', params='', query='', fragment='')
+2014-05-06 15:00:32,789 - ceilometer_api - INFO - Return meter list 
+
+2014-05-06 15:00:32,798 - ceilometer_api - INFO - Inside meter-statistics: Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters/cpu/statistics', params='', query='', fragment='')
+2014-05-06 15:00:32,798 - ceilometer_api - INFO - Inside meter_statistics: body is  {"q":[{"field": "timestamp","op": "ge","value": "2014-04-20T00:00:00"},{"field": "timestamp","op": "lt","value": "2014-04-22T23:59:59"},{"field": "user_id","op": "eq","value": "a9eeff23809e4b3ead1c98d550879c76"}]}
+2014-05-06 15:00:33,155 - ceilometer_api - INFO - Getting the meter statistics 
+
+2014-05-06 15:00:33,155 - ceilometer_api - INFO - Inside meter-statistics: Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters/network/statistics', params='', query='', fragment='')
+2014-05-06 15:00:33,156 - ceilometer_api - INFO - Inside meter_statistics: body is  {"q":[{"field": "timestamp","op": "ge","value": "2014-04-20T00:00:00"},{"field": "timestamp","op": "lt","value": "2014-04-22T23:59:59"},{"field": "user_id","op": "eq","value": "a9eeff23809e4b3ead1c98d550879c76"}]}
+2014-05-06 15:00:33,235 - ceilometer_api - INFO - Getting the meter statistics 
+
+2014-05-06 15:11:00,099 - ceilometer_api - INFO - Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters', params='', query='', fragment='')
+2014-05-06 15:11:08,944 - ceilometer_api - INFO - Return meter list 
+
+2014-05-06 15:11:14,720 - ceilometer_api - INFO - Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters', params='', query='', fragment='')
+2014-05-06 15:11:22,846 - ceilometer_api - INFO - Return meter list 
+
+2014-05-06 15:11:22,853 - ceilometer_api - INFO - Inside meter-statistics: Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters/cpu/statistics', params='', query='', fragment='')
+2014-05-06 15:11:22,854 - ceilometer_api - INFO - Inside meter_statistics: body is  {"q":[{"field": "timestamp","op": "ge","value": "2014-05-01T00:00:00"},{"field": "timestamp","op": "lt","value": "2014-05-03T23:59:59"},{"field": "user_id","op": "eq","value": "a9eeff23809e4b3ead1c98d550879c76"}]}
+2014-05-06 15:11:22,884 - ceilometer_api - INFO - Getting the meter statistics 
+
+2014-05-06 15:11:22,884 - ceilometer_api - INFO - Inside meter-statistics: Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters/network/statistics', params='', query='', fragment='')
+2014-05-06 15:11:22,885 - ceilometer_api - INFO - Inside meter_statistics: body is  {"q":[{"field": "timestamp","op": "ge","value": "2014-05-01T00:00:00"},{"field": "timestamp","op": "lt","value": "2014-05-03T23:59:59"},{"field": "user_id","op": "eq","value": "a9eeff23809e4b3ead1c98d550879c76"}]}
+2014-05-06 15:11:22,916 - ceilometer_api - INFO - Getting the meter statistics 
+
+2014-05-06 15:11:35,891 - ceilometer_api - INFO - Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters', params='', query='', fragment='')
+2014-05-06 15:11:44,189 - ceilometer_api - INFO - Return meter list 
+
+2014-05-06 15:11:44,196 - ceilometer_api - INFO - Inside meter-statistics: Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters/cpu/statistics', params='', query='', fragment='')
+2014-05-06 15:11:44,196 - ceilometer_api - INFO - Inside meter_statistics: body is  {"q":[{"field": "timestamp","op": "ge","value": "2014-05-01T00:00:00"},{"field": "timestamp","op": "lt","value": "2014-05-03T23:59:59"},{"field": "user_id","op": "eq","value": "a9eeff23809e4b3ead1c98d550879c76"}]}
+2014-05-06 15:11:44,225 - ceilometer_api - INFO - Getting the meter statistics 
+
+2014-05-06 15:11:44,226 - ceilometer_api - INFO - Inside meter-statistics: Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters/network/statistics', params='', query='', fragment='')
+2014-05-06 15:11:44,226 - ceilometer_api - INFO - Inside meter_statistics: body is  {"q":[{"field": "timestamp","op": "ge","value": "2014-05-01T00:00:00"},{"field": "timestamp","op": "lt","value": "2014-05-03T23:59:59"},{"field": "user_id","op": "eq","value": "a9eeff23809e4b3ead1c98d550879c76"}]}
+2014-05-06 15:11:44,260 - ceilometer_api - INFO - Getting the meter statistics 
+
+2014-05-06 15:21:48,276 - ceilometer_api - INFO - Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters', params='', query='', fragment='')
+2014-05-06 15:21:55,592 - ceilometer_api - INFO - Return meter list 
+
+2014-05-06 15:22:17,436 - ceilometer_api - INFO - Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters', params='', query='', fragment='')
+2014-05-06 15:22:25,518 - ceilometer_api - INFO - Return meter list 
+
+2014-05-06 15:22:25,526 - ceilometer_api - INFO - Inside meter-statistics: Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters/cpu/statistics', params='', query='', fragment='')
+2014-05-06 15:22:25,527 - ceilometer_api - INFO - Inside meter_statistics: body is  {"q":[{"field": "timestamp","op": "ge","value": "2014-04-20T00:00:00"},{"field": "timestamp","op": "lt","value": "2014-04-22T23:59:59"},{"field": "user_id","op": "eq","value": "a9eeff23809e4b3ead1c98d550879c76"}]}
+2014-05-06 15:22:25,553 - ceilometer_api - INFO - Getting the meter statistics 
+
+2014-05-06 15:22:25,553 - ceilometer_api - INFO - Inside meter-statistics: Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters/network/statistics', params='', query='', fragment='')
+2014-05-06 15:22:25,554 - ceilometer_api - INFO - Inside meter_statistics: body is  {"q":[{"field": "timestamp","op": "ge","value": "2014-04-20T00:00:00"},{"field": "timestamp","op": "lt","value": "2014-04-22T23:59:59"},{"field": "user_id","op": "eq","value": "a9eeff23809e4b3ead1c98d550879c76"}]}
+2014-05-06 15:22:25,581 - ceilometer_api - INFO - Getting the meter statistics 
+
+2014-05-06 15:23:35,241 - ceilometer_api - INFO - Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters', params='', query='', fragment='')
+2014-05-06 15:23:43,392 - ceilometer_api - INFO - Return meter list 
+
+2014-05-06 15:23:50,630 - ceilometer_api - INFO - Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters', params='', query='', fragment='')
+2014-05-06 15:23:57,990 - ceilometer_api - INFO - Return meter list 
+
+2014-05-06 15:24:23,278 - ceilometer_api - INFO - Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters', params='', query='', fragment='')
+2014-05-06 15:24:30,631 - ceilometer_api - INFO - Return meter list 
+
+2014-05-06 15:25:25,787 - ceilometer_api - INFO - Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters', params='', query='', fragment='')
+2014-05-06 15:25:33,044 - ceilometer_api - INFO - Return meter list 
+
+2014-05-06 16:00:49,682 - ceilometer_api - INFO - Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters', params='', query='', fragment='')
+2014-05-06 16:00:57,703 - ceilometer_api - INFO - Return meter list 
+
+2014-05-06 16:01:03,668 - ceilometer_api - INFO - Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters', params='', query='', fragment='')
+2014-05-06 16:01:11,772 - ceilometer_api - INFO - Return meter list 
+
+2014-05-06 16:30:32,592 - ceilometer_api - INFO - Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters', params='', query='', fragment='')
+2014-05-06 16:30:40,903 - ceilometer_api - INFO - Return meter list 
+
+2014-05-06 17:21:11,542 - ceilometer_api - INFO - Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters', params='', query='', fragment='')
+2014-05-06 17:21:19,913 - ceilometer_api - INFO - Return meter list 
+
+2014-05-06 17:21:22,547 - ceilometer_api - INFO - Inside meter-statistics: Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters/cpu/statistics', params='', query='', fragment='')
+2014-05-06 17:21:40,678 - ceilometer_api - INFO - Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters', params='', query='', fragment='')
+2014-05-06 17:21:49,272 - ceilometer_api - INFO - Return meter list 
+
+2014-05-06 17:22:17,615 - ceilometer_api - INFO - Inside meter-statistics: Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters/cpu/statistics', params='', query='', fragment='')
+2014-05-06 17:22:58,923 - ceilometer_api - INFO - Inside meter_statistics: body is  {"q":[{"field": "timestamp","op": "ge","value": "2014-05-05T00:00:00"},{"field": "timestamp","op": "lt","value": "2014-05-05T12:00:00"}]}
+2014-05-06 17:22:59,060 - ceilometer_api - INFO - Getting the meter statistics 
+
+2014-05-06 17:22:59,060 - ceilometer_api - INFO - Inside get_meter_sample: Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters/cpu', params='', query='', fragment='')
+2014-05-06 17:24:06,911 - ceilometer_api - INFO - Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters', params='', query='', fragment='')
+2014-05-06 17:24:15,439 - ceilometer_api - INFO - Return meter list 
+
+2014-05-06 17:24:18,875 - ceilometer_api - INFO - Inside meter-statistics: Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters/cpu/statistics', params='', query='', fragment='')
+2014-05-06 17:24:49,253 - ceilometer_api - INFO - Inside meter_statistics: body is  {"q":[{"field": "timestamp","op": "ge","value": "2014-05-06T00:00:00"},{"field": "timestamp","op": "lt","value": "2014-05-06T03:00:00"}]}
+2014-05-06 17:24:49,319 - ceilometer_api - INFO - Getting the meter statistics 
+
+2014-05-06 17:24:49,320 - ceilometer_api - INFO - Inside get_meter_sample: Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters/cpu', params='', query='', fragment='')
+2014-05-06 17:26:03,132 - ceilometer_api - INFO - Inside get_meter_samples: Body is {"q":[{"field": "timestamp","op": "ge","value": "2014-05-06T00:00:00"},{"field": "timestamp","op": "lt","value": "2014-05-06T03:00:00"}]}
+2014-05-06 17:26:03,688 - ceilometer_api - INFO - Fetching meter samples 
+
+2014-05-06 17:26:03,710 - ceilometer_api - INFO - Inside get_resources: Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/resources', params='', query='', fragment='')
+2014-05-06 17:26:48,635 - ceilometer_api - INFO - Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters', params='', query='', fragment='')
+2014-05-06 17:26:58,017 - ceilometer_api - INFO - Return meter list 
+
+2014-05-06 17:27:00,511 - ceilometer_api - INFO - Inside meter-statistics: Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters/cpu/statistics', params='', query='', fragment='')
+2014-05-06 17:27:07,147 - ceilometer_api - INFO - Inside meter_statistics: body is  {}
+2014-05-06 17:27:14,598 - ceilometer_api - INFO - Getting the meter statistics 
+
+2014-05-06 17:27:14,599 - ceilometer_api - INFO - Inside get_meter_sample: Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters/cpu', params='', query='', fragment='')
+2014-05-06 17:27:48,508 - ceilometer_api - INFO - Inside get_meter_samples: Body is {"q":[{"field": "timestamp","op": "ge","value": "2014-05-06T00:00:00"},{"field": "timestamp","op": "lt","value": "2014-05-06T03:00:00"}],"limit":5}
+2014-05-06 17:27:48,555 - ceilometer_api - INFO - Fetching meter samples 
+
+2014-05-06 17:27:48,557 - ceilometer_api - INFO - Inside get_resources: Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/resources', params='', query='', fragment='')
+2014-05-06 17:30:49,199 - ceilometer_api - INFO - Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters', params='', query='', fragment='')
+2014-05-06 17:30:57,186 - ceilometer_api - INFO - Return meter list 
+
+2014-05-06 17:31:01,639 - ceilometer_api - INFO - Inside meter-statistics: Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters/cpu/statistics', params='', query='', fragment='')
+2014-05-06 17:31:28,685 - ceilometer_api - INFO - Inside meter_statistics: body is  {"q":[{"field": "timestamp","op": "ge","value": "2014-05-06T00:00:00"},{"field": "timestamp","op": "lt","value": "2014-05-06T01:00:00"}]}
+2014-05-06 17:31:28,732 - ceilometer_api - INFO - Getting the meter statistics 
+
+2014-05-06 17:31:28,736 - ceilometer_api - INFO - Inside get_meter_sample: Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters/cpu', params='', query='', fragment='')
+2014-05-06 17:33:13,406 - ceilometer_api - INFO - Inside get_meter_samples: Body is {"q":[{"field": "timestamp","op": "ge","value": "2014-05-06T00:00:00"},{"field": "timestamp","op": "lt","value": "2014-05-06T01:00:00"}]}
+2014-05-06 17:33:13,620 - ceilometer_api - INFO - Fetching meter samples 
+
+2014-05-06 17:33:13,628 - ceilometer_api - INFO - Inside get_resources: Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/resources', params='', query='', fragment='')
+2014-05-06 17:53:11,564 - ceilometer_api - INFO - Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters', params='', query='', fragment='')
+2014-05-06 17:53:20,274 - ceilometer_api - INFO - Return meter list 
+
+2014-05-06 17:53:27,314 - ceilometer_api - INFO - Inside meter-statistics: Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters/cpu/statistics', params='', query='', fragment='')
+2014-05-06 17:54:17,553 - ceilometer_api - INFO - Inside meter_statistics: body is  {"q":[{"field": "timestamp","op": "ge","value": "2014-05-06T00:00:00"},{"field": "timestamp","op": "lt","value": "2014-05-06T00:10:00"}]}
+2014-05-06 17:54:17,617 - ceilometer_api - INFO - Getting the meter statistics 
+
+2014-05-06 17:54:17,620 - ceilometer_api - INFO - Inside get_meter_sample: Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters/cpu', params='', query='', fragment='')
+2014-05-06 17:55:16,493 - ceilometer_api - INFO - Inside get_meter_samples: Body is {"q":[{"field": "timestamp","op": "ge","value": "2014-05-06T00:00:00"},{"field": "timestamp","op": "lt","value": "2014-05-06T00:10:00"}]}
+2014-05-06 17:55:16,547 - ceilometer_api - INFO - Fetching meter samples 
+
+2014-05-06 17:55:16,550 - ceilometer_api - INFO - Inside get_resources: Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/resources', params='', query='', fragment='')
+2014-05-07 09:40:02,646 - ceilometer_api - INFO - Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters', params='', query='', fragment='')
+2014-05-07 09:40:11,277 - ceilometer_api - INFO - Return meter list 
+
+2014-05-07 10:04:13,852 - ceilometer_api - INFO - Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters', params='', query='', fragment='')
+2014-05-07 10:04:22,378 - ceilometer_api - INFO - Return meter list 
+
+2014-05-07 10:04:29,076 - ceilometer_api - INFO - Inside meter-statistics: Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters/cpu/statistics', params='', query='', fragment='')
+2014-05-07 10:06:31,737 - ceilometer_api - INFO - Inside meter_statistics: body is  {"q":[{"field": "resource_id","op": "eq","value": "c0918287-cc46-472c-9458-4955c3319ad2"}]}
+2014-05-07 10:06:31,865 - ceilometer_api - INFO - Getting the meter statistics 
+
+2014-05-07 10:06:31,868 - ceilometer_api - INFO - Inside get_meter_sample: Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters/cpu', params='', query='', fragment='')
+2014-05-07 10:07:00,734 - ceilometer_api - INFO - Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters', params='', query='', fragment='')
+2014-05-07 10:07:09,957 - ceilometer_api - INFO - Return meter list 
+
+2014-05-07 10:07:13,052 - ceilometer_api - INFO - Inside meter-statistics: Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters/cpu/statistics', params='', query='', fragment='')
+2014-05-07 10:07:32,185 - ceilometer_api - INFO - Inside meter_statistics: body is  {"q":[{"field": "resource_id","op": "eq","value": "2ac6cb90-f18b-4aea-9746-d02e9088d544"}]}
+2014-05-07 10:07:32,224 - ceilometer_api - INFO - Getting the meter statistics 
+
+2014-05-07 10:07:32,227 - ceilometer_api - INFO - Inside get_meter_sample: Path is ParseResult(scheme=u'http', netloc=u'160.85.4.10:8777', path=u'/v2/meters/cpu', params='', query='', fragment='')

@@ -14,12 +14,6 @@ import sys
 
 from datetime import timedelta
 
-#import djcelery
-#djcelery.setup_loader()
-#CELERYD_CONCURRENCY = 1
-
-#CELERY_IMPORTS = ('main_menu.tasks', )
-#BROKER_HOST = "localhost"
 #BASE_DIR = os.path.dirname(os.path.dirname(__file__))+'/database'
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
@@ -33,6 +27,12 @@ SECRET_KEY = '%q(qy(y#t7zo*_)tm#x0=o8m11_^eh_-n)%i8h^^wh%j&8s-8&'
 DEBUG = True
 
 TEMPLATE_DEBUG = True
+
+GLOBAL_SETTINGS = {
+       'PRO_DEBUG':True,
+}
+
+#PRO_DEBUG==True
 
 ALLOWED_HOSTS = []
 
@@ -53,8 +53,6 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'main_menu',
     'south',
-    #'celery',
-    #'djcelery',
 
 
     
@@ -81,7 +79,6 @@ LOGIN_REDIRECT_URL='/index/'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        #'NAME': os.path.join(BASE_DIR, 'meters.db'),
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }

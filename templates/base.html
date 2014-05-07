@@ -38,7 +38,7 @@
     <!-- Header Starts -->
     <div class="header">
       <div class="logo">
-        <h1><a href="#"><img src="{{STATIC_URL}}logo.png" width="170" height="60" alt="icclab-logo" /></a><span>Reinventing RCB solutions for tomorrow!</span></h1>
+        <h1><a href="/index/"><img src="{{STATIC_URL}}logo.png" width="170" height="60" alt="icclab-logo" /></a><span>Reinventing RCB solutions for tomorrow!</span></h1>
       </div>
       <div class="header_nav">
         <ul>
@@ -72,12 +72,7 @@
     <div class="banner"><img src="{{STATIC_URL}}banner.jpg" width="980" height="332" alt="banner" /></div>
     <!-- Header ends --> 
     
-    {% block breadcrumbs %}
-    <div class="breadcrumbs">
-    <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
-    {% if title %} &rsaquo; {{ title }}{% endif %}
-    </div>
-    {% endblock %}
+
     {% endif %}
 
     {% block messages %}

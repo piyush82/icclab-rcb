@@ -23,7 +23,7 @@ from django.conf.urls import patterns
 from django.shortcuts import render
 import django.forms as forms
 from django.shortcuts import render_to_response
-from django.contrib import messages
+from django.contrib import messagessp
 from django.core import serializers
 from django.core.exceptions import ObjectDoesNotExist
 from main_menu.views import auth_token,is_auth

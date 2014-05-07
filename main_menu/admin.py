@@ -30,9 +30,6 @@ from threading import Timer
 
 
 
-
-
-
 class stackUserAdmin(admin.ModelAdmin):
     fields = ['user_id', 'user_name','tenant_id']
     list_display = ('user_id', 'user_name','tenant_id')

@@ -1,18 +1,22 @@
-<!DOCTYPE html>
 {% extends "base.html" %}
-<html>
-<head>
-    <title>{% block title %}templates/mainmenu.html{% endblock %}</title>
-</head>
-<body>
 
-<div id="content">
-    {% block content %}
-    Mainmenu
-    <a href="/statinfo/">stat info</a>
-    {% endblock %}
+{% block title %}
+	{{ data.title|default:'ICCLab RCB Demo Site' }}
+{% endblock %}
 
-</div>
+{% block my_content %}
+	<div class="content1">     
+    	<h2>Rating, Charging, Billing solutions for tomorrow!</h2>
+    	<br>
+    	<p>User info page</p>
 
-</body>
-</html>
+	<a href="user_price">Calculate your price</a>
+	</div>
+	<div class="content2">
+		<div class="reel">
+			
+        </div>
+
+        <div class="clear"></div>
+	</div>
+{% endblock %}
