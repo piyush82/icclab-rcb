@@ -228,24 +228,35 @@ class stackUserAdmin(admin.ModelAdmin):
                         from_time="00:00:00"
                         to_date=str(form3.cleaned_data["dateEnd"])
                         to_time="23:59:59"
-                        q=ceilometer_api.set_query(from_date,to_date,from_time,to_time,"/",user_id_stack,True) 
-                        all_stats=[]           
-                        for i in meters_used:
-                            status,stat_list=ceilometer_api.meter_statistics(i, token_data["metering"],token_id,meter_list,True,q=q)
-                            all_stats.append(stat_list)
-                        
-                        k=0
-                        for i in range(len(pricing_list)):
-                            j=0
-                            while j<len(meter_list):
-                                if pricing_list[i]==meter_list[j]["meter-name"]:
-                                    if all_stats[k]==[]:
-                                        pricing_list[i]=0
+                        all_stats=[] 
+                        time_period=0
+                        total=[None]*len(meters_used)
+                        for i in range(len(meters_used)):
+                            total[i]=0
+                            for j in range(len(meter_list)):
+                                if meters_used[i]==meter_list[j]["meter-name"]:
+                                    resource_id=meter_list[j]["resource-id"]
+                                    q=ceilometer_api.set_query(from_date,to_date,from_time,to_time,resource_id,user_id_stack,True)
+                                    status,stat_list=ceilometer_api.meter_statistics(meters_used[i], token_data["metering"],token_id,meter_list,True,q=q)
+                                    if stat_list==[]:
+                                        total[i]+=0
                                     else:
-                                        pricing_list[i]=all_stats[k][0]['sum']
-                                    k+=1
-                                else:
-                                    j=j+1 
+                                        if meter_list[j]["meter-type"]=="cumulative":
+                                            total[i]+=stat_list[0]["max"]-stat_list[0]["min"]                                           
+                                        if meter_list[j]["meter-type"]=="gauge":
+                                            t1=datetime.datetime.combine(datetime.datetime.strptime(from_date,"%Y-%m-%d").date(),datetime.datetime.strptime(from_time,"%H:%M:%S").time())
+                                            t2=datetime.datetime.combine(datetime.datetime.strptime(to_date,"%Y-%m-%d").date(),datetime.datetime.strptime(to_time,"%H:%M:%S").time())
+                                            t=t2-t1
+                                            time_period=t.total_seconds()
+                                            total[i]+=stat_list[0]["average"]*time_period
+                                        if meter_list[j]["meter-type"]=="delta":
+                                            total[i]+=stat_list[0]["sum"]
+                            all_stats.append(total[i])
+                            for s in range(len(pricing_list)):
+                                if(pricing_list[s]==meters_used[i]):
+                                    pricing_list[s]=total[i]
+
+
                     for i in range(len(pricing_list)):
                         if pricing_list[i]==None:
                             pricing_list[i]=0
@@ -279,6 +290,7 @@ class stackUserAdmin(admin.ModelAdmin):
                     cdr=PriceCdr(user_id=user,timestamp=date_time,pricing_func_id=func, price=price)
                     cdr.save()
                     self.message_user(request, "Successfully calculated price.")
+                    self.message_user(request, "period: %s" %(time_period))
                     context={'user': queryset,'price':price,'currency':currency}
                     return render(request,'admin/show_price.html',context) 
 
