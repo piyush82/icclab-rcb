@@ -1,4 +1,4 @@
-{% extends "admin/base_site.html" %}
+{% extends "base.html" %}
 {% block head %}
 <script type="text/javascript" src="/site_media/prototype.js"></script>
 <script type="text/javascript" src="/site_media/my_ajax_function.js"></script>
@@ -25,7 +25,6 @@
         		</div>
     		{% endfor %}
 	{% endif %}
-	<input type="hidden" name="_selected_action" value={{ selected }} />
 
 
 		<p><label for="dateStart">Start date:</label>{{ query_form.dateStart }}

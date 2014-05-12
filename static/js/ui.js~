@@ -9,8 +9,8 @@ $(document).ready(function(){
 });
 
 $(function() {
-	$("#id_dateStart").datepicker({ dateFormat: 'dd-mm-yy' });
-	$("#id_dateEnd").datepicker({ dateFormat: 'dd-mm-yy' });
+	$("#id_dateStart").datepicker({ dateFormat: 'yy-mm-dd' });
+	$("#id_dateEnd").datepicker({ dateFormat: 'yy-mm-dd' });
 	$("#id_timeStart").timepicker({template:false, minuteStep: 1,showSeconds: true,showMeridian: false});
 	$("#id_timeEnd").timepicker({template:false,minuteStep: 1,showSeconds: true,showMeridian: false});
 });

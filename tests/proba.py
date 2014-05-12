@@ -34,3 +34,42 @@ print pom
 m=pom.total_seconds()
 
 print pom.days,  pom.seconds
+
+f="3+15-meter/cpu"
+def my_split(s, seps):
+    res = [s]
+    for sep in seps:
+        s, res = res, []
+        for seq in s:
+            res += seq.split(sep)
+
+        res+=sep
+    return res
+rez=[]  
+x=f    
+for i in f:
+    for j in  ["+","-","*","/","%"]:
+        if i==j:
+            m=x.split(j)  
+            x=m[1]     
+            rez.append(m[0])
+            rez.append(j)
+rez.append(m[1])
+print rez
+        
+        
+sh=" ".join(f.split())
+print sh
+res=my_split(f,["+","-","*","/","%"])
+print res
+f.replace(" ","")
+print f
+m=f.replace("+"," ")
+print m
+s=m.replace("-"," ").replace("/"," ").replace("*"," ").replace("%"," ")
+print s
+price_def=s.split(" ")
+print price_def
+
+
+

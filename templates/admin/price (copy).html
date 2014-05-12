@@ -5,11 +5,9 @@
 {% endblock %}
 {% block content %}
 
-<script type="text/javascript" src="{{ STATIC_URL }}js/jquery-1.11.0.min.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}js/jquery-ui-1.10.4.min.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}js/ui.js"></script>
+<p> Define the pricing function. </p>
 
-<form action="" method="post" >
+<form action="" method="post">
 {% csrf_token %}
 	{% if form.errors %}
 		{% for field in form %}
@@ -25,26 +23,35 @@
         		</div>
     		{% endfor %}
 	{% endif %}
-	<input type="hidden" name="_selected_action" value={{ selected }} />
+
+	<p>List of available meters per resource.</p>
+	{% for i in resources %}
+ 		<ul>	
+   		<li><b>{{i}}</b></li>
+ 				
+		
+		{% for j in meter_list %}
+			{% if forloop.counter == forloop.parentloop.counter %}
+				{% for k in j %}
+ 					<ul>
+  			 		<li>{{k}}</li>
+ 					</ul>
+				{% endfor %}
+			{% endif %}
+		{% endfor %}
+		</ul>
+	{% endfor %}
 
 
-		<p><label for="dateStart">Start date:</label>{{ query_form.dateStart }}
+    {{ pricing_func_form.as_p }}
 
-		</p>
-		<p></p>
-     	  	 <p><label for="dateEnd">End date:</label> {{ query_form.dateEnd }}
+    <p>The pricing function will be applied to the user with id:</p>
 
-		</p>
+    <ul>{{ user|unordered_list }}</ul>
 
-
-
-
-	<input type="hidden" name="action" value="calculate_price" />
-	<input type="submit" name="calculate" value="Calculate price" />
-
-
+    <input type="hidden" name="action" value="add_pricing_func" />
+    <input type="submit" name="add_pricing" value="Add pricing function" />
 </form>
-
 
 {% endblock %}
 

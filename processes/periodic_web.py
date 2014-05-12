@@ -1,7 +1,26 @@
 '''
 Created on Apr 9, 2014
 
-@author: kolv
+@author:  Tea Kolevska
+@contact: tea.kolevska@gmail.com
+@organization: ICCLab, Zurich University of Applied Sciences
+@summary: Module for the periodic pricing thread
+
+ Copyright 2014 Zuercher Hochschule fuer Angewandte Wissenschaften
+ All Rights Reserved.
+
+    Licensed under the Apache License, Version 2.0 (the "License"); you may
+    not use this file except in compliance with the License. You may obtain
+    a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+    License for the specific language governing permissions and limitations
+    under the License.
+
 '''
 from threading import Thread
 from django.contrib import admin
@@ -32,26 +51,37 @@ from threading import Timer
 
 
 def periodic_counter(self,token_data,token_id,meters_used,meter_list,func,user,time,from_date,from_time,end_date,end_time,user_id_stack):
-    
+    """
 
-    #q=ceilometer_api.set_query(from_date,end_date,from_time,end_time,"/",user_id_stack,True) 
-    #udr=get_udr(self,token_data,token_id,user,meters_used,meter_list,func,True,q=q)
+    Execute the periodic counter.
+    
+    Args:
+    token_data(string): The data received with the authentication.
+      token_id(string): X-Auth-token.
+      meters_used: List of the meters used in the pricing function.
+      meter_list: List of the available meters.
+      func: The defined pricing function.
+      user: The user for whom we calculate the price.
+      time: The time between every loop.
+      from_date: The start date.
+      from_time: The start time.
+      end_date: The end date.
+      end_time: The end time.
+      user_id_stack: The id of the user.
+      
+    Returns:
+      DateTime: The new start time for the next loop if the duration end is before the end time of the loop.
+      
+    """        
     udr,new_time=get_udr(self,token_data,token_id,user,meters_used,meter_list,func,True,from_date,from_time,end_date,end_time,user_id_stack)
     price=pricing(self,user,meter_list)
-    #t = Timer(10,periodic_counter,args=[self,token_data,token_id,meters_used,meter_list,func,user,time])
-    #t.start()
     return new_time
 
 def get_delta_samples(self,token_data,token_id,user,meter):
     delta=0.0
     meter2=str(meter)
     samples =list( MetersCounter.objects.filter(user_id=user,meter_name = meter))
-    #if len(samples)==1:
-    #    delta=0.0
-    #else:
     last=str(samples[-1])
-        #second_to_last=str(samples[-2])
-        #delta=float(last)-float(second_to_last)
     return last
         
 def get_udr(self,token_data,token_id,user,meters_used,meter_list,func,web_bool,from_date,from_time,end_date,end_time,user_id_stack):
@@ -83,18 +113,6 @@ def get_udr(self,token_data,token_id,user,meters_used,meter_list,func,web_bool,f
                         total[i]+=stat_list[0]["sum"]
                     new_time=stat_list[0]["duration-end"]
         meters_counter=MetersCounter(meter_name=meters_used[i],user_id=user,counter_volume=total[i],unit=unit ,timestamp=date_time)
-        #rez=0.0    
-        #status,sample_list=ceilometer_api.get_meter_samples(meters_used[i],token_data["metering"],token_id,False,meter_list,web_bool,q=q)
-        #for k in range(len(sample_list)):
-        #    rez+=sample_list[k]["counter-volume"]
-        #    meters_counter=MetersCounter(meter_name=meters_used[i],user_id=user,counter_volume=rez,unit=sample_list[k]["counter-unit"],timestamp=date_time)
-        #    meters_counter.save() 
-        #status,stat_list=ceilometer_api.meter_statistics(meters_used[i], token_data["metering"],token_id,meter_list,True,q=q)
-        #all_stats.append(stat_list)
-        #if stat_list==[]:
-        #    meters_counter=MetersCounter(meter_name=meters_used[i],user_id=user,counter_volume=0.0,unit="/" ,timestamp=date_time)
-        #else:
-        #    meters_counter=MetersCounter(meter_name=meters_used[i],user_id=user,counter_volume=stat_list[0]["sum"],unit=stat_list[0]["unit"] ,timestamp=date_time)
         meters_counter.save() 
         delta=get_delta_samples(self,token_data,token_id,user,meters_used[i])
         delta_list[i]=delta
@@ -108,7 +126,6 @@ def get_udr(self,token_data,token_id,user,meters_used,meter_list,func,web_bool,f
 def pricing(self,user,meter_list):
     func=PricingFunc.objects.get(user_id=user)
     udr=Udr.objects.filter(user_id=user,pricing_func_id=func).order_by('-id')[0]
-    #udr.reverse()[:1]
     pricing_list=[]
     pricing_list.append(func.param1)
     pricing_list.append(func.sign1)
@@ -193,8 +210,7 @@ class MyThread(Thread):
         self.user_id_stack=user_id_stack
 
     def run(self):
-        """Overloaded Thread.run, runs the update 
-        method once per every 10 milliseconds."""
+        """Overloaded Thread.run"""
 
         while not self.cancelled:
             new_time=periodic_counter(self.k_self,self.token_data,self.token_id,self.meters_used,self.meter_list,self.func,self.user,self.time_f,self.from_date,self.from_time,self.end_date,self.end_time,self.user_id_stack)

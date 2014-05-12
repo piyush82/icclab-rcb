@@ -1,12 +1,38 @@
+'''
+Created on Apr 16, 2014
+
+@author:  Tea Kolevska
+@contact: tea.kolevska@gmail.com
+@organization: ICCLab, Zurich University of Applied Sciences
+@summary: App views
+
+ Copyright 2014 Zuercher Hochschule fuer Angewandte Wissenschaften
+ All Rights Reserved.
+
+    Licensed under the Apache License, Version 2.0 (the "License"); you may
+    not use this file except in compliance with the License. You may obtain
+    a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+    License for the specific language governing permissions and limitations
+    under the License.
+
+'''
+
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.template import Context, loader, RequestContext
 from django.shortcuts import render_to_response
-from main_menu.models import StackUser
+from main_menu.models import StackUser, PriceCdr
 import sys
 import os
+import datetime
 from django.http.response import HttpResponseRedirect
 from django.contrib import messages
 from web_ui import settings
@@ -64,9 +90,8 @@ def user_page_calculate_price(request):
         return redirect('/auth_token_user/')
     try:
         usr=StackUser.objects.get(user_id=user)
-
         func=PricingFunc.objects.get(user_id=usr.id)
-
+        
         pricing_list=[]
         meters_used=[]
         pricing_list.append(func.param1)
@@ -80,9 +105,7 @@ def user_page_calculate_price(request):
         pricing_list.append(func.param5)     
 
         unit=float(func.unit)
-        currency=func.currency
-        #user_id_stack=usr.user_id
-                
+        currency=func.currency              
                 
         for i in range(len(pricing_list)):
             j=0
@@ -109,52 +132,7 @@ def user_page_calculate_price(request):
                 from_time="00:00:00"
                 to_date=str(form.cleaned_data["dateEnd"])
                 to_time="23:59:59"
-                q=ceilometer_api.set_query(from_date,to_date,from_time,to_time,"/",user,True) 
-                all_stats=[]           
-                for i in meters_used:
-                    status,stat_list=ceilometer_api.meter_statistics(i, token_data["metering"],token_data['token_id'],meter_list,True,q=q)
-                    all_stats.append(stat_list)
-                        
-                k=0
-                for i in range(len(pricing_list)):
-                    j=0
-                    while j<len(meter_list):
-                        if pricing_list[i]==meter_list[j]["meter-name"]:
-                            if all_stats[k]==[]:
-                                pricing_list[i]=0
-                            else:
-                                pricing_list[i]=all_stats[k][0]['sum']
-                            k+=1
-                        else:
-                            j=j+1 
-            for i in range(len(pricing_list)):
-                if pricing_list[i]==None:
-                    pricing_list[i]=0
-            price=0.0    
-            for i in range(len(pricing_list)):
-                if i==0:   
-                    if periodic.is_number(str(pricing_list[i])):    
-                        price=price+float(str(pricing_list[i]))
- 
-                if i%2!=0:
-                    if pricing_list[i] in ["+","-","*","/","%"]:
-                        if periodic.is_number(str(pricing_list[i+1])):
-                            x=float(str(pricing_list[i+1]))                             
-                        else:
-                            break                          
-                        if pricing_list[i]=="+":
-                            price=price+x
-                        if pricing_list[i]=="-": 
-                            price=price-x
-                        if pricing_list[i]=="*":
-                            price=price*x
-                        if pricing_list[i]=="/":
-                            if x!=0:
-                                price=price/x
-                        if pricing_list[i]=="%":
-                            price=price*x/100.0
-                                
-            price=price*unit
+            price=pricing(meters_used,meter_list,from_date,to_date,from_time,to_time,user,token_data,token_data['token_id'],pricing_list,unit)
             context={'user': user,'price':price,'currency':currency}
             return render(request,'user_show_price.html',context) 
 
@@ -164,7 +142,36 @@ def user_page_calculate_price(request):
             return render(request,'user_query.html',context)   
     return HttpResponseRedirect('/user/')
 
-
+@login_required
+def user_page_periodic_price(request):
+    try:
+        status=request.session["status"]
+        token_data=request.session["token_data"] 
+        status_meter_list, meter_list = ceilometer_api.get_meter_list(token_data['token_id'], token_data["metering"])
+        form=None
+        flag=True
+        user=token_data['user-id']
+    except KeyError:
+        messages.warning(request, "You have to authenticate first!")
+        return redirect('/auth_token_user/')
+    try:
+        prices=[]
+        times=[]
+        usr=StackUser.objects.get(user_id=user)
+        cdrs=PriceCdr.objects.filter(user_id=usr.id)
+        cdrs=cdrs.order_by('timestamp').reverse()[:10]
+        for i in cdrs:
+            prices.append(i.price)
+            times.append(i.timestamp)   
+        context={'user': user,'prices':prices,'times':times}
+        return render(request,'user_show_periodic.html',context)         
+    except PriceCdr.DoesNotExist:
+        messages.warning(request, 'No records for that user.')
+        flag=False
+    except StackUser.DoesNotExist:
+        messages.warning(request, 'You still have not been added to the system. Contact your admin!.')
+        flag=False
+    return HttpResponseRedirect('/user/')
 
 @login_required
 def auth_token_user(request):
@@ -245,4 +252,68 @@ def is_auth(request):
         return False
     else:
         return True
+
+
+def pricing(meters_used,meter_list,from_date,to_date,from_time,to_time,user_id_stack,token_data,token_id,pricing_list,unit):
+    all_stats=[] 
+    time_period=0
+    total=[None]*len(meters_used)
+    for i in range(len(meters_used)):
+        total[i]=0
+        for j in range(len(meter_list)):
+            if meters_used[i]==meter_list[j]["meter-name"]:
+                resource_id=meter_list[j]["resource-id"]
+                q=ceilometer_api.set_query(from_date,to_date,from_time,to_time,resource_id,user_id_stack,True)
+                status,stat_list=ceilometer_api.meter_statistics(meters_used[i], token_data["metering"],token_id,meter_list,True,q=q)
+                if stat_list==[]:
+                    total[i]+=0
+                else:
+                    if meter_list[j]["meter-type"]=="cumulative":
+                        total[i]+=stat_list[0]["max"]-stat_list[0]["min"]                                           
+                    if meter_list[j]["meter-type"]=="gauge":
+                        t1=datetime.datetime.combine(datetime.datetime.strptime(from_date,"%Y-%m-%d").date(),datetime.datetime.strptime(from_time,"%H:%M:%S").time())
+                        t2=datetime.datetime.combine(datetime.datetime.strptime(to_date,"%Y-%m-%d").date(),datetime.datetime.strptime(to_time,"%H:%M:%S").time())
+                        t=t2-t1
+                        time_period=t.total_seconds()
+                        total[i]+=stat_list[0]["average"]*time_period
+                    if meter_list[j]["meter-type"]=="delta":
+                        total[i]+=stat_list[0]["sum"]
+        all_stats.append(total[i])
+        for s in range(len(pricing_list)):
+            if(pricing_list[s]==meters_used[i]):
+                pricing_list[s]=total[i]
+
+
+    for i in range(len(pricing_list)):
+        if pricing_list[i]==None:
+            pricing_list[i]=0
+        price=0.0    
+    for i in range(len(pricing_list)):
+        if i==0:   
+            if periodic.is_number(str(pricing_list[i])):    
+                price=price+float(str(pricing_list[i]))
+ 
+        if i%2!=0:
+            if pricing_list[i] in ["+","-","*","/","%"]:
+                if periodic.is_number(str(pricing_list[i+1])):
+                    x=float(str(pricing_list[i+1]))                             
+                else:
+                    break                          
+            if pricing_list[i]=="+":
+                price=price+x
+            if pricing_list[i]=="-": 
+                price=price-x
+            if pricing_list[i]=="*":
+                price=price*x
+            if pricing_list[i]=="/":
+                if x!=0:
+                    price=price/x
+            if pricing_list[i]=="%":
+                price=price*x/100.0
+                                
+    price=price*unit
+    return price
+
+
+
 

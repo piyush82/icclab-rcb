@@ -1,7 +1,10 @@
 '''
 Created on Apr 16, 2014
 
-@author: kolv
+@author:  Tea Kolevska
+@contact: tea.kolevska@gmail.com
+@organization: ICCLab, Zurich University of Applied Sciences
+@summary: Custom admin module
 
  Copyright 2014 Zuercher Hochschule fuer Angewandte Wissenschaften
  All Rights Reserved.
