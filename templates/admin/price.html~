@@ -2,9 +2,14 @@
 {% block head %}
 <script type="text/javascript" src="/site_media/prototype.js"></script>
 <script type="text/javascript" src="/site_media/my_ajax_function.js"></script>
+
 {% endblock %}
 {% block content %}
 
+<link rel="stylesheet" href="//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
+<script type="text/javascript" src="{{ STATIC_URL }}js/jquery-1.11.0.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/jquery-ui-1.10.4.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/ui.js"></script>
 <p> Define the pricing function. </p>
 
 <form action="" method="post">
@@ -24,7 +29,8 @@
     		{% endfor %}
 	{% endif %}
 
-	<p>List of available meters per resource.'</p>
+	
+	<p>List of available meters per resource.</p>
 	{% for i in resources %}
  		<ul>	
    		<li><b>{{i}}</b></li>
@@ -42,9 +48,10 @@
 		</ul>
 	{% endfor %}
 
-
+    <input type="hidden" id="var_resources" name="var_resources" value="{{ resources }}">
+    <input type="hidden" id="var_meters" name="var_meters" value="{{ meters }}">
     {{ pricing_func_form.as_p }}
-
+    <div id="results"></div>
     <p>The pricing function will be applied to the user with id:</p>
 
     <ul>{{ user|unordered_list }}</ul>

@@ -22,6 +22,7 @@ Created on Apr 9, 2014
     under the License.
 
 '''
+
 from threading import Thread
 from django.contrib import admin
 from main_menu.models import StackUser,PricingFunc, PriceLoop, MetersCounter,\
@@ -48,9 +49,10 @@ from django.core.exceptions import ObjectDoesNotExist
 from main_menu.views import auth_token,is_auth
 from time import gmtime, strftime, strptime
 from threading import Timer
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "web_ui.settings")
+from django.conf import settings
 
-
-def periodic_counter(self,token_data,token_id,meters_used,meter_list,func,user,time,from_date,from_time,end_date,end_time,user_id_stack):
+def periodic_counter(self,token_id,token_metering,meters_used,meter_list,func,user,time,from_date,from_time,end_date,end_time,user_id_stack,pricing_list):
     """
 
     Execute the periodic counter.
@@ -73,7 +75,7 @@ def periodic_counter(self,token_data,token_id,meters_used,meter_list,func,user,t
       DateTime: The new start time for the next loop if the duration end is before the end time of the loop.
       
     """        
-    udr,new_time=get_udr(self,token_data,token_id,user,meters_used,meter_list,func,True,from_date,from_time,end_date,end_time,user_id_stack)
+    udr,new_time=get_udr(self,token_id,token_metering,user,meters_used,meter_list,func,True,from_date,from_time,end_date,end_time,user_id_stack)
     price=pricing(self,user,meter_list)
     return new_time
 
@@ -84,7 +86,7 @@ def get_delta_samples(self,token_data,token_id,user,meter):
     last=str(samples[-1])
     return last
         
-def get_udr(self,token_data,token_id,user,meters_used,meter_list,func,web_bool,from_date,from_time,end_date,end_time,user_id_stack):
+def get_udr(self,token_id,token_metering,user,meters_used,meter_list,func,web_bool,from_date,from_time,end_date,end_time,user_id_stack):
     date_time=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     delta_list=[None]*5
     all_stats=[] 
@@ -96,7 +98,7 @@ def get_udr(self,token_data,token_id,user,meters_used,meter_list,func,web_bool,f
             if meters_used[i]==meter_list[j]["meter-name"]:
                 resource_id=meter_list[j]["resource-id"]
                 q=ceilometer_api.set_query(from_date,end_date,from_time,end_time,resource_id,user_id_stack,True)
-                status,stat_list=ceilometer_api.meter_statistics(meters_used[i], token_data["metering"],token_id,meter_list,True,q=q)
+                status,stat_list=ceilometer_api.meter_statistics(meters_used[i], token_metering,token_id,meter_list,True,q=q)
                 unit=meter_list[j]["meter-unit"]
                 if stat_list==[]:
                     total[i]+=0
@@ -114,7 +116,7 @@ def get_udr(self,token_data,token_id,user,meters_used,meter_list,func,web_bool,f
                     new_time=stat_list[0]["duration-end"]
         meters_counter=MetersCounter(meter_name=meters_used[i],user_id=user,counter_volume=total[i],unit=unit ,timestamp=date_time)
         meters_counter.save() 
-        delta=get_delta_samples(self,token_data,token_id,user,meters_used[i])
+        delta=get_delta_samples(self,token_metering,token_id,user,meters_used[i])
         delta_list[i]=delta
         udr=Udr(user_id=user,timestamp=date_time,pricing_func_id=func, param1=delta_list[0], param2=delta_list[1], param3=delta_list[2], param4=delta_list[3], param5=delta_list[4])
         udr.save()        
@@ -124,6 +126,7 @@ def get_udr(self,token_data,token_id,user,meters_used,meter_list,func,web_bool,f
 
 
 def pricing(self,user,meter_list):
+    
     func=PricingFunc.objects.get(user_id=user)
     udr=Udr.objects.filter(user_id=user,pricing_func_id=func).order_by('-id')[0]
     pricing_list=[]
@@ -135,9 +138,8 @@ def pricing(self,user,meter_list):
     pricing_list.append(func.sign3)
     pricing_list.append(func.param4)
     pricing_list.append(func.sign4)
-    pricing_list.append(func.param5)
-    
-    
+    pricing_list.append(func.param5)   
+     
     udr_list=[]
     udr_list.append(udr.param1)
     udr_list.append(udr.param2)
@@ -190,30 +192,51 @@ def pricing(self,user,meter_list):
 
 
 class MyThread(Thread):
-    def __init__(self, k_self,token_data,token_id,meters_used,meter_list,func,user,time_f,from_date,from_time,end_date,end_time,user_id_stack):
+    def __init__(self, token_id,token_metering,user,time_f,from_date,from_time,end_date,end_time,user_id_stack,name):
         super(MyThread, self).__init__()
         self.daemon = True
         self.cancelled = False
-        self.k_self=k_self
-        self.token_data=token_data
         self.token_id=token_id
-        self.meters_used=meters_used
-        self.meter_list=meter_list
-        self.func=func
-        self.user=user
-        self.time_f=time_f
+        self.token_metering=token_metering
+        self.user=StackUser.objects.get(id=user)       
         self.from_date=from_date
         self.from_time=from_time
-        self.func=func
         self.end_date=end_date
         self.end_time=end_time
+        self.time_f=float(time_f)
         self.user_id_stack=user_id_stack
-
+        status_meter_list, self.meter_list = ceilometer_api.get_meter_list(token_id, token_metering)                              
+        self.pricing_list=[]
+        self.meters_used=[]
+        self.func=PricingFunc.objects.get(user_id=user) 
+        self.pricing_list.append(self.func.param1)
+        self.pricing_list.append(self.func.sign1)
+        self.pricing_list.append(self.func.param2)
+        self.pricing_list.append(self.func.sign2)
+        self.pricing_list.append(self.func.param3)
+        self.pricing_list.append(self.func.sign3)
+        self.pricing_list.append(self.func.param4)
+        self.pricing_list.append(self.func.sign4)
+        self.pricing_list.append(self.func.param5)    
+        print("Inside init thread.")
+        self.name=name            
+        for i in range(len(self.pricing_list)):
+            j=0
+            while j<len(self.meter_list):
+                if self.pricing_list[i]==self.meter_list[j]["meter-name"]:
+                    if self.pricing_list[i] in self.meters_used:
+                        continue
+                    else:
+                        self.meters_used.append(self.pricing_list[i])                                                                
+                    break
+                else:
+                    j=j+1
     def run(self):
         """Overloaded Thread.run"""
-
+        print("Inside thread run")
         while not self.cancelled:
-            new_time=periodic_counter(self.k_self,self.token_data,self.token_id,self.meters_used,self.meter_list,self.func,self.user,self.time_f,self.from_date,self.from_time,self.end_date,self.end_time,self.user_id_stack)
+            print ("while not cancelled")
+            new_time=periodic_counter(self,self.token_id,self.token_metering,self.meters_used,self.meter_list,self.func,self.user,self.time_f,self.from_date,self.from_time,self.end_date,self.end_time,self.user_id_stack,self.pricing_list)
             if new_time=="/":
                 self.from_time=self.end_time
                 self.from_date=self.end_date
@@ -234,3 +257,12 @@ class MyThread(Thread):
     def cancel(self):
         """End this timer thread"""
         self.cancelled = True
+        
+
+    
+    def setName(self,name):
+        self.name=name
+        
+    def getName(self):
+        return self.name
+        

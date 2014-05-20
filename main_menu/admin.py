@@ -33,8 +33,10 @@ from django.forms import widgets
 import datetime
 from datetime import date
 from django.forms.widgets import RadioSelect
-
+import socket
 from processes import periodic_web
+import struct
+import json
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'os_api')))
 import ceilometer_api
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'processes')))
@@ -60,6 +62,10 @@ class stackUserAdmin(admin.ModelAdmin):
     actions = ['add_pricing_func','calculate_price','start_periodic','stop_periodic']  
     
     class AddPricingFuncForm(forms.Form):
+        def __init__(self, *args, **kwargs):
+            choices = kwargs.pop("resources")
+            super(self.__class__, self).__init__(*args, **kwargs)
+            self.fields["resources"] = forms.CharField(widget=forms.Select(choices=choices))
         CHOICES = (('EUR', 'EUR',), ('CHF', 'CHF',),('USD', 'USD',), ('GBP', 'GBP',))
         CHOICES2 = (('0.01', '0.01',), ('1', '1',))
         func=forms.CharField(required=True)
@@ -96,9 +102,15 @@ class stackUserAdmin(admin.ModelAdmin):
                     if resources[i]==meter_list[j]["resource-id"]:
                    
                         meters[i].append(meter_list[j]['meter-name'])
-                    
+                        
+            resources_choice=tuple()
+            li=[]
+            for i in range(len(resources)):
+                li.append((resources[i],resources[i]))
+            resources_choice=tuple(li)            
+                
             if 'add_pricing' in request.POST:
-                form = self.AddPricingFuncForm(request.POST)
+                form = self.AddPricingFuncForm(request.POST,resources=resources_choice)
                 if form.is_valid():
                     var=form.cleaned_data['func']
                     var2=" ".join(var.split())
@@ -186,7 +198,7 @@ class stackUserAdmin(admin.ModelAdmin):
             if not form:
                 num_results = PricingFunc.objects.filter(user_id=queryset[0]).count()
                 if num_results==0:
-                    form=self.AddPricingFuncForm(initial={'_selected_action': request.POST.getlist(admin.ACTION_CHECKBOX_NAME)})
+                    form=self.AddPricingFuncForm(resources=resources_choice,initial={'_selected_action': request.POST.getlist(admin.ACTION_CHECKBOX_NAME)})
                     context={'user': queryset,'pricing_func_form': form,'meter_list':meters,'resources':resources}
                     return render(request,'admin/price.html',context)   
                 else:
@@ -351,8 +363,7 @@ class stackUserAdmin(admin.ModelAdmin):
             form2 = None
             try:
                 token_data=request.session["token_data"] 
-                token_id=token_data["token_id"]
-                status_meter_list, meter_list = ceilometer_api.get_meter_list(token_id, token_data["metering"])      
+                token_id=token_data["token_id"]      
             except KeyError:
                 messages.warning(request, "You have to authenticate first!")
                 return redirect('/auth_token/?next=%s' % request.path)
@@ -378,45 +389,60 @@ class stackUserAdmin(admin.ModelAdmin):
                             try:
                                 func=PricingFunc.objects.get(user_id=user) 
                                 usr=StackUser.objects.get(user_id=user)
-                                
-                                pricing_list=[]
-                                meters_used=[]
-                                pricing_list.append(func.param1)
-                                pricing_list.append(func.sign1)
-                                pricing_list.append(func.param2)
-                                pricing_list.append(func.sign2)
-                                pricing_list.append(func.param3)
-                                pricing_list.append(func.sign3)
-                                pricing_list.append(func.param4)
-                                pricing_list.append(func.sign4)
-                                pricing_list.append(func.param5)     
-            
                                 user_id_stack=usr.user_id
-            
-                                for i in range(len(pricing_list)):
-                                    j=0
-                                    while j<len(meter_list):
-                                        if pricing_list[i]==meter_list[j]["meter-name"]:
-                                            if pricing_list[i] in meters_used:
-                                                continue
-                                            else:
-                                                meters_used.append(pricing_list[i])                                                                
-                                            break
-                                        else:
-                                            j=j+1
-                                k_self=self
-                                request.session["thread_running"] = True
-                                global thread1
-                                thread1=periodic_web.MyThread(k_self,token_data,token_id,meters_used,meter_list,func,user,time_f,from_date,from_time,end_date,end_time,user_id_stack)
-                                thread1.start()
+                                user_id=user.id
+
+                                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                                try:
+                                    s.connect(('127.0.0.1', 9005))
+                                except socket.error:
+                                    print 'could not open socket'
+                                    sys.exit(1)
+                                s.sendall('periodic_start')
+                                resp = s.recv(100)
+                                #global thread1
+                                #thread1=periodic_web.MyThread(k_self,token_data,token_id,meters_used,meter_list,func,user,time_f,from_date,from_time,end_date,end_time,user_id_stack)
+                                #thread1.start()
+                                if resp=="ok":
+                                    print("Got ok, sending data.")
+                                    lista=[token_id,token_data["metering"],user_id,time_f,from_date,from_time,end_date,end_time,user_id_stack,None]
+                                    #lista={'k_self':k_self,'token_data':token_data,'token_id':token_id,'meters_used':meters_used,'meter_list':meter_list,'func':func,'user':user,'time_f':time_f,'from_date':from_date,'from_time':from_time,'end_date':end_date,'end_time':end_time,'user_id_stack':user_id_stack}
+                                    for i in lista:
+                                        msg=str(i)
+                                        msg = struct.pack('>I', len(msg)) + msg
+                                        s.sendall(msg)
+                                    print("Done sending data")
+                                    resp2 = s.recv(200)
+                                    self.message_user(request, resp2)
+                                s.close()
+                                print("Closing client socket.")
                             except PricingFunc.DoesNotExist:
                                     messages.warning(request, 'You have to define the pricing function first.')   
 
 
             if not form2:
-                form2=self.StartPeriodicForm(initial={'_selected_action': request.POST.getlist(admin.ACTION_CHECKBOX_NAME)})
-                context={'user': queryset,'periodic_form': form2}
-                return render(request,'admin/periodic.html',context)       
+                user=queryset[0]
+                user_id=user.id
+                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                try:
+                    s.connect(('127.0.0.1', 9005))
+                except socket.error:
+                    print 'could not open socket'                
+                s.sendall('check threads')
+                response = s.recv(100)
+                if response=="ok":
+                    thread_name="thread"+str(user_id)
+                    print (thread_name)
+                    s.sendall(thread_name)
+                    response=s.recv(100)
+                    s.close()
+                    if response=="True":
+                        messages.warning(request, "Periodic counter already started for this user.") 
+                        return HttpResponseRedirect('/admin/main_menu/stackuser/')                        
+                    else:   
+                        form2=self.StartPeriodicForm(initial={'_selected_action': request.POST.getlist(admin.ACTION_CHECKBOX_NAME)})
+                        context={'user': queryset,'periodic_form': form2}
+                        return render(request,'admin/periodic.html',context)       
                 
 
     start_periodic.short_description = "Start the periodic counter for the selected user"
@@ -432,11 +458,12 @@ class stackUserAdmin(admin.ModelAdmin):
             return HttpResponseRedirect('/admin/main_menu/stackuser/')
              
         else:
+            user=queryset[0]
+            user_id=user.id
             form5 = None
             try:
                 token_data=request.session["token_data"] 
-                token_id=token_data["token_id"]
-                status_meter_list, meter_list = ceilometer_api.get_meter_list(token_id, token_data["metering"])      
+                token_id=token_data["token_id"]    
             except KeyError:
                 messages.warning(request, "You have to authenticate first!")
                 return redirect('/auth_token/?next=%s' % request.path)
@@ -446,20 +473,39 @@ class stackUserAdmin(admin.ModelAdmin):
             if 'stop_counter' in request.POST:
                 form5 = self.StopPeriodicThread(request.POST)
                 if form5.is_valid():
-                    try:
-                        thread_running=request.session["thread_running"] 
-                        global thread1
-                        if thread1.isAlive():
-                            thread1.cancel()
-                    except KeyError:
-                        messages.warning(request, "Counter hasn't been started!")
-                        return redirect('/auth_token/?next=%s' % request.path)
-
-
+                        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                        try:
+                            s.connect(('127.0.0.1', 9005))
+                        except socket.error:
+                            print 'Could not open socket' 
+                        s.sendall('periodic_stop')
+                        resp = s.recv(100)
+                        if resp=="ok":
+                            thread_name="thread"+str(user_id)
+                            s.sendall(thread_name)
+                            resp=s.recv(1000)
+                            self.message_user(request, resp)
             if not form5:
-                form5=self.StopPeriodicThread(initial={'_selected_action': request.POST.getlist(admin.ACTION_CHECKBOX_NAME)})
-                context={'user': queryset,'stop_form': form5}
-                return render(request,'admin/stop_periodic.html',context)       
+                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                try:
+                    s.connect(('127.0.0.1', 9005))
+                except socket.error:
+                    print 'could not open socket'                
+                s.sendall('check threads')
+                response = s.recv(100)
+                if response=="ok":
+                    thread_name="thread"+str(user_id)
+                    print (thread_name)
+                    s.sendall(thread_name)
+                    response=s.recv(100)
+                    s.close()
+                    if response=="False":
+                        messages.warning(request, "Periodic counter hasn't been  started for this user.") 
+                        return HttpResponseRedirect('/admin/main_menu/stackuser/') 
+                    else:
+                        form5=self.StopPeriodicThread(initial={'_selected_action': request.POST.getlist(admin.ACTION_CHECKBOX_NAME)})
+                        context={'user': queryset,'stop_form': form5}
+                        return render(request,'admin/stop_periodic.html',context)       
                 
 
     stop_periodic.short_description = "Stop the periodic counter for the selected user"
