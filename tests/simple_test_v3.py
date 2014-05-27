@@ -37,7 +37,7 @@ def main(argv):
     else:
         print "Authentication was not successful."
     if status:
-        
+        status,tenant_list=keystone_api.get_list_tenants(pom,auth_uri)
         #status, server_list = compute_api.get_server_list(token_data["token-id"], token_data["computev3"])
         #if status:
          #   print "The list of servers are printed next."

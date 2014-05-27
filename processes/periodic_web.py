@@ -76,7 +76,7 @@ def periodic_counter(self,token_id,token_metering,meters_used,meter_list,func,us
       
     """        
     udr,new_time=get_udr(self,token_id,token_metering,user,meters_used,meter_list,func,True,from_date,from_time,end_date,end_time,user_id_stack)
-    price=pricing(self,user,meter_list)
+    price=pricing(self,user,meter_list,pricing_list,udr)
     return new_time
 
 def get_delta_samples(self,token_data,token_id,user,meter):
@@ -116,29 +116,22 @@ def get_udr(self,token_id,token_metering,user,meters_used,meter_list,func,web_bo
                     new_time=stat_list[0]["duration-end"]
         meters_counter=MetersCounter(meter_name=meters_used[i],user_id=user,counter_volume=total[i],unit=unit ,timestamp=date_time)
         meters_counter.save() 
-        delta=get_delta_samples(self,token_metering,token_id,user,meters_used[i])
-        delta_list[i]=delta
-        udr=Udr(user_id=user,timestamp=date_time,pricing_func_id=func, param1=delta_list[0], param2=delta_list[1], param3=delta_list[2], param4=delta_list[3], param5=delta_list[4])
-        udr.save()        
+        #delta=get_delta_samples(self,token_metering,token_id,user,meters_used[i])
+        #delta_list[i]=delta
+        for i in range(len(delta_list)):
+            for j in range(len(total)):
+                if i==j:
+                    delta_list[i]=total[j]
+    udr=Udr(user_id=user,timestamp=date_time,pricing_func_id=func, param1=delta_list[0], param2=delta_list[1], param3=delta_list[2], param4=delta_list[3], param5=delta_list[4])
+    udr.save()        
     return udr,new_time
 
 
 
 
-def pricing(self,user,meter_list):
+def pricing(self,user,meter_list,pricing_list,udr):
     
     func=PricingFunc.objects.get(user_id=user)
-    udr=Udr.objects.filter(user_id=user,pricing_func_id=func).order_by('-id')[0]
-    pricing_list=[]
-    pricing_list.append(func.param1)
-    pricing_list.append(func.sign1)
-    pricing_list.append(func.param2)
-    pricing_list.append(func.sign2)
-    pricing_list.append(func.param3)
-    pricing_list.append(func.sign3)
-    pricing_list.append(func.param4)
-    pricing_list.append(func.sign4)
-    pricing_list.append(func.param5)   
      
     udr_list=[]
     udr_list.append(udr.param1)

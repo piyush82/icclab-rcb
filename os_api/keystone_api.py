@@ -171,7 +171,66 @@ def get_token_v3(uri,web,**kwargs):
             catalog_element =  data["token"]["catalog"][i]
             auth_data[catalog_element["type"]] = catalog_element["endpoints"][0]["url"]
     return True, auth_data 
-    
+
+def get_list_tenants(token,api_endpoint):
+    headers = {
+               'Accept': 'application/json',
+               'Content-Type': 'application/json;',
+               'X-Auth-Token': token
+    }    
+    path = '/v2.0/tenants'
+    target = urlparse(api_endpoint+path)
+    method = 'GET'
+    body=''
+    tenant_list=[]
+    h = http.Http()
+    response, content = h.request(target.geturl(),method,body,headers)
+    #converting the header of the response to json object
+    header = json.dumps(response)
+    json_header = json.loads(header)    
+    server_response = json_header["status"]
+    if server_response not in {'200'}:
+        print "Inside get_tenants_list(): Something went wrong!"
+        return False, tenant_list
+    else:
+        data = json.loads(content)
+        tenant_list = [None]*len(data["tenants"])
+        for i in range(len(data["tenants"])):
+            tenant_list[i] = {}
+            tenant_list[i]["tenant_id"] = data["tenants"][i]["id"]
+            tenant_list[i]["tenant_name"] = data["tenants"][i]["name"]
+            tenant_list[i]["tenant_desc"] = data["tenants"][i]["description"]
+    return True, tenant_list
+
+def get_users_per_tenant(token,api_endpoint,tenantId):
+    headers = {
+               'Accept': 'application/json',
+               'Content-Type': 'application/json;',
+               'X-Auth-Token': token
+    }    
+    path = '/v2.0/tenants/'+tenantId+'/users'
+    target = urlparse(api_endpoint+path)
+    method = 'GET'
+    body=''
+    users_list=[]
+    h = http.Http()
+    response, content = h.request(target.geturl(),method,body,headers)
+    #converting the header of the response to json object
+    header = json.dumps(response)
+    json_header = json.loads(header)    
+    server_response = json_header["status"]
+    if server_response not in {'200'}:
+        print "Inside get_users_per_tenants(): Something went wrong!"
+        return False, users_list
+    else:
+        data = json.loads(content)
+        users_list = [None]*len(data["users"])
+        for i in range(len(data["users"])):
+            users_list[i] = {}
+            users_list[i]["tenant_id"] = data["tenants"][i]["id"]
+            users_list[i]["tenant_name"] = data["tenants"][i]["name"]
+            users_list[i]["tenant_desc"] = data["tenants"][i]["description"]
+    return True, users_list
     
 def get_token_v2(uri):
     ''' 

@@ -49,7 +49,7 @@ def get_server_list(token, api_endpoint):
     #converting the header of the response to json object
     header = json.dumps(response)
     json_header = json.loads(header)
-    
+    server_list=[]
     server_response = json_header["status"]
     if server_response not in {'200'}:
         print "Inside get_server_list(): Something went wrong!"

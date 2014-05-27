@@ -30,9 +30,11 @@ import periodic_web
 import json
 import threading
 import json
+from Queue import Queue
+from threading import Thread
 
 def main(argv):  
-    running_threads=[{}]   
+    running_threads={}   
     print ("In main before while, running threads: %s" %running_threads) 
     HOST = '127.0.0.1'   # Symbolic name meaning all available interfaces
     PORT = 9005 # Arbitrary non-privileged port 
@@ -43,22 +45,57 @@ def main(argv):
     except socket.error , msg:
         print 'Bind failed. Error Code : ' + str(msg[0]) + ' Message ' + msg[1]
         sys.exit()
-    s.listen(10)
+    s.listen(20)
+    pool = ThreadPool(20)
     while 1:
         conn, addr = s.accept()
         print("Connection accepted.")
-        pid=os.fork()
-        print("Forked with pid %s" %pid)
-        if pid==-1:
-            os._exit(0)
-        elif pid==0:
-            socket_connection(s,conn,running_threads)
-            print (pid, running_threads)
-        else:
-            conn.close()
-        print(pid, running_threads)
+        pool.add_task(socket_connection,conn,running_threads)
+        #pid=os.fork()
+        #print("Forked with pid %s" %pid)
+        #if pid==-1:
+        #    os._exit(0)
+        #elif pid==0:
+        #    socket_connection(s,conn,running_threads)
+        #    print (pid, running_threads)
+        #else:
+        #    conn.close()
+        #print(pid, running_threads)
+        print("In while poool running threads %s" %running_threads)
+        pool.wait_completion()
     return
 
+class Worker(Thread):
+    """Thread executing tasks from a given tasks queue"""
+    def __init__(self, tasks):
+        Thread.__init__(self)
+        self.tasks = tasks
+        self.daemon = True
+        self.start()
+
+    def run(self):
+        while True:
+            func, args, kargs = self.tasks.get()
+            try:
+                func(*args, **kargs)
+            except Exception, e:
+                print e
+            finally:
+                self.tasks.task_done()
+
+class ThreadPool:
+    """Pool of threads consuming tasks from a queue"""
+    def __init__(self, num_threads):
+        self.tasks = Queue(num_threads)
+        for _ in range(num_threads): Worker(self.tasks)
+
+    def add_task(self, func, *args, **kargs):
+        """Add a task to the queue"""
+        self.tasks.put((func, args, kargs))
+
+    def wait_completion(self):
+        """Wait for completion of all the tasks in the queue"""
+        self.tasks.join()
 
 def recvall(sock, n):
     # Helper function to recv n bytes or return None if EOF is hit
@@ -70,7 +107,7 @@ def recvall(sock, n):
         data += packet
     return data
  
-def socket_connection(s,conn,running_threads): 
+def socket_connection(conn,running_threads): 
     #s.close()
     data = conn.recv(1024)
     print("Received data.")
@@ -83,24 +120,30 @@ def socket_connection(s,conn,running_threads):
         #    running_threads=json.load(f)
         print (running_threads)
         print(t_name)
-        if t_name in running_threads[0]:
+        if t_name in running_threads:
 
             conn.sendall("True")     
         else:   
             conn.sendall("False")  
-            
+        conn.close()
+      
     if data=="periodic_stop":
         conn.sendall("ok")
         t_name=conn.recv(1024)
         #with open('threads.json') as f:
         #    data = json.load(f)
+        canceled=False
         print(running_threads)
-        for key,value in running_threads: 
+        for key,value in running_threads.iteritems(): 
             if key==t_name:
                 value.cancel()
-                conn.sendall("Stopping counter.")
-                del data[t_name] 
-
+                canceled=True
+        if canceled==True:
+            conn.sendall("Stopping counter.")
+            del running_threads[t_name] 
+        else:
+            conn.sendall("Error stopping counter.")
+        conn.close()
              
     if data=="periodic_start":
         conn.sendall("ok")
@@ -140,18 +183,14 @@ def socket_connection(s,conn,running_threads):
             thread_name.start()
             #my_dict={thread_name:user}
             #.update(my_dict)
-            #running_threads[name]=thread_name
-            running_threads=add_threads(running_threads,name,thread_name)
+            running_threads[name]=thread_name
+            #running_threads=add_threads(running_threads,name,thread_name)
             print("Thread started %s." %thread_name)
             print ("Running threads %s" %running_threads)
-
+        conn.close()
     return running_threads
 
-def add_threads(running_threads,name,thread):
-    dict=running_threads[0]
-    new_dict=dict.update({name:thread})
-    running_threads[0]=dict
-    return running_threads
+
 
 
 
