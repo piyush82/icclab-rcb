@@ -20,7 +20,7 @@ import periodic
 
 def main(argv):
     print "Hello There. This is a simple test application making a test API call to OpenStack"
-    auth_uri = 'http://160.85.4.10:5000' #internal test-setup, replace it with your own value
+    auth_uri = 'http://160.85.4.10:35357' #internal test-setup, replace it with your own value
     status, token_data = keystone_api.get_token_v3(auth_uri,False)
     if status:
         print 'The authentication was successful, below are the data we got:'
@@ -38,6 +38,10 @@ def main(argv):
         print "Authentication was not successful."
     if status:
         status,tenant_list=keystone_api.get_list_tenants(pom,auth_uri)
+        status,user_list=keystone_api.get_users_per_tenant(pom,auth_uri,'4e9c4e1b93124cdba2a930e98eb26ede')
+        for i in range(len(user_list)):
+            print '%20s %20s' %(user_list[i]["user_id"], user_list[i]["user_name"])
+            
         #status, server_list = compute_api.get_server_list(token_data["token-id"], token_data["computev3"])
         #if status:
          #   print "The list of servers are printed next."

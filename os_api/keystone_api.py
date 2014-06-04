@@ -227,9 +227,10 @@ def get_users_per_tenant(token,api_endpoint,tenantId):
         users_list = [None]*len(data["users"])
         for i in range(len(data["users"])):
             users_list[i] = {}
-            users_list[i]["tenant_id"] = data["tenants"][i]["id"]
-            users_list[i]["tenant_name"] = data["tenants"][i]["name"]
-            users_list[i]["tenant_desc"] = data["tenants"][i]["description"]
+            users_list[i]["user_id"] = data["users"][i]["id"]
+            users_list[i]["user_name"] = data["users"][i]["name"]
+            users_list[i]["user_email"] = data["users"][i]["email"]
+            users_list[i]["user_enabled"] = data["users"][i]["enabled"]
     return True, users_list
     
 def get_token_v2(uri):

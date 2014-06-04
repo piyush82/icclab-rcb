@@ -1,9 +1,16 @@
 from django.db import models
 
+class Tenant(models.Model):
+    tenant_id=models.CharField(max_length=200)
+    tenant_name=models.CharField(max_length=200)
+
+    def __unicode__(self):
+        return u'%s %s' %(self.tenant_id,self.tenant_name)
+
 class StackUser(models.Model):
     user_id = models.CharField(max_length=200)
     user_name=models.CharField(max_length=200)
-    tenant_id = models.CharField(max_length=200)
+    tenant_id = models.ForeignKey(Tenant)
     
     def __unicode__(self):  
         return u'%s' % (self.user_id)
@@ -23,7 +30,7 @@ class MetersCounter(models.Model):
 class PriceLoop(models.Model):
     price = models.FloatField()
     timestamp = models.DateTimeField()
-    tenant_id = models.ForeignKey(StackUser)
+    tenant_id = models.ForeignKey(Tenant)
     
     def __unicode__(self):  
         return u'%s %s %s' % (self.tenant_id, self.price, self.timestamp)
@@ -75,10 +82,13 @@ class PriceCdr(models.Model):
 class PriceDaily(models.Model):
     price = models.FloatField(blank=True, null=True) 
     timestamp = models.DateTimeField() 
-    tenant_id = models.ForeignKey(StackUser) 
+    tenant_id = models.ForeignKey(Tenant) 
     pricing_func_id = models.ForeignKey(PricingFunc)   
     
     def __unicode__(self):  
-        return u'%s %s %s  ' % (self.tenant_id, self.price, self.timestamp)      
+        return u'%s %s %s  ' % (self.tenant_id, self.price, self.timestamp)    
+       
+
+  
     
 

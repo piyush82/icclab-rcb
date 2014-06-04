@@ -1,0 +1,33 @@
+{% extends "admin/base_site.html" %}
+{% block head %}
+<script type="text/javascript" src="/site_media/prototype.js"></script>
+<script type="text/javascript" src="/site_media/my_ajax_function.js"></script>
+{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
+<script type="text/javascript" src="{{ STATIC_URL }}js/jquery-1.11.0.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/jquery-ui-1.10.4.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/ui.js"></script>
+
+<p>List of users for the tenant {{ tenant }}</p>
+<form action="" method="post" >
+{% csrf_token %}
+{% for id in user_ids %}
+	{% for name in user_names %} 	
+	{% if forloop.counter == forloop.parentloop.counter %}
+		<input type="radio" name="user" value={{ id }}>{{ name }}<br>
+	{% endif %}
+	{% endfor %}
+{% endfor %}
+
+
+{{ users_form}}
+<input type="hidden" name="action" value="list_users" />
+<input type="submit" name="user_status" value="Show user status" />
+
+
+</form>
+
+
+{% endblock %}
+
