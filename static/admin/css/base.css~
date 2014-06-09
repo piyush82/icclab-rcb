@@ -13,7 +13,7 @@ body {
 
 /* LINKS */
 
-breadcrumbs .a:link, breadcrumbs .a:visited {
+.breadcrumbs a:link, .breadcrumbs a:visited {
     color: #5b80b2;
     text-decoration: none;
 }
@@ -232,6 +232,8 @@ p img, h1 img, h2 img, h3 img, h4 img, td img {
 table {
     border-collapse: collapse;
     border-color: #ccc;
+    width:620px;
+    overflow: scroll;
 }
 
 td, th {
