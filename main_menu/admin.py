@@ -64,10 +64,10 @@ class stackUserAdmin(admin.ModelAdmin):
     actions = ['add_pricing_func','calculate_price','start_periodic','stop_periodic']  
     
     class AddPricingFuncForm(forms.Form):
-        def __init__(self, *args, **kwargs):
-            choices = kwargs.pop("resources")
-            super(self.__class__, self).__init__(*args, **kwargs)
-            self.fields["resources"] = forms.CharField(widget=forms.Select(choices=choices))
+        #def __init__(self, *args, **kwargs):
+       #     choices = kwargs.pop("resources")
+         #   super(self.__class__, self).__init__(*args, **kwargs)
+          #  self.fields["resources"] = forms.CharField(widget=forms.Select(choices=choices))
         CHOICES = (('EUR', 'EUR',), ('CHF', 'CHF',),('USD', 'USD',), ('GBP', 'GBP',))
         CHOICES2 = (('0.01', '0.01',), ('1', '1',))
         func=forms.CharField(required=True)
@@ -112,7 +112,7 @@ class stackUserAdmin(admin.ModelAdmin):
             resources_choice=tuple(li)            
                 
             if 'add_pricing' in request.POST:
-                form = self.AddPricingFuncForm(request.POST,resources=resources_choice)
+                form = self.AddPricingFuncForm(request.POST)
                 if form.is_valid():
                     var=form.cleaned_data['func']
                     var2=" ".join(var.split())
@@ -200,8 +200,10 @@ class stackUserAdmin(admin.ModelAdmin):
             if not form:
                 num_results = PricingFunc.objects.filter(user_id=queryset[0]).count()
                 if num_results==0:
-                    form=self.AddPricingFuncForm(resources=resources_choice,initial={'_selected_action': request.POST.getlist(admin.ACTION_CHECKBOX_NAME)})
-                    context={'user': queryset,'pricing_func_form': form,'meter_list':meters,'resources':resources}
+                    for i in request.POST.getlist(admin.ACTION_CHECKBOX_NAME):
+                        selected=int(str(i))
+                    form=self.AddPricingFuncForm(initial={'_selected_action': request.POST.getlist(admin.ACTION_CHECKBOX_NAME)})
+                    context={'user': queryset,'pricing_func_form': form,'meter_list':meters,'resources':resources,'selected':selected}
                     return render(request,'admin/price.html',context)   
                 else:
                     messages.warning(request, "Pricing function already defined for selected user. You can change it in main_menu->pricing func!") 

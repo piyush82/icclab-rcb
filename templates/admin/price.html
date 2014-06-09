@@ -52,19 +52,15 @@
     </div>
     <input type="hidden" id="var_resources" name="var_resources" value="{{ resources }}">
     <input type="hidden" id="var_meters" name="var_meters" value="{{ meter_list }}">
-    <table cellspacing="0" cellpadding="0" style="border:none; font-size:medium; margin-bottom:20px; border-collapse: collapse;">
-    {% for fields in pricing_func_form %}
-        {%if "selected action" not in fields.label %}
-           {%if "Resources" not in fields.label %}
-		{%if "Func"  in fields.label %}
-		<tr style="border:0;"><td style="width:95px; margin-right:10px; padding: 0;">Pricing function</td><td style="font-size:12px;">{{fields}}</td><tr>
-		{%else%}
-		<tr style="border:0;"><td style="width:95px; margin-right:10px; padding: 0;">{{fields.label}} </td><td style="font-size:12px;"> {{fields}}</td><tr>
-	{% endif %}
-	{% endif %}
-	{% endif %}
-    {% endfor %}
-    </table>
+
+		<p><label for="func" style="width:95px; margin-right:5px; ">Pricing function:</label>{{ pricing_func_form.func }}
+		</p>
+		<p></p>
+     	  	 <p><label for="currency" style="width:95px; margin-right:5px; ">Currency        :</label> {{ pricing_func_form.currency }}
+		</p>
+     	  	 <p><label for="unit" style="width:95px; margin-right:5px; ">Unit            :</label> {{ pricing_func_form.unit }}
+		</p>
+    <input type="hidden" name="_selected_action" value={{ selected }} />
     <div id="results"></div>
     <p>The pricing function will be applied to the user with id:</p>
 
