@@ -9,10 +9,12 @@
     	<h2>Rating, Charging, Billing solutions for tomorrow!</h2>
     	<br>
     	<p>User info page</p>
-
-	<a href="user_price">Calculate your price</a>
 	<p></p>
-	<a href="user_periodic">Check your current status</a>
+ 	<div style="background-color:#E6E6E6;">
+	<a href="user_price">Calculate your price</a></div>
+	<p></p>
+	<div style="background-color:#E6E6E6;">
+	<a href="user_periodic">Check your current status</a></div>
 	</div>
 	<div class="content2">
 		<div class="reel">

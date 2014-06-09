@@ -441,9 +441,11 @@ class stackUserAdmin(admin.ModelAdmin):
                     if response=="True":
                         messages.warning(request, "Periodic counter already started for this user.") 
                         return HttpResponseRedirect('/admin/main_menu/stackuser/')                        
-                    else:   
+                    else:  
+                        for i in request.POST.getlist(admin.ACTION_CHECKBOX_NAME):
+                            selected=int(str(i)) 
                         form2=self.StartPeriodicForm(initial={'_selected_action': request.POST.getlist(admin.ACTION_CHECKBOX_NAME)})
-                        context={'user': queryset,'periodic_form': form2}
+                        context={'user': queryset,'periodic_form': form2,'selected':selected}
                         return render(request,'admin/periodic.html',context)       
                 
 
@@ -583,8 +585,10 @@ class tenantAdmin(admin.ModelAdmin):
                     form6 = self.ListUsersForm(request.POST)
                     user=request.POST["user"]
                     stack_user_object=stackUserAdmin(StackUser,admin)
+                    for i in request.POST.getlist(admin.ACTION_CHECKBOX_NAME):
+                            selected=int(str(i))
                     form2=stack_user_object.StartPeriodicForm(initial={'_selected_action': request.POST.getlist(admin.ACTION_CHECKBOX_NAME)})
-                    context={'user': [user],'periodic_form': form2}
+                    context={'user': [user],'periodic_form': form2,'selected':selected}
                     return render(request,'admin/periodic_tenant.html',context)
                 
                 if 'start_counter' in request.POST:
@@ -656,9 +660,11 @@ class tenantAdmin(admin.ModelAdmin):
                     li=[]
                     for i in range(len(resources)):
                         li.append((resources[i],resources[i]))
-                    resources_choice=tuple(li)               
+                    resources_choice=tuple(li)    
+                    for i in request.POST.getlist(admin.ACTION_CHECKBOX_NAME):
+                        selected=int(str(i))           
                     form=stack_user_object.AddPricingFuncForm(initial={'_selected_action': request.POST.getlist(admin.ACTION_CHECKBOX_NAME)})
-                    context={'user': [user],'pricing_func_form': form,'meter_list':meters,'resources':resources}
+                    context={'user': [user],'pricing_func_form': form,'meter_list':meters,'resources':resources,'selected':selected}
                     return render(request,'admin/price_tenant.html',context)
                 
                 if 'user_status_stop_periodic' in request.POST:

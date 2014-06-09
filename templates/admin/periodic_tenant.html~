@@ -38,7 +38,7 @@
     <p>The periodic pricing will be applied to the user with id:</p>
 
     <ul>{{ user|unordered_list }}</ul>
-    <input type="hidden" name="user" value={{ user }}>
+    <input type="hidden" name="user" value={{ user|first }}>
     <input type="submit" name="start_counter" value="Start the loop." />
     <input type="hidden" name="action" value="list_users" />
 </form>

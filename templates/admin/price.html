@@ -52,14 +52,14 @@
     </div>
     <input type="hidden" id="var_resources" name="var_resources" value="{{ resources }}">
     <input type="hidden" id="var_meters" name="var_meters" value="{{ meter_list }}">
+   		<table  style=" margin-bottom:20px;width:550px;">
+		<tr><td style="width:100px; font-size:12px; border:none;"><label for="func" style=" margin-right:5px; ">Pricing function:</label></td><td style="border:none;">{{ pricing_func_form.func }}</td></tr>
+	
+     	  	<tr><td style="width:100px; font-size:12px; border:none;"><label for="currency" style="  margin-right:5px; ">Currency:</label> </td><td style="border:none;">{{ pricing_func_form.currency }}</td></tr>
 
-		<p><label for="func" style="width:95px; margin-right:5px; ">Pricing function:</label>{{ pricing_func_form.func }}
-		</p>
-		<p></p>
-     	  	 <p><label for="currency" style="width:95px; margin-right:5px; ">Currency        :</label> {{ pricing_func_form.currency }}
-		</p>
-     	  	 <p><label for="unit" style="width:95px; margin-right:5px; ">Unit            :</label> {{ pricing_func_form.unit }}
-		</p>
+     	  	<tr><td style="width:100px; font-size:12px; border:none;"><label for="unit" style="margin-right:5px; ">Unit:</label></td><td style="border:none;">{{ pricing_func_form.unit }}</td></tr>
+		</table>
+    
     <input type="hidden" name="_selected_action" value={{ selected }} />
     <div id="results"></div>
     <p>The pricing function will be applied to the user with id:</p>

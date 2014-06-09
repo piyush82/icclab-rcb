@@ -202,7 +202,11 @@ def auth_token(request):
     try:
         status=request.session["status"]
         token_data=request.session["token_data"] 
-        return HttpResponseRedirect('/admin/')
+        if status==True:
+            return HttpResponseRedirect('/admin/')
+        else:
+            messages.warning(request, "Unsuccessful authentication!")
+            return HttpResponseRedirect('/auth_token/')
     except KeyError:
         if request.method == 'POST':
             username=request.POST['user']

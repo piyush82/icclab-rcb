@@ -28,14 +28,20 @@
 	{% endif %}
 
 
-    <p>Enter date and time.</p>
+    <p style="margin-bottom:20px;">Enter date and time.</p>
+    <p></p>	
+
+   <table >
+   <tr><td style="width:90px; font-size:12px; border:none;"><label for="dateStart" >Starting date:</label></td><td style="border:none;">{{ periodic_form.dateStart }}</td></tr>
+	
+   <tr><td style="width:90px; font-size:12px; border:none;"><label for="time" >Time in hours:</label> </td><td style="border:none;">{{ periodic_form.time }}</td></tr>
+
+   </table>
+    
+    <input type="hidden" name="_selected_action" value={{ selected }} />
 
 
-    {{ periodic_form.as_p}}
-
-
-
-    <p>The periodic pricing will be applied to the user with id:</p>
+    <p style="margin-top:20px;">The periodic pricing will be applied to the user with id:</p>
 
     <ul>{{ user|unordered_list }}</ul>
 

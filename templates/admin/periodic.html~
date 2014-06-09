@@ -4,7 +4,7 @@
 <script type="text/javascript" src="/site_media/my_ajax_function.js"></script>
 {% endblock %}
 {% block content %}
-
+<link rel="stylesheet" href="//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
 <script type="text/javascript" src="{{ STATIC_URL }}js/jquery-1.11.0.min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/jquery-ui-1.10.4.min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/ui.js"></script>
@@ -28,14 +28,20 @@
 	{% endif %}
 
 
-    <p>Enter date and time.</p>
+    <p style="margin-bottom:20px;">Enter date and time.</p>
+    <p></p>	
+
+   <table >
+   <tr><td style="width:100px; font-size:12px; border:none;"><label for="dateStart" >Starting date:</label></td><td style="border:none;">{{ periodic_form.dateStart }}</td></tr>
+	
+   <tr><td style="width:100px; font-size:12px; border:none;"><label for="time" >Time in hours:</label> </td><td style="border:none;">{{ periodic_form.time }}</td></tr>
+
+   </table>
+    
+    <input type="hidden" name="_selected_action" value={{ selected }} />
 
 
-    {{ periodic_form.as_p}}
-
-
-
-    <p>The periodic pricing will be applied to the user with id:</p>
+    <p style="margin-top:20px;">The periodic pricing will be applied to the user with id:</p>
 
     <ul>{{ user|unordered_list }}</ul>
 

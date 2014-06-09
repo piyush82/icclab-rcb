@@ -50,10 +50,17 @@
 	{% endfor %}
     </div>
 
-    {{ pricing_func_form.as_p }}
-    <div id="results"></div>
-    <p>The pricing function will be applied to the user with id:</p>
+   		<table  style=" margin-bottom:20px;width:550px;">
+		<tr><td style="width:100px; font-size:12px; border:none;"><label for="func" style=" margin-right:5px; ">Pricing function:</label></td><td style="border:none;">{{ pricing_func_form.func }}</td></tr>
+	
+     	  	<tr><td style="width:100px; font-size:12px; border:none;"><label for="currency" style="  margin-right:5px; ">Currency:</label> </td><td style="border:none;">{{ pricing_func_form.currency }}</td></tr>
 
+     	  	<tr><td style="width:100px; font-size:12px; border:none;"><label for="unit" style="margin-right:5px; ">Unit:</label></td><td style="border:none;">{{ pricing_func_form.unit }}</td></tr>
+		</table>
+    <div id="results"></div>
+    <input type="hidden" name="_selected_action" value={{ selected }} />
+    <p>The pricing function will be applied to the user with id:</p>
+    
     <ul>{{ user|unordered_list }}</ul>
     <input type="hidden" name="user" value={{ user|first }}>
     <input type="hidden" name="action" value="list_users" />
