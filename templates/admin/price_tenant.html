@@ -31,6 +31,7 @@
 
 	
 	<p>List of available meters per resource.</p>
+	<div id="meters" style="height:600px; display:inline-block; overflow-y:auto; margin-bottom:30px; background-color:#E6E6E6;">
 	{% for i in resources %}
  		<ul>	
    		<li><b>{{i}}</b></li>
@@ -47,6 +48,7 @@
 		{% endfor %}
 		</ul>
 	{% endfor %}
+    </div>
 
     {{ pricing_func_form.as_p }}
     <div id="results"></div>

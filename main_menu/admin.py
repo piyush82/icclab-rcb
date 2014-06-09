@@ -657,7 +657,7 @@ class tenantAdmin(admin.ModelAdmin):
                     for i in range(len(resources)):
                         li.append((resources[i],resources[i]))
                     resources_choice=tuple(li)               
-                    form=stack_user_object.AddPricingFuncForm(resources=resources_choice,initial={'_selected_action': request.POST.getlist(admin.ACTION_CHECKBOX_NAME)})
+                    form=stack_user_object.AddPricingFuncForm(initial={'_selected_action': request.POST.getlist(admin.ACTION_CHECKBOX_NAME)})
                     context={'user': [user],'pricing_func_form': form,'meter_list':meters,'resources':resources}
                     return render(request,'admin/price_tenant.html',context)
                 
@@ -702,7 +702,7 @@ class tenantAdmin(admin.ModelAdmin):
                         li.append((resources[i],resources[i]))
                     resources_choice=tuple(li) 
                     stack_user_object=stackUserAdmin(StackUser,admin)
-                    form = stack_user_object.AddPricingFuncForm(request.POST,resources=resources_choice)
+                    form = stack_user_object.AddPricingFuncForm(request.POST)
                     if form.is_valid():
                         var=form.cleaned_data['func']
                         var2=" ".join(var.split())
