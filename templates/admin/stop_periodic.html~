@@ -28,7 +28,7 @@
 	{% endif %}
 
 
-    <p>Stop counter?</p>
+    <p>Enter date and time.</p>
 
 
     {{ stop_form.as_p}}

@@ -333,7 +333,7 @@ class stackUserAdmin(admin.ModelAdmin):
                     cdr=PriceCdr(user_id=user,timestamp=date_time,pricing_func_id=func, price=price)
                     cdr.save()
                     self.message_user(request, "Successfully calculated price.")
-                    self.message_user(request, "period: %s" %(time_period))
+                    #self.message_user(request, "period: %s" %(time_period))
                     context={'user': queryset,'price':price,'currency':currency}
                     return render(request,'admin/show_price.html',context) 
 
@@ -628,8 +628,8 @@ class tenantAdmin(admin.ModelAdmin):
                                         print("Done sending data")
                                         resp2 = s.recv(200)
                                         self.message_user(request, resp2)
-                                        s.close()
-                                        print("Closing client socket.")
+                                    s.close()
+                                    print("Closing client socket.")
                                 except PricingFunc.DoesNotExist:
                                     messages.warning(request, 'You have to define the pricing function first.')     
                     
@@ -809,7 +809,7 @@ def parse(f):
     for i in f:
         for j in  ["+","-","*","/","%"]:
             if i==j:
-                m=x.split(j)  
+                m=x.split(j,1)  
                 x=m[1]     
                 rez.append(m[0])
                 rez.append(j)

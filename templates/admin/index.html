@@ -8,7 +8,7 @@
 {% block breadcrumbs %}{% endblock %}
 
 {% block my_content %}
-<div id="content1">
+<div id="content">
 
 {% if app_list %}
     {% for app in app_list %}
@@ -22,19 +22,19 @@
         {% for model in app.models %}
             <tr class="model-{{ model.object_name|lower }}">
             {% if model.admin_url %}
-                <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
+                <th scope="row" style="width:70%;"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
             {% else %}
-                <th scope="row">{{ model.name }}</th>
+                <th scope="row" style="width:70%;"S>{{ model.name }}</th>
             {% endif %}
 
             {% if model.add_url %}
-                <td><a href="{{ model.add_url }}" class="addlink">{% trans 'Add' %}</a></td>
+                <td style=" width:15%;"><a style="align:right;" href="{{ model.add_url }}" class="addlink">{% trans 'Add' %} </a></td>
             {% else %}
                 <td>&nbsp;</td>
             {% endif %}
 
             {% if model.admin_url %}
-                <td><a href="{{ model.admin_url }}" class="changelink">{% trans 'Change' %}</a></td>
+                <td style="width:15%;"><a style="align:right;" href="{{ model.admin_url }}" class="changelink">{% trans 'Change' %}</a></td>
             {% else %}
                 <td>&nbsp;</td>
             {% endif %}

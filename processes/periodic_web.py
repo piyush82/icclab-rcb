@@ -196,7 +196,7 @@ class MyThread(Thread):
         self.from_time=from_time
         self.end_date=end_date
         self.end_time=end_time
-        self.time_f=float(time_f)
+        self.time_f=float(time_f)*3600
         self.user_id_stack=user_id_stack
         status_meter_list, self.meter_list = ceilometer_api.get_meter_list(token_id, token_metering)                              
         self.pricing_list=[]

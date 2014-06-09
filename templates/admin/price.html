@@ -10,6 +10,7 @@
 <script type="text/javascript" src="{{ STATIC_URL }}js/jquery-1.11.0.min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/jquery-ui-1.10.4.min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/ui.js"></script>
+
 <p> Define the pricing function. </p>
 
 <form action="" method="post">
@@ -31,6 +32,7 @@
 
 	
 	<p>List of available meters per resource.</p>
+	<div id="meters" style="height:600px; display:inline-block; overflow-y:auto; margin-bottom:30px; background-color:#E6E6E6;">
 	{% for i in resources %}
  		<ul>	
    		<li><b>{{i}}</b></li>
@@ -47,10 +49,22 @@
 		{% endfor %}
 		</ul>
 	{% endfor %}
-
+    </div>
     <input type="hidden" id="var_resources" name="var_resources" value="{{ resources }}">
     <input type="hidden" id="var_meters" name="var_meters" value="{{ meter_list }}">
-    {{ pricing_func_form.as_p }}
+    <table cellspacing="0" cellpadding="0" style="border:none; font-size:medium; margin-bottom:20px; border-collapse: collapse;">
+    {% for fields in pricing_func_form %}
+        {%if "selected action" not in fields.label %}
+           {%if "Resources" not in fields.label %}
+		{%if "Func"  in fields.label %}
+		<tr style="border:0;"><td style="width:95px; margin-right:10px; padding: 0;">Pricing function</td><td style="font-size:12px;">{{fields}}</td><tr>
+		{%else%}
+		<tr style="border:0;"><td style="width:95px; margin-right:10px; padding: 0;">{{fields.label}} </td><td style="font-size:12px;"> {{fields}}</td><tr>
+	{% endif %}
+	{% endif %}
+	{% endif %}
+    {% endfor %}
+    </table>
     <div id="results"></div>
     <p>The pricing function will be applied to the user with id:</p>
 
