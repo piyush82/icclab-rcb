@@ -26,7 +26,7 @@ Created on May 13, 2014
 import socket
 import sys,os
 import struct
-import periodic_web
+from processes import periodic_web
 import json
 import threading
 import json
@@ -166,8 +166,8 @@ def socket_connection(conn,running_threads):
         conn.close()
         print("Closing server socket.")
         print("len %s" %len(li_var))
-        if len(li_var)==10:
-            user=li_var[2]
+        if len(li_var)==12:
+            user=li_var[4]
             thread_name="thread"+user
             print(thread_name)
             name=thread_name
@@ -179,7 +179,7 @@ def socket_connection(conn,running_threads):
             #with open('threads.json', 'w') as f:
             #    json.dump(data, f)
             
-            thread_name=periodic_web.MyThread(li_var[0],li_var[1],li_var[2],li_var[3],li_var[4],li_var[5],li_var[6],li_var[7],li_var[8],thread_name)
+            thread_name=periodic_web.MyThread(li_var[0],li_var[1],li_var[2],li_var[3],li_var[4],li_var[5],li_var[6],li_var[7],li_var[8],li_var[9],li_var[10],thread_name)
             thread_name.start()
             #my_dict={thread_name:user}
             #.update(my_dict)

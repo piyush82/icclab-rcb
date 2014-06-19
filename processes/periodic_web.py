@@ -24,33 +24,27 @@ Created on Apr 9, 2014
 '''
 
 from threading import Thread
-from django.contrib import admin
+import sys,os
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "web_ui.settings")
+from django.conf import settings
 from main_menu.models import StackUser,PricingFunc, PriceLoop, MetersCounter,\
     Udr, PriceCdr
-from django.http import HttpResponseRedirect
-import sys,os
+
+
 from django.core import urlresolvers
 from django.forms import widgets
 import datetime
 import time
+from os_api import keystone_api
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'os_api')))
 import ceilometer_api
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'processes')))
 import periodic
-from django.contrib.contenttypes.models import ContentType
-from django.core.urlresolvers import reverse
-from django.conf.urls import patterns
-from django.shortcuts import render
-import django.forms as forms
-from django.shortcuts import render_to_response
-from django.contrib import messages
-from django.core import serializers
-from django.core.exceptions import ObjectDoesNotExist
 from main_menu.views import auth_token,is_auth
 from time import gmtime, strftime, strptime
 from threading import Timer
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "web_ui.settings")
-from django.conf import settings
+
+
 
 def periodic_counter(self,token_id,token_metering,meters_used,meter_list,func,user,time,from_date,from_time,end_date,end_time,user_id_stack,pricing_list):
     """
@@ -185,12 +179,18 @@ def pricing(self,user,meter_list,pricing_list,udr):
 
 
 class MyThread(Thread):
-    def __init__(self, token_id,token_metering,user,time_f,from_date,from_time,end_date,end_time,user_id_stack,name):
+    def __init__(self, username,password,domain,project,user,time_f,from_date,from_time,end_date,end_time,user_id_stack,name):
         super(MyThread, self).__init__()
+        auth_uri = 'http://160.85.4.10:5000'
+        self.username=username
+        self.password=password
+        self.domain=domain
+        self.project=project
+        status, token_data = keystone_api.get_token_v3(auth_uri,True,username=username, password=password, domain=domain,project=project)
         self.daemon = True
         self.cancelled = False
-        self.token_id=token_id
-        self.token_metering=token_metering
+        self.token_id=token_data["token_id"] 
+        self.token_metering=token_data["metering"]
         self.user=StackUser.objects.get(id=user)       
         self.from_date=from_date
         self.from_time=from_time
@@ -198,7 +198,7 @@ class MyThread(Thread):
         self.end_time=end_time
         self.time_f=float(time_f)*3600
         self.user_id_stack=user_id_stack
-        status_meter_list, self.meter_list = ceilometer_api.get_meter_list(token_id, token_metering)                              
+        status_meter_list, self.meter_list = ceilometer_api.get_meter_list(self.token_id, self.token_metering)                              
         self.pricing_list=[]
         self.meters_used=[]
         self.func=PricingFunc.objects.get(user_id=user) 
