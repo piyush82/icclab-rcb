@@ -217,6 +217,10 @@ def auth_token(request):
             status, token_data = keystone_api.get_token_v3(auth_uri,True,username=username, password=password, domain=domain,project=project)
             request.session["status"] = status
             request.session["token_data"] = token_data
+            request.session['username']=username
+            request.session['password']=password
+            request.session['domain']=domain
+            request.session['project']=project
             if 'next' in request.GET:
                 return redirect(request.GET['next'])
             else:

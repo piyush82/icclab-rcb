@@ -376,6 +376,10 @@ class stackUserAdmin(admin.ModelAdmin):
                     
             if 'start_counter' in request.POST:
                 form2 = self.StartPeriodicForm(request.POST)
+                username=request.session['username']
+                password=request.session['password']
+                domain=request.session['domain']
+                project=request.session['project']
                 if form2.is_valid():
                     from_date=str(form2.cleaned_data["dateStart"])
                     from_time='00:00:00'
@@ -406,7 +410,7 @@ class stackUserAdmin(admin.ModelAdmin):
                                 resp = s.recv(100)
                                 if resp=="ok":
                                     print("Got ok, sending data.")
-                                    lista=[token_id,token_data["metering"],user_id,time_f,from_date,from_time,end_date,end_time,user_id_stack,None]
+                                    lista=[username,password,domain,project,user_id,time_f,from_date,from_time,end_date,end_time,user_id_stack,None]
                                     #lista={'k_self':k_self,'token_data':token_data,'token_id':token_id,'meters_used':meters_used,'meter_list':meter_list,'func':func,'user':user,'time_f':time_f,'from_date':from_date,'from_time':from_time,'end_date':end_date,'end_time':end_time,'user_id_stack':user_id_stack}
                                     for i in lista:
                                         msg=str(i)
@@ -543,14 +547,11 @@ class tenantAdmin(admin.ModelAdmin):
                     ten=Tenant.objects.get(tenant_id=tenant_list[i]["tenant_id"])
                 except Tenant.DoesNotExist:
                     tenant=Tenant(tenant_id=tenant_list[i]["tenant_id"],tenant_name=tenant_list[i]["tenant_name"])
-                    tenant.save()   
-            #for i in range(len(tenant_list)):
-            #    print '%20s %20s' %(tenant_list[i]["user_id"], tenant_list[i]["user_name"])
-            return self.list_display  
+                    tenant.save()
         except KeyError:
-            messages.warning(request, "You have to authenticate first!")
-            return redirect('/auth_token/?next=%s' % request.path)
-
+            messages.warning(request, "You have to authenticate first!")  
+            return redirect('/auth_token/?next=%s' % request.path)  
+        return self.list_display 
     
     class ListUsersForm(forms.Form):
         _selected_action = forms.CharField(widget=forms.MultipleHiddenInput)   
@@ -593,7 +594,10 @@ class tenantAdmin(admin.ModelAdmin):
                 
                 if 'start_counter' in request.POST:
                     user=request.POST["user"]
-
+                    username=request.session['username']
+                    password=request.session['password']
+                    domain=request.session['domain']
+                    project=request.session['project']
                     stack_user_object=stackUserAdmin(StackUser,admin)
                     form2 = stack_user_object.StartPeriodicForm(request.POST)
                     if form2.is_valid():
@@ -626,7 +630,7 @@ class tenantAdmin(admin.ModelAdmin):
                                     resp = s.recv(100)
                                     if resp=="ok":
                                         print("Got ok, sending data.")
-                                        lista=[token_id,token_data["metering"],user_id,time_f,from_date,from_time,end_date,end_time,user_id_stack,None]
+                                        lista=[username,password,domain,project,user_id,time_f,from_date,from_time,end_date,end_time,user_id_stack,None]
                                         for i in lista:
                                             msg=str(i)
                                             msg = struct.pack('>I', len(msg)) + msg
