@@ -29,8 +29,8 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "web_ui.settings")
 from django.conf import settings
 from main_menu.models import StackUser,PricingFunc, PriceLoop, MetersCounter,\
     Udr, PriceCdr
-
-
+path=os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..'))
+import sqlite3
 from django.core import urlresolvers
 from django.forms import widgets
 import datetime
@@ -76,11 +76,15 @@ def periodic_counter(self,token_id,token_metering,meters_used,meter_list,func,us
 def get_delta_samples(self,token_data,token_id,user,meter):
     delta=0.0
     meter2=str(meter)
-    samples =list( MetersCounter.objects.filter(user_id=user,meter_name = meter))
-    last=str(samples[-1])
+    conn = sqlite3.connect(path+'/db.sqlite3',check_same_thread=False)
+    cursor = conn.execute('SELECT max(ID) FROM MAIN_MENU_METERSCOUNTER')
+    last = cursor.fetchone()
+    #samples =list( MetersCounter.objects.filter(user_id=user,meter_name = meter))
+    #last=str(samples[-1])
     return last
         
-def get_udr(self,token_id,token_metering,user,meters_used,meter_list,func,web_bool,from_date,from_time,end_date,end_time,user_id_stack):
+def get_udr(self,token_id,token_metering,user,meters_used,meter_list,func,web_bool,from_date,from_time,end_date,end_time,user_id_stack):   
+    conn = sqlite3.connect(path+'/db.sqlite3',check_same_thread=False)
     date_time=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     delta_list=[None]*5
     all_stats=[] 
@@ -107,32 +111,43 @@ def get_udr(self,token_id,token_metering,user,meters_used,meter_list,func,web_bo
                         total[i]+=stat_list[0]["average"]*time_period
                     if meter_list[j]["meter-type"]=="delta":
                         total[i]+=stat_list[0]["sum"]
-                    new_time=stat_list[0]["duration-end"]
-        meters_counter=MetersCounter(meter_name=meters_used[i],user_id=user,counter_volume=total[i],unit=unit ,timestamp=date_time)
-        meters_counter.save() 
+                    new_time=stat_list[0]["duration-end"]   
+        conn.execute("INSERT INTO MAIN_MENU_METERSCOUNTER(METER_NAME,USER_ID_ID,COUNTER_VOLUME,UNIT,TIMESTAMP) \
+            VALUES ('"+ str(meters_used[i]) +"' ,' "+ str(user)+"' ,' "+str(total[i])+"' ,' "+str(unit)+"' ,' "+str(date_time)+" ')")
+        #meters_counter=MetersCounter(meter_name=meters_used[i],user_id=user,counter_volume=total[i],unit=unit ,timestamp=date_time)
+        #meters_counter.save() 
         #delta=get_delta_samples(self,token_metering,token_id,user,meters_used[i])
         #delta_list[i]=delta
         for i in range(len(delta_list)):
             for j in range(len(total)):
                 if i==j:
                     delta_list[i]=total[j]
-    udr=Udr(user_id=user,timestamp=date_time,pricing_func_id=func, param1=delta_list[0], param2=delta_list[1], param3=delta_list[2], param4=delta_list[3], param5=delta_list[4])
-    udr.save()        
+    conn.execute("INSERT INTO MAIN_MENU_UDR(USER_ID_ID,TIMESTAMP,PRICING_FUNC_ID_ID,PARAM1,PARAM2,PARAM3,PARAM4,PARAM5) \
+           VALUES ( '"+ str(user) +"', '"+str(date_time)+"', '"+str(func)+"', '"+ str(delta_list[0]) +"','" +str(delta_list[1]) +"','" +str(delta_list[2]) +"','" + str(delta_list[3]) +" ','"+ str(delta_list[4]) +" ')")
+#    udr=Udr(user_id=user,timestamp=date_time,pricing_func_id=func, param1=delta_list[0], param2=delta_list[1], param3=delta_list[2], param4=delta_list[3], param5=delta_list[4])
+#    udr.save()        
+    #return udr,new_time
+    conn.commit()
+    conn.close()
+    udr={'param1':delta_list[0],'param2':delta_list[1],'param3':delta_list[2],'param4':delta_list[3],'param5':delta_list[4]}
     return udr,new_time
-
 
 
 
 def pricing(self,user,meter_list,pricing_list,udr):
     
-    func=PricingFunc.objects.get(user_id=user)
+    #func=PricingFunc.objects.get(user_id=user)
+    conn = sqlite3.connect(path+'/db.sqlite3',check_same_thread=False)
+    cursor=conn.execute("SELECT ID FROM MAIN_MENU_PRICINGFUNC WHERE USER_ID_ID="+str(user))
+    for row in cursor:
+        func_id=row[0]
      
     udr_list=[]
-    udr_list.append(udr.param1)
-    udr_list.append(udr.param2)
-    udr_list.append(udr.param3)
-    udr_list.append(udr.param4)
-    udr_list.append(udr.param5)
+    udr_list.append(udr['param1'])
+    udr_list.append(udr['param2'])
+    udr_list.append(udr['param3'])
+    udr_list.append(udr['param4'])
+    udr_list.append(udr['param5'])
     for i in udr_list:
         if i==None:
             i=0
@@ -172,8 +187,13 @@ def pricing(self,user,meter_list,pricing_list,udr):
                 if pricing_list[i]=="%":
                     price=price*x/100.0
     date_time=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    cdr=PriceCdr(user_id=user,timestamp=date_time,pricing_func_id=func, price=price)
-    cdr.save()
+    #cdr=PriceCdr(user_id=user,timestamp=date_time,pricing_func_id=func, price=price)
+    #cdr.save()
+    conn.execute("INSERT INTO MAIN_MENU_PRICECDR(PRICE,TIMESTAMP,USER_ID_ID,PRICING_FUNC_ID_ID) \
+            VALUES ('"+ str(price) +"' ,' "+ str(date_time)+"' ,' "+str(user)+"' ,' "+str(func_id)+" ')")
+    conn.commit()
+    conn.close()
+    print ("Price calculated. Inserted into CDR table.")
     return price
 
 
@@ -182,6 +202,7 @@ class MyThread(Thread):
     def __init__(self, username,password,domain,project,user,time_f,from_date,from_time,end_date,end_time,user_id_stack,name):
         super(MyThread, self).__init__()
         auth_uri = 'http://160.85.4.10:5000'
+        conn = sqlite3.connect(path+'/db.sqlite3',check_same_thread=False)
         self.username=username
         self.password=password
         self.domain=domain
@@ -191,27 +212,34 @@ class MyThread(Thread):
         self.cancelled = False
         self.token_id=token_data["token_id"] 
         self.token_metering=token_data["metering"]
-        self.user=StackUser.objects.get(id=user)       
+        self.user=user
+        #self.user=StackUser.objects.get(id=user)       
         self.from_date=from_date
         self.from_time=from_time
         self.end_date=end_date
         self.end_time=end_time
-        self.time_f=float(time_f)*3600
+        #self.time_f=float(time_f)*3600
+        self.time_f=float(time_f)
         self.user_id_stack=user_id_stack
         status_meter_list, self.meter_list = ceilometer_api.get_meter_list(self.token_id, self.token_metering)                              
         self.pricing_list=[]
         self.meters_used=[]
-        self.func=PricingFunc.objects.get(user_id=user) 
-        self.pricing_list.append(self.func.param1)
-        self.pricing_list.append(self.func.sign1)
-        self.pricing_list.append(self.func.param2)
-        self.pricing_list.append(self.func.sign2)
-        self.pricing_list.append(self.func.param3)
-        self.pricing_list.append(self.func.sign3)
-        self.pricing_list.append(self.func.param4)
-        self.pricing_list.append(self.func.sign4)
-        self.pricing_list.append(self.func.param5)    
+        #self.func=PricingFunc.objects.get(user_id=user) 
+        cursor=conn.execute("SELECT PARAM1,SIGN1,PARAM2,SIGN2,PARAM3,SIGN3,PARAM4,SIGN4,PARAM5,ID FROM MAIN_MENU_PRICINGFUNC WHERE USER_ID_ID="+str(user))
+        for row in cursor:
+            self.pricing_list.append(row[0])
+            self.pricing_list.append(row[1])
+            self.pricing_list.append(row[2])
+            self.pricing_list.append(row[3])
+            self.pricing_list.append(row[4])
+            self.pricing_list.append(row[5])
+            self.pricing_list.append(row[6])
+            self.pricing_list.append(row[7])
+            self.pricing_list.append(row[8])
+            self.func=row[9]    
         print("Inside init thread.")
+        conn.commit()
+        conn.close()
         self.name=name            
         for i in range(len(self.pricing_list)):
             j=0
