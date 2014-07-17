@@ -568,7 +568,7 @@ class stackUserAdmin(admin.ModelAdmin):
                                             elif pricing_list[i]==func.param5:
                                                 data_value[count]+=float(j.param5)
                                             data['itemized-data'][count]['value']=data_value[count]
-                                            count+=1
+                                        count+=1
                                     
                         else:
                             status_meter_list, meter_list = ceilometer_api.get_meter_list(token_id, token_data["metering"]) 
