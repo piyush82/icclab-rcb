@@ -596,6 +596,7 @@ class stackUserAdmin(admin.ModelAdmin):
                                 data['itemized-data'][i]['value']=data_value2[i]
                                 i+=1
                             bill_total=price
+                            data_value=list(data_value2)
                             
                         count2=0
                         data_price=[]
