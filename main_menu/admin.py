@@ -518,7 +518,7 @@ class stackUserAdmin(admin.ModelAdmin):
                 data['company'] = company_name
                 data['company-address-1'] = 'Obere Kirchgasse 2'
                 data['company-address-2'] = '8400, Winterthur, Switzerland'
-                data['user-name'] = 'Patrik Eschel'
+                data['user-name'] = usr.user_name
                 data['user-address-1'] = 'Team-IAMP, Technikumstrasse 9'
                 data['user-address-2'] = '8400 Winterthur, Switzerland'
                 data['bill-month'] = one_month_ago.strftime("%B")
