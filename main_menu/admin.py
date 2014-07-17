@@ -347,7 +347,7 @@ class stackUserAdmin(admin.ModelAdmin):
 
                                 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                                 try:
-                                    s.connect(('127.0.0.1', 9005))
+                                    s.connect(('160.85.4.236', 9005))
                                 except socket.error:
                                     print 'could not open socket'
                                     sys.exit(1)
@@ -376,7 +376,7 @@ class stackUserAdmin(admin.ModelAdmin):
                 user_id=usr.id
                 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 try:
-                    s.connect(('127.0.0.1', 9005))
+                    s.connect(('160.85.4.236', 9005))
                 except socket.error:
                     print 'could not open socket'                
                 s.sendall('check threads')
@@ -428,7 +428,7 @@ class stackUserAdmin(admin.ModelAdmin):
                 if form5.is_valid():
                         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                         try:
-                            s.connect(('127.0.0.1', 9005))
+                            s.connect(('160.85.4.236', 9005))
                         except socket.error:
                             print 'Could not open socket' 
                         s.sendall('periodic_stop')
@@ -441,7 +441,7 @@ class stackUserAdmin(admin.ModelAdmin):
             if not form5:
                 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 try:
-                    s.connect(('127.0.0.1', 9005))
+                    s.connect(('160.85.4.236', 9005))
                 except socket.error:
                     print 'could not open socket'                
                 s.sendall('check threads')
@@ -744,7 +744,7 @@ class tenantAdmin(admin.ModelAdmin):
                                     func=PricingFunc.objects.get(user_id=user_id)
                                     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                                     try:
-                                        s.connect(('127.0.0.1', 9005))
+                                        s.connect(('160.85.4.236', 9005))
                                     except socket.error:
                                         print 'could not open socket'
                                         sys.exit(1)
@@ -962,7 +962,7 @@ def show_user_status(request):
         func=PricingFunc.objects.get(user_id=user_id)
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
-            s.connect(('127.0.0.1', 9005))
+            s.connect(('160.85.4.236', 9005))
         except socket.error:
             print 'Could not open socket'                
         s.sendall('check threads')
