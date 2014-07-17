@@ -205,8 +205,23 @@ def auth_token(request):
         if status==True:
             return HttpResponseRedirect('/admin/')
         else:
-            messages.warning(request, "Unsuccessful authentication!")
-            return HttpResponseRedirect('/auth_token/')
+            if request.method == 'POST':
+                username=request.POST['user']
+                password=request.POST['pass']
+                domain=request.POST['domain']
+                project=request.POST['project']
+                auth_uri = 'http://160.85.4.10:5000'
+                status, token_data = keystone_api.get_token_v3(auth_uri,True,username=username, password=password, domain=domain,project=project)
+                request.session["status"] = status
+                request.session["token_data"] = token_data
+                request.session['username']=username
+                request.session['password']=password
+                request.session['domain']=domain
+                request.session['project']=project
+                return HttpResponseRedirect('/admin/')
+            else:
+                messages.warning(request, "Unsuccessful authentication!")
+                return render(request,'auth_token.html')
     except KeyError:
         if request.method == 'POST':
             username=request.POST['user']

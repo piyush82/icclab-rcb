@@ -32,6 +32,8 @@ from dateutil.relativedelta import *
 import datetime
 import time
 import sys
+import os
+
 
 class PDF(FPDF):
 
@@ -90,7 +92,7 @@ class PDF(FPDF):
 
 
 def generate_pdf(data):
-    fileName = data['directory'] + data['prefix'] + data['userid'] + '.pdf'
+    fileName =  data['prefix'] + data['userid'] + '.pdf'
     pdf = PDF(data['logo'], data['company'], data['company-address-1'], data['company-address-2'])
     pdf.alias_nb_pages()
     pdf.add_page()
@@ -132,9 +134,15 @@ def generate_pdf(data):
     pdf.section_title('Additional Notes')
     pdf.set_font('Times', '', 9)
     pdf.section_body(data['notes'])
-    pdf.output(fileName, 'F')
+    tmp_path=os.path.join(os.path.dirname( __file__ ), '..','..')
+    if not os.path.exists(tmp_path+"/tmp/cyclops/generated-bills/"):
+        os.makedirs(tmp_path+"/tmp/cyclops/generated-bills/")
+    file_path=tmp_path+"/tmp/cyclops/generated-bills/"+fileName
+    pdf.output(name=file_path, dest='F')
     print fileName
-    return True
+    
+    return file_path
+
 
 def main(argv):
     now = datetime.datetime.now()
