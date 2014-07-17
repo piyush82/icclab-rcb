@@ -544,6 +544,7 @@ class stackUserAdmin(admin.ModelAdmin):
                         print cdrs
                         bill_total=0
                         data_value=[None]*dat_len
+                        data_value2=[]
                         all_values=[]
                         total=[]*len(pricing_list)
                         count=0
@@ -589,10 +590,10 @@ class stackUserAdmin(admin.ModelAdmin):
                             for i in range(len(pricing_list)):
                                 if pricing_list[i]:
                                     if periodic.is_number(pricing_list[i])==False and pricing_list[i] not in ["+","-","/","*","%"]:
-                                        data_value.append(modified_list[i])
+                                        data_value2.append(modified_list[i])
                             i=0
                             while i<dat_len:
-                                data['itemized-data'][i]['value']=data_value[i]
+                                data['itemized-data'][i]['value']=data_value2[i]
                                 i+=1
                             bill_total=price
                             
