@@ -34,14 +34,15 @@ import httplib2 as http
 import sys, re
 import json
 import getpass
-
+import os
 try:
     from urlparse import urlparse
 except ImportError:
     from urllib.parse import urlparse
 
+dir_path=os.path.join(os.path.dirname( __file__ ), '..',)
 config = {}
-execfile("icclab-rcb/config.conf", config) 
+execfile(dir_path+"/config.conf", config) 
 
 def strip_non_ascii(string):
     ''' 

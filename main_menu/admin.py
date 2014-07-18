@@ -59,9 +59,9 @@ from dateutil.relativedelta import *
 pic_path=os.path.join(os.path.dirname( __file__ ), '..', 'static')
 from django.http import HttpResponse
 from django.core.servers.basehttp import FileWrapper
-
+dir_path=os.path.join(os.path.dirname( __file__ ), '..',)
 config = {}
-execfile("icclab-rcb/config.conf", config) 
+execfile(dir_path+"/config.conf", config) 
 
 class stackUserAdmin(admin.ModelAdmin):
     fields = ['user_id', 'user_name','tenant_id']

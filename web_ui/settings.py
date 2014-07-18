@@ -13,8 +13,9 @@ import os
 import sys
 from datetime import timedelta
 
+dir_path=os.path.join(os.path.dirname( __file__ ), '..',)
 config = {}
-execfile("icclab-rcb/config.conf", config) 
+execfile(dir_path+"/config.conf", config) 
 
 #BASE_DIR = os.path.dirname(os.path.dirname(__file__))+'/database'
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -90,7 +91,7 @@ DATABASES = {
         'USER': config["USER"],
         'PASSWORD': config["PASSWORD"],
         'HOST': config["HOST"],   # Or an IP Address that your DB is hosted on
-        'PORT': config["PORT"],
+        'PORT': config["PORT_DB"],
         'OPTIONS': {
                     "init_command": "SET foreign_key_checks = 0;",
                     },
