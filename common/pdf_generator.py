@@ -97,8 +97,9 @@ def generate_pdf(data):
     pdf.alias_nb_pages()
     pdf.add_page()
     pdf.set_font('Arial', 'B', 16)
-    pdf.cell(140, 10, 'ICCLab External Cloud Usage Bill for month:', 0, 0, 'L')
-    month_value = '%s-%d' % (data['bill-month'], data['bill-year'])
+    pdf.cell(140, 10, 'ICCLab External Cloud Usage Bill for period:', 0, 0, 'L')
+    pdf.set_font('Arial', 'B', 12)
+    month_value = '%s - %s' % (data['bill-start'], data['bill-end'])
     pdf.cell(50, 10, month_value, 1, 0, 'R')
     pdf.ln(20)
     pdf.set_font('Times', 'B', 12)
@@ -164,8 +165,8 @@ def main(argv):
     data['user-name'] = 'Patrik Eschel'
     data['user-address-1'] = 'Team-IAMP, Technikumstrasse 9'
     data['user-address-2'] = '8400 Winterthur, Switzerland'
-    data['bill-month'] = one_month_ago.strftime("%B")
-    data['bill-year'] = now.year
+    data['bill-start'] = one_month_ago.strftime("%B")
+    data['bill-end'] = now.year
     data['itemized-data'] = {}
     #each itemized entry must have 3 parts: meter-name, meter-value (with unit), item price
     data['itemized-data'][0] = {}
