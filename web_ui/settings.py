@@ -11,8 +11,10 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 import sys
-
 from datetime import timedelta
+
+config = {}
+execfile("icclab-rcb/config.conf", config) 
 
 #BASE_DIR = os.path.dirname(os.path.dirname(__file__))+'/database'
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -26,7 +28,7 @@ SECRET_KEY = '%q(qy(y#t7zo*_)tm#x0=o8m11_^eh_-n)%i8h^^wh%j&8s-8&'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-TEMPLATE_DEBUG = True
+TEMPLATE_DEBUG = config["DEBUG"]
 
 GLOBAL_SETTINGS = {
        'PRO_DEBUG':True,
@@ -72,7 +74,7 @@ ROOT_URLCONF = 'web_ui.urls'
 WSGI_APPLICATION = 'web_ui.wsgi.application'
 
 LOGIN_REDIRECT_URL='/index/'
-
+#LOGIN_URL='/accounts/login/?next=/demo/'
 # Database
 # https://docs.djangoproject.com/en/1.6/ref/settings/#databases
 
@@ -85,10 +87,10 @@ DATABASES = {
     'default':{
         'ENGINE': 'django.db.backends.mysql', 
         'NAME': 'db_cyclops',
-        'USER': 'icclab',
-        'PASSWORD': 'icclab',
-        'HOST': 'localhost',   # Or an IP Address that your DB is hosted on
-        'PORT': '3306',
+        'USER': config["USER"],
+        'PASSWORD': config["PASSWORD"],
+        'HOST': config["HOST"],   # Or an IP Address that your DB is hosted on
+        'PORT': config["PORT"],
         'OPTIONS': {
                     "init_command": "SET foreign_key_checks = 0;",
                     },

@@ -34,7 +34,6 @@ import datetime
 from datetime import date
 from django.forms.widgets import RadioSelect
 import socket
-from processes import periodic_web
 import struct
 import json
 from django.contrib.admin.options import ModelAdmin
@@ -61,16 +60,15 @@ pic_path=os.path.join(os.path.dirname( __file__ ), '..', 'static')
 from django.http import HttpResponse
 from django.core.servers.basehttp import FileWrapper
 
+config = {}
+execfile("icclab-rcb/config.conf", config) 
+
 class stackUserAdmin(admin.ModelAdmin):
     fields = ['user_id', 'user_name','tenant_id']
     list_display = ('user_id', 'user_name','tenant_id')
     actions = ['add_pricing_func','calculate_price','start_periodic','stop_periodic','generate_bill']  
     
     class AddPricingFuncForm(forms.Form):
-        #def __init__(self, *args, **kwargs):
-       #     choices = kwargs.pop("resources")
-         #   super(self.__class__, self).__init__(*args, **kwargs)
-          #  self.fields["resources"] = forms.CharField(widget=forms.Select(choices=choices))
         CHOICES = (('EUR', 'EUR',), ('CHF', 'CHF',),('USD', 'USD',), ('GBP', 'GBP',))
         CHOICES2 = (('0.01', '0.01',), ('1', '1',))
         func=forms.CharField(required=True)
@@ -120,7 +118,6 @@ class stackUserAdmin(admin.ModelAdmin):
                     var=form.cleaned_data['func']
                     var2=" ".join(var.split())
                     var2=var2.replace(" ", "")
-                    #price_def=var2.split(" ")
                     price_def=parse(var2)
                     curr=form.cleaned_data['currency']
                     unit=form.cleaned_data['unit']
@@ -275,12 +272,9 @@ class stackUserAdmin(admin.ModelAdmin):
                         from_date=str(form3.cleaned_data["dateStart"])
                         to_date=str(form3.cleaned_data["dateEnd"])
                         price,var=calculate_price_helper(from_date,to_date,meters_used,meter_list,user_id_stack,token_data,token_id,pricing_list,unit)
-                
-                    #date_time=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                    #cdr=PriceCdr(user_id=user,timestamp=date_time,pricing_func_id=func, price=price)
-                    #cdr.save()
+
                     self.message_user(request, "Successfully calculated price.")
-                    #self.message_user(request, "period: %s" %(time_period))
+
                     context={'user': queryset,'price':price,'currency':currency}
                     return render(request,'admin/show_price.html',context) 
 
@@ -347,7 +341,9 @@ class stackUserAdmin(admin.ModelAdmin):
 
                                 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                                 try:
-                                    s.connect(('160.85.4.236', 9005))
+                                    sock_addr=config["SOCKET_ADDR"]
+                                    sock_port=config["PORT_SOCKET"]
+                                    s.connect((sock_addr,sock_port))
                                 except socket.error:
                                     print 'could not open socket'
                                     sys.exit(1)
@@ -356,7 +352,6 @@ class stackUserAdmin(admin.ModelAdmin):
                                 if resp=="ok":
                                     print("Got ok, sending data.")
                                     lista=[username,password,domain,project,user_id,time_f,from_date,from_time,end_date,end_time,user_id_stack,None]
-                                    #lista={'k_self':k_self,'token_data':token_data,'token_id':token_id,'meters_used':meters_used,'meter_list':meter_list,'func':func,'user':user,'time_f':time_f,'from_date':from_date,'from_time':from_time,'end_date':end_date,'end_time':end_time,'user_id_stack':user_id_stack}
                                     for i in lista:
                                         msg=str(i)
                                         msg = struct.pack('>I', len(msg)) + msg
@@ -376,7 +371,9 @@ class stackUserAdmin(admin.ModelAdmin):
                 user_id=usr.id
                 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 try:
-                    s.connect(('160.85.4.236', 9005))
+                    sock_addr=config["SOCKET_ADDR"]
+                    sock_port=config["PORT_SOCKET"]
+                    s.connect((sock_addr,sock_port))
                 except socket.error:
                     print 'could not open socket'                
                 s.sendall('check threads')
@@ -428,7 +425,9 @@ class stackUserAdmin(admin.ModelAdmin):
                 if form5.is_valid():
                         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                         try:
-                            s.connect(('160.85.4.236', 9005))
+                            sock_addr=config["SOCKET_ADDR"]
+                            sock_port=config["PORT_SOCKET"]
+                            s.connect((sock_addr,sock_port))
                         except socket.error:
                             print 'Could not open socket' 
                         s.sendall('periodic_stop')
@@ -441,7 +440,9 @@ class stackUserAdmin(admin.ModelAdmin):
             if not form5:
                 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 try:
-                    s.connect(('160.85.4.236', 9005))
+                    sock_addr=config["SOCKET_ADDR"]
+                    sock_port=config["PORT_SOCKET"]
+                    s.connect((sock_addr,sock_port))
                 except socket.error:
                     print 'could not open socket'                
                 s.sendall('check threads')
@@ -513,7 +514,7 @@ class stackUserAdmin(admin.ModelAdmin):
                 ######### This is how the dictionary is to be created, all entries are self explanatory
                 data = {}
                 data['prefix'] = prefix
-                data['userid'] = userid
+                data['userid'] = usr.user_name
                 data['logo'] = logo
                 data['company'] = company_name
                 data['company-address-1'] = 'Obere Kirchgasse 2'
@@ -521,8 +522,6 @@ class stackUserAdmin(admin.ModelAdmin):
                 data['user-name'] = usr.user_name
                 data['user-address-1'] = 'Team-IAMP, Technikumstrasse 9'
                 data['user-address-2'] = '8400 Winterthur, Switzerland'
-                data['bill-month'] = one_month_ago.strftime("%B")
-                data['bill-year'] = now.year
                 data['notes'] = 'As a public service to our research and student community, currently we do not charge you for using our cloud facilities. This arrangement may change in the future.'
                 data['due-date'] = str(datetime.date.today() + datetime.timedelta(20)) 
                 data['itemized-data'] = {}
@@ -540,6 +539,8 @@ class stackUserAdmin(admin.ModelAdmin):
                     if form7.is_valid():                                          
                         from_date=str(form7.cleaned_data["dateStart"])
                         to_date=str(form7.cleaned_data["dateEnd"])
+                        data['bill-start'] = datetime.datetime.strftime(datetime.datetime.strptime(from_date,'%Y-%m-%d'),'%d.%m.%Y')
+                        data['bill-end'] = datetime.datetime.strftime(datetime.datetime.strptime(to_date,'%Y-%m-%d'),'%d.%m.%Y')
                         cdrs=PriceCdr.objects.filter(timestamp__range=(from_date, to_date))
                         print cdrs
                         bill_total=0
@@ -617,7 +618,6 @@ class stackUserAdmin(admin.ModelAdmin):
                                                 data_price.append(data_value[j]*float(pricing_list[i+1])/100.0)
                         i=0
                         while i<dat_len:
-                                #if data_price[count2]!=None:
                             data['itemized-data'][i]['price']=data_price[i]  
                             i+=1           
                         data['amount-due']=bill_total  
@@ -625,10 +625,7 @@ class stackUserAdmin(admin.ModelAdmin):
                         file_name=data['prefix'] + data['userid'] + '.pdf'
                         response = HttpResponse(FileWrapper(open(file_path)), content_type='application/pdf')
                         response['Content-Disposition'] = 'inline; filename='+file_name
-                        #self.message_user(request, "Bill created.")
                         return response
-                        #context={'response':response}
-                        #return render('/admin/main_menu/stackuser/',context)  
 
                 if not form7:
                     for i in request.POST.getlist(admin.ACTION_CHECKBOX_NAME):
@@ -665,7 +662,8 @@ class tenantAdmin(admin.ModelAdmin):
         try:
             token_data=request.session["token_data"] 
             token_id=token_data["token_id"]   
-            status,tenant_list=keystone_api.get_list_tenants(token_id,'http://160.85.4.10:35357')  
+            auth_uri=config["AUTH_URI"]
+            status,tenant_list=keystone_api.get_list_tenants(token_id,auth_uri)  
             for i in range(len(tenant_list)):
                 try:
                     ten=Tenant.objects.get(tenant_id=tenant_list[i]["tenant_id"])
@@ -746,7 +744,9 @@ class tenantAdmin(admin.ModelAdmin):
                                     func=PricingFunc.objects.get(user_id=user_id)
                                     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                                     try:
-                                        s.connect(('160.85.4.236', 9005))
+                                        sock_addr=config["SOCKET_ADDR"]
+                                        sock_port=config["PORT_SOCKET"]
+                                        s.connect((sock_addr,sock_port))
                                     except socket.error:
                                         print 'could not open socket'
                                         sys.exit(1)
@@ -802,7 +802,9 @@ class tenantAdmin(admin.ModelAdmin):
                     user_id=usr.id
                     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                     try:
-                        s.connect(('127.0.0.1', 9005))
+                        sock_addr=config["SOCKET_ADDR"]
+                        sock_port=config["PORT_SOCKET"]
+                        s.connect((sock_addr,sock_port))
                     except socket.error:
                         print 'Could not open socket' 
                     s.sendall('periodic_stop')
@@ -964,7 +966,9 @@ def show_user_status(request):
         func=PricingFunc.objects.get(user_id=user_id)
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
-            s.connect(('160.85.4.236', 9005))
+            sock_addr=config["SOCKET_ADDR"]
+            sock_port=config["PORT_SOCKET"]
+            s.connect((sock_addr,sock_port))
         except socket.error:
             print 'Could not open socket'                
         s.sendall('check threads')

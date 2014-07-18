@@ -40,6 +40,9 @@ try:
 except ImportError:
     from urllib.parse import urlparse
 
+config = {}
+execfile("icclab-rcb/config.conf", config) 
+
 def strip_non_ascii(string):
     ''' 
     Returns the string without non ASCII characters.
@@ -107,7 +110,7 @@ def get_endpoints(tokenId, uri):
                'Accept': 'application/json',
                'Content-Type': 'application/json;'
     }
-    uri="http://160.85.4.10:5000"
+    uri=config["AUTH_URI"]
     path = '/v2.0/tokens/' + tokenId + '/endpoints'
     target = urlparse(uri+path)
     method = 'GET'
