@@ -39,6 +39,7 @@ import json
 from django.contrib.admin.options import ModelAdmin
 from os_api import keystone_api
 from common.pdf_generator import generate_pdf
+from sympy.core import sympify
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'os_api')))
 import ceilometer_api
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'processes')))
@@ -643,8 +644,8 @@ class stackUserAdmin(admin.ModelAdmin):
      
 
 class pricingFuncAdmin(admin.ModelAdmin):
-    fields = ['user_id', 'param1','sign1', 'param2','sign2', 'param3','sign3', 'param4','sign4', 'param5']
-    list_display = ('user_id', 'param1','sign1', 'param2','sign2', 'param3','sign3', 'param4','sign4', 'param5')
+    fields = ['user_id', 'param1','sign1', 'param2','sign2', 'param3','sign3', 'param4','sign4', 'param5','currency','unit']
+    list_display = ('user_id', 'param1','sign1', 'param2','sign2', 'param3','sign3', 'param4','sign4', 'param5','currency','unit')
     actions = ['change_pricing_func']
     
     
@@ -1024,29 +1025,16 @@ def calculate_price_helper(from_date,to_date,meters_used,meter_list,user_id_stac
     for i in range(len(pricing_list)):
         if pricing_list[i]==None:
             pricing_list[i]=0
-    price=0.0    
+    price=0.0 
+    str_expr=""
     for i in range(len(pricing_list)):
-        if i==0:   
-            if periodic.is_number(str(pricing_list[i])):    
-                price=price+float(str(pricing_list[i]))
- 
-        if i%2!=0:
-            if pricing_list[i] in ["+","-","*","/","%"]:
-                if periodic.is_number(str(pricing_list[i+1])):
-                    x=float(str(pricing_list[i+1]))                             
-                else:
-                    break                          
-                if pricing_list[i]=="+":
-                    price=price+x
-                if pricing_list[i]=="-": 
-                    price=price-x
-                if pricing_list[i]=="*":
-                    price=price*x
-                if pricing_list[i]=="/":
-                    if x!=0:
-                        price=price/x
-                if pricing_list[i]=="%":
-                    price=price*x/100.0
+        if i!=None:
+            str_expr+=str(pricing_list[i])
+        else:
+            break
+    print(str_expr)
+    expr=sympify(str_expr)   
+    price=expr.evalf()
                                 
     price=price*unit
     return price,pricing_list
