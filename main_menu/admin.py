@@ -601,22 +601,24 @@ class stackUserAdmin(admin.ModelAdmin):
                             data_value=list(data_value2)
                             
                         count2=0
+                        k=0
                         data_price=[]
                         for i in range(len(pricing_list)):
                             if (pricing_list[i]) and pricing_list[i+1]!=None:
                                 if periodic.is_number(pricing_list[i+1])==True:
-                                    for j in range(len(data_value)):
+                                    #for j in range(len(data_value)):
                                             if pricing_list[i]=="+":
-                                                data_price.append(data_value[j]+float(pricing_list[i+1]))
+                                                data_price.append(data_value[k]+float(pricing_list[i+1]))
                                             if pricing_list[i]=="-": 
-                                                    data_price.append(data_value[j]-float(pricing_list[i+1]))
+                                                    data_price.append(data_value[k]-float(pricing_list[i+1]))
                                             if pricing_list[i]=="*":
-                                                data_price.append(data_value[j]*float(pricing_list[i+1]))
+                                                data_price.append(data_value[k]*float(pricing_list[i+1]))
                                             if pricing_list[i]=="/":
                                                 if data_value[i+2]!=0:
-                                                    data_price.append(data_value[j]/float(pricing_list[i+1]))
+                                                    data_price.append(data_value[k]/float(pricing_list[i+1]))
                                             if pricing_list[i]=="%":
-                                                data_price.append(data_value[j]*float(pricing_list[i+1])/100.0)
+                                                data_price.append(data_value[k]*float(pricing_list[i+1])/100.0)
+                                            k+=1
                         i=0
                         while i<dat_len:
                             data['itemized-data'][i]['price']=data_price[i]  
