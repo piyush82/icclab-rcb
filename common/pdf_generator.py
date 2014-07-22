@@ -114,17 +114,21 @@ def generate_pdf(data):
     ######## here just go over the itemized data and print out a line
     pdf.set_font('Times', 'B', 10)
     pdf.cell(100, 8, 'Meter Name', 1, 0, 'L')
-    pdf.cell(60, 8, 'Units Consumed', 1, 0, 'R')
-    pdf.cell(30, 8, 'Price', 1, 1, 'R')
+    pdf.cell(55, 8, 'Units Consumed', 1, 0, 'R')
+    pdf.cell(35, 8, 'Price', 1, 1, 'R')
     pdf.set_font('Courier', 'I', 10)
     for key in data['itemized-data'].keys():
         item = data['itemized-data'][key]
         pdf.cell(100, 8, str(item['name']), 0, 0, 'L')
-        pdf.cell(60, 8, str(item['value']), 0, 0, 'R')
-        pdf.cell(30, 8, str(item['price']), 0, 1, 'R')
+        pdf.cell(55, 8, str(item['value']), 0, 0, 'R')
+        pdf.cell(35, 8, str(item['price']), 0, 1, 'R')
+    pdf.set_font('Times', '', 9)
+    if str(data['unit'])=='0.01':
+        pdf.cell(190,7,'* P r i c e s  p e r   u n i t   a r e   i n   c e n t s',0,1,'L')
     pdf.set_font('Times', 'B', 10)
-    pdf.cell(160, 8, 'Total Amount Due', 1, 0, 'L')
-    pdf.cell(30, 8, str(data['amount-due']), 1, 1, 'R')
+    pdf.cell(155, 8, 'Total Amount Due', 1, 0, 'L')
+    pdf.cell(25, 8, str(data['amount-due']), 'T B L', 0, 'R')
+    pdf.cell(10,8,str(data['currency']),'T B R',1,'L')
     ############################
     pdf.ln(30)
     pdf.section_title('Important Dates')

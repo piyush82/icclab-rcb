@@ -525,6 +525,8 @@ class stackUserAdmin(admin.ModelAdmin):
                 data['user-address-2'] = '8400 Winterthur, Switzerland'
                 data['notes'] = 'As a public service to our research and student community, currently we do not charge you for using our cloud facilities. This arrangement may change in the future.'
                 data['due-date'] = str(datetime.date.today() + datetime.timedelta(20)) 
+                data['currency']=func.currency
+                data['unit']=func.unit
                 data['itemized-data'] = {}
                 dat_len=0
                 for i in range(len(pricing_list)):
