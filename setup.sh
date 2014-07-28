@@ -18,6 +18,4 @@ sudo apt-get install mysql-server
 
 mysqladmin create db_cyclops
 
-cd icclab-rcb 
-
 python manage.py syncdb --migrate
