@@ -1,6 +1,6 @@
 #! /usr/local/bin/python
 
-git clone https://github.com/piyush82/icclab-rcb.git
+
 
 sudo apt-get install python-django
 
