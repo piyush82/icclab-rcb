@@ -28,17 +28,6 @@ PORT_DB= 3306
 
 #Socket parameters
 PORT_SOCKET = 9005
-#Identity Endpoint
-AUTH_URI = "http://160.85.4.10:5000"
-
-#Database config
-USER ="icclab"
-PASSWORD= "icclab"
-HOST= "160.85.4.235"
-PORT_DB= 3306
-
-#Socket parameters
-PORT_SOCKET = 9005
 
 
 *The periodic counter stops running after sometime. It gets a bad response from the ceilometer api call when it tries to poll the statistics.
