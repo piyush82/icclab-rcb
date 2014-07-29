@@ -1,0 +1,26 @@
+Before entering the Cyclops demo site, you will be redirected to the site's login page. 
+
+For the admin page, you have to authenticicate with your OpenStack credidentials. Depending of the debug settings in the config file, you may see the keystone response. In the dashboard, there are four tables which help the admin keep track of the users in his cloud and their billing features.
+
+In the "Users" table, you can add all the users who can access the site and give them staff rights if appropriate. 
+
+In the "Pricing funcs" table, you see all the defined pricing functions for every user. By clicking on the UserID, you open a dialog where you can change the parameters of the selected function.
+ 
+In the "Stack users" table, the admin can add all the users that are on his cloud by specifying their username, user id and tenant id. If you want to change some of those properties, you can again click on the UserID. If you open the dropdown action menu that is on top, you will see the list of available actions for each user. You can then select only one of the users and choose the desired action to apply. 
+Firstly, you will want to specify a pricing function for every user. You will be redirect to a new page where the list of available meters for that particular user is displayed. The meters are grouped by resource and are generated using an api call to ceilometer. You can choose from these meters and apply standard arithmetics to get your desired pricing function. You can use up to five different operands in total. Further more, you can choose the currency (CHF, EUR, USD and GBP) and whether you want the price per meter unit to be calculated in cents (in which case it will be multiplied by 0.01) or not. With the pricing function being set for the particular user, you can then calculate his price for the consumed resources between a certain time period. You will only have to specify the desired start and end period and Cyclops will return the computed cost. 
+Apart from that, you can also start a periodic counter that will calculate the price periodically by applying the pricing policy over the metered data that is being fetched by ceilometer. You only need to specify the start date and the periodicity in hours. The results of this action are being stored in the database table "main_menu_cdr".
+There is also an option to stop the counter when needed.
+Lastly, you can generate the bill for the user. Again, you specify the time period for which you want to bill the user. Cyclops will check if there are charge data records in the "main_menu_cdr" table in which case it will collect them to create the final bill. Otherwise, it will calculate the over-all price on the spot. Cyclops will produce a PDF document where you see an itemized price breakdown for every specified billable meter along with its consumed units. The PDFs are saved on the server side on this location "/tmp/cyclops/generated-bills/".
+
+In the "Tenants" table, a list of all the tenants in your cloud is being shown. From the actions menu, you can choose to list all the users per tenant and check their status. What this means is that Cyclops will check whether the particular user has been also added to the database, whether there has been a pricing function defined for him and if so, wheteher the periodic counter has been started. If the counter is running, you would be presented with the option to stop it if you want.
+
+For accessing the user page, you will also need to authenticicate with your Openstack credidentials. On the user info page, you can either calculate your price between a certain time period or check your status. By checking your status, you will get to see the last ten charge records that exist for your account. For calculating the total price between an interval, you will need to specify the start and the end date for the period you wish to compute your costs.
+
+You should properly configure your database and then replace those parameters in the configuration files.
+
+MySql important tables:
+1. "main_menu_stackuser": stores the user id, user name and tenant id.
+2. "main_menu_pricingfunc": stores the user id, the parsed operands and operators, the currency and unit.
+3. "main_menu_meterscounter": stores the user id, meter name, volume and unit and timestamp.
+4. "main_menu_udr": stores the usage data records that correspond to the meters defined in the pricing function.
+5. "main_menu_cdr": stores the charge data records that the periodic counter generates.
