@@ -388,7 +388,7 @@ def main(argv):
     print "Hello there. This is a simple periodic counter."
     logger.info('--------------- \n')
     logger.info('Starting periodic ')
-    auth_uri = 'http://160.85.4.10:5000' #internal test-setup, replace it with your own value
+    auth_uri = 'http://160.85.4.64:5000' #internal test-setup, replace it with your own value
     #auth_uri = 'http://160.85.231.233:5000' #internal test-setup, replace it with your own value
                     
     status, token_data = keystone_api.get_token_v3(auth_uri,False)

@@ -20,7 +20,7 @@ import periodic
 
 def main(argv):
     print "Hello There. This is a simple test application making a test API call to OpenStack"
-    auth_uri = 'http://160.85.4.10:35357' #internal test-setup, replace it with your own value
+    auth_uri = 'http://160.85.4.64:35357' #internal test-setup, replace it with your own value
     status, token_data = keystone_api.get_token_v3(auth_uri,False)
     if status:
         print 'The authentication was successful, below are the data we got:'

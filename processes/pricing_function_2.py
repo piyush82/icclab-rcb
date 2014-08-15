@@ -35,7 +35,7 @@ logger.propagate = False
 
 def main(argv):
     print "Hello There. This is a simple test pricing function."
-    auth_uri = 'http://160.85.4.10:5000' #internal test-setup, replace it with your own value
+    auth_uri = 'http://160.85.4.64:5000' #internal test-setup, replace it with your own value
     status, token_data = keystone_api.get_token_v3(auth_uri)
     if status:
         print 'The authentication was successful.'

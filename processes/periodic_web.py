@@ -201,7 +201,7 @@ def pricing(self,user,meter_list,pricing_list,udr):
 class MyThread(Thread):
     def __init__(self, username,password,domain,project,user,time_f,from_date,from_time,end_date,end_time,user_id_stack,name):
         super(MyThread, self).__init__()
-        auth_uri = 'http://160.85.4.10:5000'
+        auth_uri = 'http://160.85.4.64:5000'
         conn = sqlite3.connect(path+'/db.sqlite3',check_same_thread=False)
         self.username=username
         self.password=password
