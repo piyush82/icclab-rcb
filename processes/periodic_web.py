@@ -43,7 +43,9 @@ import periodic
 from main_menu.views import auth_token,is_auth
 from time import gmtime, strftime, strptime
 from threading import Timer
-
+dir_path=os.path.join(os.path.dirname( __file__ ), '..',)
+config = {}
+execfile(dir_path+"/config.conf", config) 
 
 
 def periodic_counter(self,token_id,token_metering,meters_used,meter_list,func,user,time,from_date,from_time,end_date,end_time,user_id_stack,pricing_list):
@@ -201,7 +203,7 @@ def pricing(self,user,meter_list,pricing_list,udr):
 class MyThread(Thread):
     def __init__(self, username,password,domain,project,user,time_f,from_date,from_time,end_date,end_time,user_id_stack,name):
         super(MyThread, self).__init__()
-        auth_uri = 'http://160.85.4.64:5000'
+        auth_uri = config["AUTH_URI"]
         conn = sqlite3.connect(path+'/db.sqlite3',check_same_thread=False)
         self.username=username
         self.password=password

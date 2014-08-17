@@ -32,7 +32,7 @@ DEBUG = True
 TEMPLATE_DEBUG = config["DEBUG"]
 
 GLOBAL_SETTINGS = {
-       'PRO_DEBUG':True,
+       'PRO_DEBUG':TEMPLATE_DEBUG ,
 }
 
 #PRO_DEBUG==True

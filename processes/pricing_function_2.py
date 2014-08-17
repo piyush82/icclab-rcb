@@ -15,7 +15,9 @@ import compute_api
 import keystone_api
 import textwrap
 import logging
-
+dir_path=os.path.join(os.path.dirname( __file__ ), '..',)
+config = {}
+execfile(dir_path+"/config.conf", config) 
 def is_number(s):
     try:
         float(s)
@@ -35,7 +37,7 @@ logger.propagate = False
 
 def main(argv):
     print "Hello There. This is a simple test pricing function."
-    auth_uri = 'http://160.85.4.64:5000' #internal test-setup, replace it with your own value
+    auth_uri = config["AUTH_URI"] #internal test-setup, replace it with your own value
     status, token_data = keystone_api.get_token_v3(auth_uri)
     if status:
         print 'The authentication was successful.'

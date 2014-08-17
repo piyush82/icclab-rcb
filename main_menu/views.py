@@ -43,7 +43,9 @@ import compute_api
 import keystone_api
 from main_menu.models import StackUser,PricingFunc
 from main_menu import forms
-
+dir_path=os.path.join(os.path.dirname( __file__ ), '..',)
+config = {}
+execfile(dir_path+"/config.conf", config) 
 
 def index(request):
     return render_to_response('index.html',{},
@@ -185,7 +187,7 @@ def auth_token_user(request):
             password=request.POST['pass']
             domain=request.POST['domain']
             project=request.POST['project']
-            auth_uri = 'http://160.85.4.64:5000'
+            auth_uri = config["AUTH_URI"]
             status, token_data = keystone_api.get_token_v3(auth_uri,True,username=username, password=password, domain=domain,project=project)
             request.session["status"] = status
             request.session["token_data"] = token_data
@@ -210,7 +212,7 @@ def auth_token(request):
                 password=request.POST['pass']
                 domain=request.POST['domain']
                 project=request.POST['project']
-                auth_uri = 'http://160.85.4.64:5000'
+                auth_uri = config["AUTH_URI"]
                 status, token_data = keystone_api.get_token_v3(auth_uri,True,username=username, password=password, domain=domain,project=project)
                 request.session["status"] = status
                 request.session["token_data"] = token_data
@@ -228,7 +230,7 @@ def auth_token(request):
             password=request.POST['pass']
             domain=request.POST['domain']
             project=request.POST['project']
-            auth_uri = 'http://160.85.4.64:5000'
+            auth_uri = config["AUTH_URI"]
             status, token_data = keystone_api.get_token_v3(auth_uri,True,username=username, password=password, domain=domain,project=project)
             request.session["status"] = status
             request.session["token_data"] = token_data

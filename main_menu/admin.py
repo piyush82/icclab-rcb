@@ -929,7 +929,7 @@ class tenantAdmin(admin.ModelAdmin):
                 
                 if not form6:
                     form6=self.ListUsersForm(initial={'_selected_action': request.POST.getlist(admin.ACTION_CHECKBOX_NAME)})
-                    status,user_list=keystone_api.get_users_per_tenant(token_id,'http://160.85.4.64:5000',str(tenant))  
+                    status,user_list=keystone_api.get_users_per_tenant(token_id,config["AUTH_URI"],str(tenant))  
                     for i in range(len(user_list)):
                         user_ids.append(user_list[i]["user_id"])
                         user_names.append(user_list[i]["user_name"])
