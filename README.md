@@ -20,10 +20,10 @@ Generic Rating, Charging & Billing framework for cloud services.
 
 ##Get started
 
-1. Install git on the server
-2. Load the coadbase on to the server ```git clone https://github.com/piyush82/icclab-rcb.git```
-3. Change directory into "icclab-rcb" ```cd icclab-rcb```
-4. Run the setup file ```sudo bash setup.sh {username} {password}```
-  4.1 Here the username and password are the mysql account details that will be used by cyclops.
-5. Edit the config.conf file to add the URL for authentication and mysql server login credentials, mysql username and password will be the values you provided while running the script.
-6. Start the server ```python manage.py runserver 0.0.0.0:[port]```
+* Install git on the server
+* Load the coadbase on to the server ```git clone https://github.com/piyush82/icclab-rcb.git```
+* Change directory into "icclab-rcb" ```cd icclab-rcb```
+* Run the setup file ```sudo bash setup.sh {username} {password}```
+ * Here the username and password are the mysql account details that will be used by cyclops.
+* Edit the config.conf file to add the URL for authentication and mysql server login credentials, mysql username and password will be the values you provided while running the script.
+* Start the server ```python manage.py runserver 0.0.0.0:[port]```
