@@ -87,7 +87,7 @@ class stackUserAdmin(admin.ModelAdmin):
             try:
                 token_data=request.session["token_data"] 
                 token_id=token_data["token_id"]
-                status_meter_list, meter_list = ceilometer_api.get_meter_list(token_id, token_data["metering"])      
+                status_meter_list, meter_list = ceilometer_api.get_meter_list(token_id, config["METERING_URI"])      
             except KeyError:
                 messages.warning(request, "You have to authenticate first!")
                 return redirect('/auth_token/?next=%s' % request.path)
@@ -135,7 +135,7 @@ class stackUserAdmin(admin.ModelAdmin):
                             if price_def[i]==meter_list[j]["meter-name"]:
                                 meters_used.append(price_def[i])
                                 meters_ids.append(meter_list[j]["meter-id"])
-                                status_samples,sample_list=ceilometer_api.get_meter_samples(price_def[i],token_data["metering"],token_id,False,meter_list,False,'')
+                                status_samples,sample_list=ceilometer_api.get_meter_samples(price_def[i],config["METERING_URI"],token_id,False,meter_list,False,'')
                                 if sample_list==[]:
                                     price_def[i]=str(0)
 
@@ -225,7 +225,7 @@ class stackUserAdmin(admin.ModelAdmin):
             try:
                 token_data=request.session["token_data"] 
                 token_id=token_data["token_id"]
-                status_meter_list, meter_list = ceilometer_api.get_meter_list(token_id, token_data["metering"])      
+                status_meter_list, meter_list = ceilometer_api.get_meter_list(token_id, config["METERING_URI"])      
             except KeyError:
                 messages.warning(request, "You have to authenticate first!")
                 return redirect('/auth_token/?next=%s' % request.path)
@@ -575,7 +575,7 @@ class stackUserAdmin(admin.ModelAdmin):
                                         count+=1
                                     
                         else:
-                            status_meter_list, meter_list = ceilometer_api.get_meter_list(token_id, token_data["metering"]) 
+                            status_meter_list, meter_list = ceilometer_api.get_meter_list(token_id, config["METERING_URI"]) 
                             for i in range(len(pricing_list)):
                                 j=0
                                 while j<len(meter_list):
@@ -778,7 +778,7 @@ class tenantAdmin(admin.ModelAdmin):
                     user=request.POST["user"]
                     usr=StackUser.objects.get(user_id=user)   
                     resources=[]
-                    status_meter_list, meter_list = ceilometer_api.get_meter_list(token_id, token_data["metering"])
+                    status_meter_list, meter_list = ceilometer_api.get_meter_list(token_id, config["METERING_URI"])
                     for i in range(len(meter_list)):
                         resources.append(meter_list[i]["resource-id"])
                     set_resources=set(resources)
@@ -826,7 +826,7 @@ class tenantAdmin(admin.ModelAdmin):
                     usr=StackUser.objects.get(user_id=user)
                     user_id=usr.id
                     resources=[]
-                    status_meter_list, meter_list = ceilometer_api.get_meter_list(token_id, token_data["metering"])
+                    status_meter_list, meter_list = ceilometer_api.get_meter_list(token_id, config["METERING_URI"])
                     for i in range(len(meter_list)):
                         resources.append(meter_list[i]["resource-id"])
                     set_resources=set(resources)
@@ -864,7 +864,7 @@ class tenantAdmin(admin.ModelAdmin):
                                 if price_def[i]==meter_list[j]["meter-name"]:
                                     meters_used.append(price_def[i])
                                     meters_ids.append(meter_list[j]["meter-id"])
-                                    status_samples,sample_list=ceilometer_api.get_meter_samples(price_def[i],token_data["metering"],token_id,False,meter_list,False,'')
+                                    status_samples,sample_list=ceilometer_api.get_meter_samples(price_def[i],config["METERING_URI"],token_id,False,meter_list,False,'')
                                     if sample_list==[]:
                                         price_def[i]=str(0)
 
@@ -1006,7 +1006,7 @@ def calculate_price_helper(from_date,to_date,meters_used,meter_list,user_id_stac
             if meters_used[i]==meter_list[j]["meter-name"]:
                 resource_id=meter_list[j]["resource-id"]
                 q=ceilometer_api.set_query(from_date,to_date,from_time,to_time,resource_id,user_id_stack,True)
-                status,stat_list=ceilometer_api.meter_statistics(meters_used[i], token_data["metering"],token_id,meter_list,True,q=q)
+                status,stat_list=ceilometer_api.meter_statistics(meters_used[i], config["METERING_URI"],token_id,meter_list,True,q=q)
                 if stat_list==[]:
                     total[i]+=0
                 else:
