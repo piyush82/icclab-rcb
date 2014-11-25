@@ -191,25 +191,29 @@ def set_query(from_date,to_date,from_time,to_time,resource_id,user_id,status_q):
       
     """       
     if(status_q==True):
-        q='"q":['
+        #q='"q":['
+        q = ''
         if (from_date not in "/"):
-            q= q+'{"field": "timestamp","op": "ge","value": "'+from_date+'T'+from_time+'"},{"field": "timestamp","op": "lt","value": "'+to_date+'T'+to_time+'"}'
+            #q= q+'{"field": "timestamp","op": "gt","value": "'+from_date+'T'+from_time+'"},{"field": "timestamp","op": "lt","value": "'+to_date+'T'+to_time+'"}'
+            q = 'q.field=timestamp&q.op=gt&q.value=' + from_date + 'T' + from_time + '&q.field=timestamp&q.op=lt&q.value=' + to_date + 'T' + to_time
+            if (user_id != "/"):
+                #q=q+',{"field": "user_id","op": "eq","value": "'+user_id+'"}'
+                q = q + '&q.field=user_id&q.op=eq&q.value=' + user_id
             if (resource_id != "/"):
-                q=q+',{"field": "resource_id","op": "eq","value": "'+resource_id+'"}'
-                if (user_id != "/"):
-                    q=q+',{"field": "user_id","op": "eq","value": "'+user_id+'"}'
-            else:
-                if (user_id != "/"):
-                    q=q+',{"field": "user_id","op": "eq","value": "'+user_id+'"}'
+                #q=q+',{"field": "resource_id","op": "eq","value": "'+resource_id+'"}'
+                q = q + '&q.field=resource_id&q.op=eq&q.value=' + resource_id
         else:
-            if (resource_id != "/"):
-                q=q+'{"field": "resource_id","op": "eq","value": "'+resource_id+'"}'
-                if (user_id != "/"):
-                    q=q+',{"field": "user_id","op": "eq","value": "'+user_id+'"}'
+            if (user_id != "/"):
+                #q=q+',{"field": "user_id","op": "eq","value": "'+user_id+'"}'
+                q = q + '&q.field=user_id&q.op=eq&q.value=' + user_id
+                if (resource_id != "/"):
+                    #q=q+'{"field": "resource_id","op": "eq","value": "'+resource_id+'"}'
+                    q = q + '&q.field=resource_id&q.op=eq&q.value=' + resource_id
             else:
                 if (user_id != "/"):
-                    q=q+'{"field": "user_id","op": "eq","value": "'+user_id+'"}'
-        q=q+']'
+                    #q=q+'{"field": "user_id","op": "eq","value": "'+user_id+'"}'
+                    q = q + '&q.field=user_id&q.op=eq&q.value=' + user_id
+        #q=q+']'
     return q
 
 
@@ -234,15 +238,16 @@ def meter_statistics(meter_id,api_endpoint,token,meter_list,web,**kwargs):
     headers = {
                #'Accept': 'application/json',
                'Content-Type': 'application/json;',
+               'Accept': 'application/json',
                'X-Auth-Token': token
-               
     }
 
 
 
         
-    path = "/v2/meters/"+meter_id+"/statistics"
-    target = urlparse(api_endpoint+path)
+    path = "/v2/meters/"+meter_id+"/statistics?"
+    q=kwargs.pop('q')
+    target = urlparse(api_endpoint+path+q)
     method = 'GET'
     logger.info('Inside meter-statistics: Path is %s',target)
     if(web==False):    
@@ -315,7 +320,7 @@ def meter_statistics(meter_id,api_endpoint,token,meter_list,web,**kwargs):
                         body=body+groupby_def
                 body=body+"}"
     else:       
-        q=kwargs.pop('q')
+        #q=kwargs.pop('q')
         if 'period' in kwargs:
             period=kwargs.pop('period')
             body="{"+q
@@ -326,10 +331,18 @@ def meter_statistics(meter_id,api_endpoint,token,meter_list,web,**kwargs):
     if is_in_mlist(meter_id,meter_list):        
         logger.info('Inside meter_statistics: body is  %s',body)        
         h = http.Http()
-        response, content = h.request(target.geturl(),method,body,headers)
+        #print method
+        #print body
+        #print headers
+        #print target.geturl()
+        #response, content = h.request(target.geturl(),method,body,headers)
+        response, content = h.request(target.geturl(),method,'',headers)
+        #print response
         header = json.dumps(response)
+        #print header
         json_header = json.loads(header)
-    
+        #print json_header
+
         server_response = json_header["status"]
         if server_response not in {'200'}:
             print "Inside meter_statistics(): Something went wrong!"
@@ -338,6 +351,9 @@ def meter_statistics(meter_id,api_endpoint,token,meter_list,web,**kwargs):
         else:
             logger.info('Getting the meter statistics \n')
             data = json.loads(content)
+            #print content
+            #print data
+            #print "========================="
             meter_stat = [None]*len(data)
             for i in range(len(data)):
                 meter_stat[i]={}
@@ -420,6 +436,7 @@ def get_meter_samples(meter_name,api_endpoint,token,bool_query,meter_list,web,q)
         logger.info('Inside get_meter_samples: Body is %s', body)
         h = http.Http()
         response, content = h.request(target.geturl(),method,body,headers)
+        #response, content = h.request(target.geturl(),method,'',headers)
         header = json.dumps(response)
         json_header = json.loads(header)
     

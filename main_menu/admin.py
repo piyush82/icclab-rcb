@@ -1012,13 +1012,13 @@ def calculate_price_helper(from_date,to_date,meters_used,meter_list,user_id_stac
                 else:
                     if meter_list[j]["meter-type"]=="cumulative":
                         total[i]+=stat_list[0]["max"]-stat_list[0]["min"]                                           
-                    if meter_list[j]["meter-type"]=="gauge":
+                    elif meter_list[j]["meter-type"]=="gauge":
                         t1=datetime.datetime.combine(datetime.datetime.strptime(from_date,"%Y-%m-%d").date(),datetime.datetime.strptime(from_time,"%H:%M:%S").time())
                         t2=datetime.datetime.combine(datetime.datetime.strptime(to_date,"%Y-%m-%d").date(),datetime.datetime.strptime(to_time,"%H:%M:%S").time())
                         t=t2-t1
                         time_period=t.total_seconds()
                         total[i]+=stat_list[0]["average"]*time_period
-                    if meter_list[j]["meter-type"]=="delta":
+                    elif meter_list[j]["meter-type"]=="delta":
                         total[i]+=stat_list[0]["sum"]
         all_stats.append(total[i])
         for s in range(len(pricing_list)):
