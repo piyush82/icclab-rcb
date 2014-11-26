@@ -1,0 +1,50 @@
+{% extends "admin/base_site.html" %}
+{% block head %}
+<script type="text/javascript" src="/site_media/prototype.js"></script>
+<script type="text/javascript" src="/site_media/my_ajax_function.js"></script>
+{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
+<script type="text/javascript" src="{{ STATIC_URL }}js/jquery-1.11.0.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/jquery-ui-1.10.4.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/ui.js"></script>
+
+<form action="" method="post" >
+{% csrf_token %}
+	{% if form.errors %}
+		{% for field in form %}
+			{% for error in field.errors %}
+            			<div class="alert alert-error">
+                			<strong>{{ error|escape }}</strong>
+            			</div>
+        		{% endfor %}
+    		{% endfor %}
+    		{% for error in form.non_field_errors %}
+        		<div class="alert alert-error">
+            			<strong>{{ error|escape }}</strong>
+        		</div>
+    		{% endfor %}
+	{% endif %}
+	<input type="hidden" name="_selected_action" value={{ selected }} />
+
+
+		<p><label for="dateStart">Start date:</label>{{ query_form.dateStart }}
+
+		</p>
+		<p></p>
+     	  	 <p><label for="dateEnd">End date:</label> {{ query_form.dateEnd }}
+
+		</p>
+
+
+
+
+	<input type="hidden" name="action" value="generate_bill_tenant" />
+	<input type="submit" name="bill_tenant" value="Generate bill" onclick="this.form.target='_blank';return true;" />
+
+
+</form>
+
+
+{% endblock %}
+

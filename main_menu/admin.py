@@ -39,6 +39,7 @@ import json
 from django.contrib.admin.options import ModelAdmin
 from os_api import keystone_api
 from common.pdf_generator import generate_pdf
+from common.pdf_generator import generate_pdf_tenant
 from sympy.core import sympify
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'os_api')))
 import ceilometer_api
@@ -87,7 +88,7 @@ class stackUserAdmin(admin.ModelAdmin):
             try:
                 token_data=request.session["token_data"] 
                 token_id=token_data["token_id"]
-                status_meter_list, meter_list = ceilometer_api.get_meter_list(token_id, token_data["metering"])      
+                status_meter_list, meter_list = ceilometer_api.get_meter_list(token_id, config["METERING_URI"])      
             except KeyError:
                 messages.warning(request, "You have to authenticate first!")
                 return redirect('/auth_token/?next=%s' % request.path)
@@ -135,7 +136,7 @@ class stackUserAdmin(admin.ModelAdmin):
                             if price_def[i]==meter_list[j]["meter-name"]:
                                 meters_used.append(price_def[i])
                                 meters_ids.append(meter_list[j]["meter-id"])
-                                status_samples,sample_list=ceilometer_api.get_meter_samples(price_def[i],token_data["metering"],token_id,False,meter_list,False,'')
+                                status_samples,sample_list=ceilometer_api.get_meter_samples(price_def[i],config["METERING_URI"],token_id,False,meter_list,False,'')
                                 if sample_list==[]:
                                     price_def[i]=str(0)
 
@@ -225,7 +226,7 @@ class stackUserAdmin(admin.ModelAdmin):
             try:
                 token_data=request.session["token_data"] 
                 token_id=token_data["token_id"]
-                status_meter_list, meter_list = ceilometer_api.get_meter_list(token_id, token_data["metering"])      
+                status_meter_list, meter_list = ceilometer_api.get_meter_list(token_id, config["METERING_URI"])      
             except KeyError:
                 messages.warning(request, "You have to authenticate first!")
                 return redirect('/auth_token/?next=%s' % request.path)
@@ -575,7 +576,7 @@ class stackUserAdmin(admin.ModelAdmin):
                                         count+=1
                                     
                         else:
-                            status_meter_list, meter_list = ceilometer_api.get_meter_list(token_id, token_data["metering"]) 
+                            status_meter_list, meter_list = ceilometer_api.get_meter_list(token_id, config["METERING_URI"]) 
                             for i in range(len(pricing_list)):
                                 j=0
                                 while j<len(meter_list):
@@ -656,7 +657,7 @@ class pricingFuncAdmin(admin.ModelAdmin):
 class tenantAdmin(admin.ModelAdmin):
     fields=['tenant_id','tenant_name']
     list_display=('tenant_id','tenant_name')    
-    actions = ['list_users']
+    actions = ['list_users','generate_bill_tenant']
     
     def get_list_display(self, request):
         """
@@ -778,7 +779,7 @@ class tenantAdmin(admin.ModelAdmin):
                     user=request.POST["user"]
                     usr=StackUser.objects.get(user_id=user)   
                     resources=[]
-                    status_meter_list, meter_list = ceilometer_api.get_meter_list(token_id, token_data["metering"])
+                    status_meter_list, meter_list = ceilometer_api.get_meter_list(token_id, config["METERING_URI"])
                     for i in range(len(meter_list)):
                         resources.append(meter_list[i]["resource-id"])
                     set_resources=set(resources)
@@ -826,7 +827,7 @@ class tenantAdmin(admin.ModelAdmin):
                     usr=StackUser.objects.get(user_id=user)
                     user_id=usr.id
                     resources=[]
-                    status_meter_list, meter_list = ceilometer_api.get_meter_list(token_id, token_data["metering"])
+                    status_meter_list, meter_list = ceilometer_api.get_meter_list(token_id, config["METERING_URI"])
                     for i in range(len(meter_list)):
                         resources.append(meter_list[i]["resource-id"])
                     set_resources=set(resources)
@@ -864,7 +865,7 @@ class tenantAdmin(admin.ModelAdmin):
                                 if price_def[i]==meter_list[j]["meter-name"]:
                                     meters_used.append(price_def[i])
                                     meters_ids.append(meter_list[j]["meter-id"])
-                                    status_samples,sample_list=ceilometer_api.get_meter_samples(price_def[i],token_data["metering"],token_id,False,meter_list,False,'')
+                                    status_samples,sample_list=ceilometer_api.get_meter_samples(price_def[i],config["METERING_URI"],token_id,False,meter_list,False,'')
                                     if sample_list==[]:
                                         price_def[i]=str(0)
 
@@ -929,7 +930,7 @@ class tenantAdmin(admin.ModelAdmin):
                 
                 if not form6:
                     form6=self.ListUsersForm(initial={'_selected_action': request.POST.getlist(admin.ACTION_CHECKBOX_NAME)})
-                    status,user_list=keystone_api.get_users_per_tenant(token_id,config["AUTH_URI"],str(tenant))  
+                    status,user_list=keystone_api.get_users_per_tenant(token_id,config["AUTH_URI_ADMIN"],str(tenant))  
                     for i in range(len(user_list)):
                         user_ids.append(user_list[i]["user_id"])
                         user_names.append(user_list[i]["user_name"])
@@ -940,7 +941,146 @@ class tenantAdmin(admin.ModelAdmin):
                 return redirect('/auth_token/?next=%s' % request.path)  
 
 
+    
+    class BillTenantForm(forms.Form):
+        dateStart=forms.DateField( input_formats=['%Y-%m-%d'])
+        dateEnd=forms.DateField( input_formats=['%Y-%m-%d'])
+        _selected_action = forms.CharField(widget=forms.MultipleHiddenInput) 
 
+    def generate_bill_tenant(self, request, queryset):
+        if len(queryset)>1:
+            messages.warning(request, "You can only select one tenant at a time!") 
+            return HttpResponseRedirect('/admin/main_menu/tenant/')
+             
+        else:  
+            try:
+                token_data=request.session["token_data"] 
+                token_id=token_data["token_id"]
+                var=str(queryset[0]).split(" ")
+                tenant=var[0]
+                user_ids=[]
+                user_names=[]
+                stack_users_not_added=[]
+                pricing_func_not_added=[]
+                data={}
+                stack_user_status=True
+                pricing_func_status=True
+                status,user_list=keystone_api.get_users_per_tenant(token_id,config["AUTH_URI_ADMIN"],str(tenant))  
+                for i in range(len(user_list)):
+                    user_ids.append(user_list[i]["user_id"])
+                    user_names.append(user_list[i]["user_name"])
+                    try:
+                        usr=StackUser.objects.get(user_id=user_list[i]["user_id"])
+                        user_id=usr.id
+                        func=PricingFunc.objects.get(user_id=user_id)
+                    except PricingFunc.DoesNotExist:
+                        pricing_func_status=False
+                        pricing_func_not_added.append(user_list[i]["user_id"])
+                    except StackUser.DoesNotExist:
+                        stack_user_status=False
+                        stack_users_not_added.append(user_list[i]["user_id"])  
+                if pricing_func_status==False:
+                    str_func = ",".join(pricing_func_not_added)
+                    messages.warning(request, "The following users don't have pricing function defined:"+str_func)
+                if stack_user_status==False:
+                    str_usr = ",".join(stack_users_not_added )
+                    messages.warning(request, "The following users have not been added to the database:"+str_usr)   
+                if stack_user_status==False or pricing_func_status==False:
+                    return redirect('/admin/main_menu/tenant/' )  
+                form8=None
+                now = datetime.datetime.now()
+                prefix = '%d-%d-%d-' % (now.year, now.month, now.day)
+                userid = 'piyush'
+                logo = pic_path+'/icclab1.png'
+                company_name = 'InIT Cloud Computing Lab'
+                one_month_ago = datetime.datetime.now() - relativedelta(months=1)
+                bill_total=0
+                ######### This is how the dictionary is to be created, all entries are self explanatory
+                data = {}
+                data['prefix'] = prefix
+                tenant_object=Tenant.objects.get(tenant_id=tenant)
+                data['tenantid'] = tenant
+                data['logo'] = logo
+                data['company'] = company_name
+                data['company-address-1'] = 'Obere Kirchgasse 2'
+                data['company-address-2'] = '8400, Winterthur, Switzerland'
+                data['tenant-name'] = tenant_object.tenant_name
+                data['user-address-1'] = 'Team-IAMP, Technikumstrasse 9'
+                data['user-address-2'] = '8400 Winterthur, Switzerland'
+                data['notes'] = 'As a public service to our research and student community, currently we do not charge you for using our cloud facilities. This arrangement may change in the future.'
+                data['due-date'] = str(datetime.date.today() + datetime.timedelta(20)) 
+                if 'bill_tenant' in request.POST:
+                    form8 = self.BillTenantForm(request.POST)
+                    if form8.is_valid():                                          
+                        from_date=str(form8.cleaned_data["dateStart"])
+                        to_date=str(form8.cleaned_data["dateEnd"])
+                        data['bill-start'] = datetime.datetime.strftime(datetime.datetime.strptime(from_date,'%Y-%m-%d'),'%d.%m.%Y')
+                        data['bill-end'] = datetime.datetime.strftime(datetime.datetime.strptime(to_date,'%Y-%m-%d'),'%d.%m.%Y')
+                        data['itemized-data'] = {}
+                        if stack_user_status==True and pricing_func_status==True:
+                            for i in range(len(user_ids)):
+                                data['currency']=func.currency
+                                data['unit']=func.unit
+                                pricing_list=[]
+                                meters_used=[]
+                                pricing_list.append(func.param1)
+                                pricing_list.append(func.sign1)
+                                pricing_list.append(func.param2)
+                                pricing_list.append(func.sign2)
+                                pricing_list.append(func.param3)
+                                pricing_list.append(func.sign3)
+                                pricing_list.append(func.param4)
+                                pricing_list.append(func.sign4)
+                                pricing_list.append(func.param5) 
+                                data['itemized-data'][i]={}
+                                data['itemized-data'][i]['name']=user_names[i]
+                                data['itemized-data'][i]['id']=user_ids[i]
+                                currency=func.currency
+                                usr=StackUser.objects.get(user_id=user_ids[i])
+                                cdrs=PriceCdr.objects.filter(timestamp__range=(from_date, to_date)).filter(user_id=usr.id)
+                                usr_price=0
+                                if cdrs:
+                                    for m in cdrs:
+                                        usr_price+=m.price
+                                else:
+                                    status_meter_list, meter_list = ceilometer_api.get_meter_list(token_id, config["METERING_URI"]) 
+                                    unit=float(func.unit)
+                                    for m in range(len(pricing_list)):
+                                        j=0
+                                        while j<len(meter_list):
+                                            if pricing_list[m]==meter_list[j]["meter-name"]:
+                                                if pricing_list[m] in meters_used:
+                                                    continue
+                                                else:
+                                                    meters_used.append(pricing_list[m])                                                                
+                                                break
+                                            else:
+                                                j=j+1
+                                    list_helper=list(pricing_list)
+                                    price,modified_list=calculate_price_helper(from_date,to_date,meters_used,meter_list,user_ids[i],token_data,token_id,pricing_list,unit)
+                                    usr_price=price
+                                data['itemized-data'][i]['price']=usr_price                                  
+                                bill_total+=usr_price
+                            data['amount-due']=bill_total  
+                            file_path=generate_pdf_tenant(data) 
+                            file_name=data['prefix'] + data['tenantid'] + '.pdf'
+                            response = HttpResponse(FileWrapper(open(file_path)), content_type='application/pdf')
+                            response['Content-Disposition'] = 'inline; filename='+file_name
+                            return response                                                             
+                
+                if not form8:
+                    for i in request.POST.getlist(admin.ACTION_CHECKBOX_NAME):
+                        selected=int(str(i))
+                    form8=self.BillTenantForm(initial={'_selected_action': request.POST.getlist(admin.ACTION_CHECKBOX_NAME)})
+                    context={'tenant': tenant,'query_form': form8, 'selected':selected}
+                    return render(request,'admin/bill_tenant.html',context)             
+                                            
+            except KeyError:
+                messages.warning(request, "You have to authenticate first!")
+                return redirect('/auth_token/?next=%s' % request.path)  
+            
+    generate_bill_tenant.short_description = "Generate the bill for the specific tenant."                 
+                
 admin.site.register(StackUser,stackUserAdmin)
 admin.site.register(PricingFunc,pricingFuncAdmin)
 admin.site.register(Tenant,tenantAdmin)        
@@ -1006,7 +1146,7 @@ def calculate_price_helper(from_date,to_date,meters_used,meter_list,user_id_stac
             if meters_used[i]==meter_list[j]["meter-name"]:
                 resource_id=meter_list[j]["resource-id"]
                 q=ceilometer_api.set_query(from_date,to_date,from_time,to_time,resource_id,user_id_stack,True)
-                status,stat_list=ceilometer_api.meter_statistics(meters_used[i], token_data["metering"],token_id,meter_list,True,q=q)
+                status,stat_list=ceilometer_api.meter_statistics(meters_used[i], config["METERING_URI"],token_id,meter_list,True,q=q)
                 if stat_list==[]:
                     total[i]+=0
                 else:

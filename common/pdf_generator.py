@@ -148,6 +148,64 @@ def generate_pdf(data):
     
     return file_path
 
+def generate_pdf_tenant(data):
+    fileName =  data['prefix'] + data['tenant-name'] + '.pdf'
+    pdf = PDF(data['logo'], data['company'], data['company-address-1'], data['company-address-2'])
+    pdf.alias_nb_pages()
+    pdf.add_page()
+    pdf.set_font('Arial', 'B', 16)
+    pdf.cell(140, 10, 'ICCLab External Cloud Usage Bill for period:', 0, 0, 'L')
+    pdf.set_font('Arial', 'B', 12)
+    month_value = '%s - %s' % (data['bill-start'], data['bill-end'])
+    pdf.cell(50, 10, month_value, 1, 0, 'R')
+    pdf.ln(20)
+    pdf.set_font('Times', 'B', 12)
+    tenant='%s - %s' %(data['tenant-name'],data['tenantid'])
+    pdf.cell(190, 8, tenant, 0, 1, 'R')
+    pdf.set_font('Times', 'I', 10)
+    pdf.cell(190, 1, data['user-address-1'], 0, 1, 'R')
+    pdf.set_font('Times', '', 10)
+    pdf.cell(190, 7, data['user-address-2'], 0, 0, 'R')
+    pdf.ln(30)
+    pdf.section_title('Itemized Price Breakdown')
+    pdf.ln(5)
+    ######## here just go over the itemized data and print out a line
+    pdf.set_font('Times', 'B', 10)
+    pdf.cell(60, 8, 'User name', 1, 0, 'L')
+    pdf.cell(95, 8, 'User ID', 1, 0, 'R')
+    pdf.cell(35, 8, 'Price', 1, 1, 'R')
+    pdf.set_font('Courier', 'I', 10)
+    for key in data['itemized-data'].keys():
+        item = data['itemized-data'][key]
+        pdf.cell(60, 8, str(item['name']), 0, 0, 'L')
+        pdf.cell(95, 8, str(item['id']), 0, 0, 'R')
+        pdf.cell(35, 8, str(round(item['price'],2)), 0, 1, 'R')
+    pdf.set_font('Times', '', 9)
+    if str(data['unit'])=='0.01':
+        pdf.cell(190,7,'* P r i c e s  p e r   u n i t   a r e   i n   c e n t s',0,1,'L')
+    pdf.set_font('Times', 'B', 10)
+    pdf.cell(155, 8, 'Total Amount Due', 1, 0, 'L')
+    pdf.cell(25, 8, str(round(data['amount-due'],2)), 'T B L', 0, 'R')
+    pdf.cell(10,8,str(data['currency']),'T B R',1,'L')
+    ############################
+    pdf.ln(30)
+    pdf.section_title('Important Dates')
+    payment_hint = 'Your payment is due by: %s' % (data['due-date'])
+    pdf.set_font('Times', 'B', 10)
+    pdf.cell(190, 7, payment_hint, 0, 0, 'L')
+    pdf.ln(30)
+    pdf.section_title('Additional Notes')
+    pdf.set_font('Times', '', 9)
+    pdf.section_body(data['notes'])
+    tmp_path=os.path.join(os.path.dirname( __file__ ), '..','..')
+    if not os.path.exists(tmp_path+"/tmp/cyclops/generated-bills/"):
+        os.makedirs(tmp_path+"/tmp/cyclops/generated-bills/")
+    file_path=tmp_path+"/tmp/cyclops/generated-bills/"+fileName
+    pdf.output(name=file_path, dest='F')
+    print fileName
+    
+    return file_path
+
 
 def main(argv):
     now = datetime.datetime.now()
