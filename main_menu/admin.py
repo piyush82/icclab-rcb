@@ -1019,6 +1019,9 @@ class tenantAdmin(admin.ModelAdmin):
                         data['itemized-data'] = {}
                         if stack_user_status==True and pricing_func_status==True:
                             for i in range(len(user_ids)):
+                                usr=StackUser.objects.get(user_id=user_list[i]["user_id"])
+                                user_id=usr.id
+                                func=PricingFunc.objects.get(user_id=user_id)                            
                                 data['currency']=func.currency
                                 data['unit']=func.unit
                                 pricing_list=[]
